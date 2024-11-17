@@ -1,0 +1,39 @@
+package database
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+var Instance *gorm.DB
+
+func Init() {
+	dsn := envs.getDatabaseDSN()
+
+	var err error
+	Instance, err = gorm.Open(postgres.Open(dsn))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	err = migrateTables()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Database connected succesfully!")
+}
+
+func migrateTables() error {
+	err := Instance.AutoMigrate(
+		&models.User{},
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}

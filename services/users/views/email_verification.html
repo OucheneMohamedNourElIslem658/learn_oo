@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        #status {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Email Verification</h1>
+    <div class="spinner"></div>
+    <p id="status"></p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Extract token from the URL
+            const token = window.location.pathname.split('/').pop();
+
+            fetch(`/api/v1/users/auth/verify-email/${token}`)
+                .then(response => response.json().then(data => ({ status: response.status, data })))
+                .then(result => {
+                    const statusElement = document.getElementById("status");
+                    const spinner = document.querySelector(".spinner");
+
+                    spinner.style.display = "none";
+
+                    if (result.status == 200) {
+                        statusElement.textContent = "Your email has been successfully verified!";
+                    } else {
+                        statusElement.textContent = result.data.message
+                    }
+                })
+                .catch(error => {
+                    const statusElement = document.getElementById("status");
+                    const spinner = document.querySelector(".spinner");
+
+                    spinner.style.display = "none"; // Hide spinner when an error occurs
+                    statusElement.textContent = "An error occurred. Please try again later";
+                });
+        });
+    </script>
+</body>
+</html>
