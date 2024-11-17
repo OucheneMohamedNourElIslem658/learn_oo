@@ -28,7 +28,7 @@ func (server *Server) Run() {
 	v1 := router.Group("/api/v1")
 
 	v1.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "<b>Welcome To Learn_oo API V1</b>")
+		ctx.String(http.StatusOK, "Welcome To Learn_oo API V1")
 	})
 
 	subRoute := v1.Group("/users/auth/")

@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
 
 	repositories "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
@@ -195,66 +198,57 @@ func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "reset_password_form.html", nil)
 }
 
-// func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
-// 	provider := r.PathValue("provider")
+func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
+	var body struct {
+		SuccessURL string `json:"success_url"`
+		FailureURL string `json:"failure_url"`
+	}
 
-// 	var body struct {
-// 		IsAdmin bool `json:"is_admin"`
-// 		SuccessURL string `json:"success_url"`
-// 		FailureURL string `json:"failure_url"`
-// 	}
+	provider := ctx.Param("provider")
+	successURL := ctx.Query("success_url")
+	failureURL := ctx.Query("failure_url")
 
-// 	query := r.URL.Query()
-// 	isAdminString := query.Get("is_admin")
-// 	isAdmin, _ := strconv.ParseBool(isAdminString)
-// 	body.IsAdmin = isAdmin
+	body.SuccessURL = successURL
+	body.FailureURL = failureURL
+	bodyBytes, _ := json.Marshal(&body)
 
-// 	successURL := query.Get("success_url")
-// 	failureURL := query.Get("failure_url")
-// 	body.SuccessURL = successURL
-// 	body.FailureURL = failureURL
+	authRepository := authcontroller.authRepository
+	if result, err := authRepository.OAuth(provider, successURL, failureURL); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+	} else {
+		oauthConfig := result["oauthConfig"].(*oauth2.Config)
+	    url := oauthConfig.AuthCodeURL(string(bodyBytes), oauth2.AccessTypeOffline)
+		ctx.Redirect(http.StatusTemporaryRedirect, url)
+	}
+}
 
-// 	bodyBytes, _ := json.Marshal(&body)
+func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
+	provider := ctx.Param("provider")
 
-// 	authRepository := authcontroller.authRepository
-// 	status, result := authRepository.OAuth(provider, successURL, failureURL)
-// 	if status != http.StatusOK {
-// 		w.WriteHeader(status)
-// 		reponse, _ := json.Marshal(result)
-// 		w.Write(reponse)
-// 		return
-// 	}
+	var metadata struct {
+		SuccessURL string `json:"success_url"`
+		FailureURL string `json:"failure_url"`
+	}
+	code := ctx.Query("code")
+	state := ctx.Query("state")
+	json.Unmarshal([]byte(state), &metadata)
 
-// 	oauthConfig := result["oauthConfig"].(*oauth2.Config)
-// 	url := oauthConfig.AuthCodeURL(string(bodyBytes), oauth2.AccessTypeOffline)
-// 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-// }
-
-// func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
-// 	provider := r.PathValue("provider")
-
-// 	query := r.URL.Query()
-// 	code := query.Get("code")
-
-// 	var metadata struct {
-// 		IsAdmin bool `json:"is_admin"`
-// 		SuccessURL string `json:"success_url"`
-// 		FailureURL string `json:"failure_url"`
-// 	}
-// 	state := query.Get("state")
-// 	json.Unmarshal([]byte(state), &metadata)
-
-// 	authRepository := authcontroller.authRepository
-// 	status, result := authRepository.OAuthCallback(provider, code, metadata.IsAdmin, r.Context())
-// 	if status == http.StatusOK {
-// 		if idToken, ok := result["id_token"].(string); ok {
-// 			http.Redirect(w, r, fmt.Sprintf("%v?id_token=%v", metadata.SuccessURL, idToken), http.StatusFound)
-// 		} else {
-// 			err := errors.New("INTERNAL_SERVER_ERROR")
-// 			http.Redirect(w, r, fmt.Sprintf("%v?error=%v", metadata.FailureURL, err.Error()), http.StatusFound)
-// 		}
-// 		return
-// 	}
-
-// 	http.Redirect(w, r, fmt.Sprintf("%v?error=%v", metadata.FailureURL, result["error"]), http.StatusFound)
-// }
+	authRepository := authcontroller.authRepository
+	
+	if result, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
+		ctx.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message))
+	} else {
+		idToken, okIdToken := result["idToken"].(string)
+		refreshToken, okRefreshToken := result["refreshToken"].(string)
+		if okIdToken && okRefreshToken {
+			ctx.SetCookie("id_token", idToken, 3600, "/", "localhost", false, true)
+		    ctx.SetCookie("refresh_token", refreshToken, 3600, "/", "localhost", false, true)
+			ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
+		} else {
+			err := errors.New("casting tokens failed")
+			ctx.Redirect(http.StatusInternalServerError, fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Error()))
+		}
+	}
+}

@@ -432,6 +432,14 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 		}
 	}
 
+	refreshToken, err := authUtils.CreateRefreshToken(existingUser.ID)
+	if err != nil {
+		return nil, &sharedUtils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+	}
+
 	idToken, err := authUtils.CreateIdToken(
 		existingUser.ID,
 		existingUser.Email,
@@ -445,6 +453,7 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 	}
 
 	return gin.H{
-		"id_token": idToken,
+		"idToken": idToken,
+		"refreshToken": refreshToken,
 	}, nil
 }

@@ -9,7 +9,7 @@ import (
 
 var secretKey = []byte("learn_oo")
 
-func CreateIdToken(id uint, email string, emailVerified bool) (string, error) {
+func CreateIdToken(id string, email string, emailVerified bool) (string, error) {
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
@@ -55,7 +55,7 @@ func VerifyToken(idToken string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func CreateRefreshToken(id uint) (string, error) {
+func CreateRefreshToken(id string) (string, error) {
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
