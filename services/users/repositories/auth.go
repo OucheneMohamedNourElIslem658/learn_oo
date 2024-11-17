@@ -389,15 +389,25 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 		EmailVerified: emailVerified,
 	}
 
+	fmt.Println(userData)
+
 	// Handle the profile pic url:
 
 	switch provider {
 	case "google":
 		user.FullName = userData["name"].(string)
 		user.Email = userData["email"].(string)
+		user.Image = &models.File{
+			URL: userData["picture"].(string),
+		}
 	case "facebook":
 		user.FullName = userData["name"].(string)
 		user.Email = userData["email"].(string)
+		user.Image = &models.File{
+			URL: userData["picture"].(map[string]interface {})["data"].
+			    (map[string]interface {})["url"].
+				(string),
+		}
 	}
 
 	var database = authRepo.database
@@ -422,15 +432,14 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 		}
 	}
 
-	if existingUser.Email != user.Email || existingUser.FullName != user.FullName {
-		existingUser.Email = user.Email
-		existingUser.FullName = user.FullName
-		err = database.Save(&existingUser).Error
-		if err != nil {
-			return nil, &sharedUtils.APIError{
-				StatusCode: http.StatusInternalServerError,
-				Message: err.Error(),
-			}
+	existingUser.Email = user.Email
+	existingUser.FullName = user.FullName
+	existingUser.Image = user.Image
+	err = database.Save(&existingUser).Error
+	if err != nil {
+		return nil, &sharedUtils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message: err.Error(),
 		}
 	}
 
