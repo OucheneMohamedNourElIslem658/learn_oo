@@ -7,8 +7,8 @@ import (
 )
 
 type Provider struct {
-	Config     *oauth2.Config
-	UserInfoURL string
+	Config       *oauth2.Config
+	UserInfoURL  string
 	EmailInfoURL string
 }
 
@@ -36,7 +36,7 @@ func Init() {
 				Scopes:       []string{"public_profile", "email"},
 				Endpoint:     facebook.Endpoint,
 			},
-			UserInfoURL: "https://graph.facebook.com/me?fields=id,name,email",
+			UserInfoURL: "https://graph.facebook.com/me?fields=id,name,email,picture",
 		},
 	}
 }
