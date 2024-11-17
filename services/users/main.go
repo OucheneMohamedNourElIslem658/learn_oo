@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	database "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/database"
 	email "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/email"
 	oauthproviders "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/oauth_providers"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
+	"github.com/joho/godotenv"
 )
 
 func init()  {
@@ -15,6 +19,9 @@ func init()  {
 }
 
 func main() {
-	server := NewServer("127.0.0.1:8000")
+	godotenv.Load();
+	host := os.Getenv("HOST")
+	
+	server := NewServer(fmt.Sprintf("%v:8000", host))
 	server.Run()
 }

@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 
 	repositories "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
@@ -219,7 +221,7 @@ func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 		})
 	} else {
 		oauthConfig := result["oauthConfig"].(*oauth2.Config)
-	    url := oauthConfig.AuthCodeURL(string(bodyBytes), oauth2.AccessTypeOffline)
+		url := oauthConfig.AuthCodeURL(string(bodyBytes), oauth2.AccessTypeOffline)
 		ctx.Redirect(http.StatusTemporaryRedirect, url)
 	}
 }
@@ -236,15 +238,17 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	json.Unmarshal([]byte(state), &metadata)
 
 	authRepository := authcontroller.authRepository
-	
+
 	if result, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
 		ctx.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message))
 	} else {
 		idToken, okIdToken := result["idToken"].(string)
 		refreshToken, okRefreshToken := result["refreshToken"].(string)
 		if okIdToken && okRefreshToken {
-			ctx.SetCookie("id_token", idToken, 3600, "/", "localhost", false, true)
-		    ctx.SetCookie("refresh_token", refreshToken, 3600, "/", "localhost", false, true)
+			godotenv.Load()
+			host := os.Getenv("HOST")
+			ctx.SetCookie("id_token", idToken, 3600, "/", host, false, true)
+			ctx.SetCookie("refresh_token", refreshToken, 3600, "/", host, false, true)
 			ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 		} else {
 			err := errors.New("casting tokens failed")

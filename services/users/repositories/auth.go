@@ -389,6 +389,8 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 		EmailVerified: emailVerified,
 	}
 
+	// Handle the profile pic url:
+
 	switch provider {
 	case "google":
 		user.FullName = userData["name"].(string)

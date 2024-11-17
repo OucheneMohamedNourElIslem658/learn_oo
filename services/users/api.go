@@ -20,7 +20,8 @@ func NewServer(address string) *Server {
 }
 
 func (server *Server) Run() {
-	router := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.New()
 
 	router.Use(gin.Logger())
 	router.LoadHTMLGlob("./views/*")
