@@ -31,6 +31,6 @@ func (authRouter *AuthRouter) RegisterRoutes() {
 	router.POST("/send-password-reset-link", authController.SendPasswordResetLink)
 	router.GET("/serve-reset-password-form/:id-token", authController.ServeResetPasswordForm)
 	router.POST("/reset-password/:id-token", authController.ResetPassword)
-	router.GET("/oauth/:provider", authController.OAuth)
+	router.GET("/oauth/:provider/login", authController.OAuth)
 	router.GET("/oauth/:provider/callback", authController.OAuthCallback)
 }
