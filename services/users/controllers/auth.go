@@ -240,19 +240,21 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	authRepository := authcontroller.authRepository
 
 	if result, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
-		ctx.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message))
+		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
+		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
 		idToken, okIdToken := result["idToken"].(string)
 		refreshToken, okRefreshToken := result["refreshToken"].(string)
 		if okIdToken && okRefreshToken {
-			godotenv.Load()
+			godotenv.Load("../../.env")
 			host := os.Getenv("HOST")
 			ctx.SetCookie("id_token", idToken, 3600, "/", host, false, true)
 			ctx.SetCookie("refresh_token", refreshToken, 3600, "/", host, false, true)
 			ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 		} else {
 			err := errors.New("casting tokens failed")
-			ctx.Redirect(http.StatusInternalServerError, fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Error()))
+			successURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Error())
+			ctx.Redirect(http.StatusInternalServerError, successURL)
 		}
 	}
 }

@@ -29,14 +29,14 @@ type Customer struct {
 func (p *Payment) CreateCustomer(email, name string) (customer *Customer, err error) {
 	instance := p.instance
 
-	client := resty.New()
+	user := resty.New()
 
 	requestBody := Customer{
 		Email: email,
 		Name:  name,
 	}
 
-	resp, err := client.R().
+	resp, err := user.R().
 		SetHeader("Authorization", fmt.Sprintf("Bearer %v", instance.SecretKey)).
 		SetHeader("Content-Type", "application/json").
 		SetBody(requestBody).
@@ -77,7 +77,7 @@ func (p *Payment) CreateProduct(course models.Course) (product *Product, err err
 		return nil, fmt.Errorf("price is required")
 	}
 
-	client := resty.New()
+	user := resty.New()
 
 	requestBody := gin.H{
 		"name":        course.Title,
@@ -89,7 +89,7 @@ func (p *Payment) CreateProduct(course models.Course) (product *Product, err err
 		requestBody["images"] = images
 	}
 
-	resp, err := client.R().
+	resp, err := user.R().
 		SetHeader("Authorization", fmt.Sprintf("Bearer %v", instance.SecretKey)).
 		SetHeader("Content-Type", "application/json").
 		SetBody(requestBody).
@@ -145,7 +145,7 @@ func (p *Payment) createPrice(amount int, currency, productID string) (price *Pr
 		return nil, fmt.Errorf("product is required")
 	}
 
-	client := resty.New()
+	user := resty.New()
 
 	requestBody := Price{
 		ProductID: productID,
@@ -153,7 +153,7 @@ func (p *Payment) createPrice(amount int, currency, productID string) (price *Pr
 		Currency:  currency,
 	}
 
-	resp, err := client.R().
+	resp, err := user.R().
 		SetHeader("Authorization", fmt.Sprintf("Bearer %v", instance.SecretKey)).
 		SetHeader("Content-Type", "application/json").
 		SetBody(requestBody).
@@ -183,7 +183,7 @@ type Checkout struct {
 func (p *Payment) MakePayment(senderPaymentID, successURL, failureURL string, courses []models.Course) (checkout *Checkout, err error) {
 	instance := p.instance
 
-	client := resty.New()
+	user := resty.New()
 
 	requestBody := gin.H{
 		"success_url": successURL,
@@ -209,7 +209,7 @@ func (p *Payment) MakePayment(senderPaymentID, successURL, failureURL string, co
 	requestBytes, _ := json.MarshalIndent(&requestBody, "\t", "")
 	fmt.Println(string(requestBytes))
 
-	resp, err := client.R().
+	resp, err := user.R().
 		SetHeader("Authorization", fmt.Sprintf("Bearer %v", instance.SecretKey)).
 		SetHeader("Content-Type", "application/json").
 		SetBody(requestBody).

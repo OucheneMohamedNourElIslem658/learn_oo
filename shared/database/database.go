@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
+	// "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -29,26 +29,26 @@ func Init() {
 }
 
 func migrateTables() error {
-	err := Instance.AutoMigrate(
-		&models.User{},
-		&models.Author{},
-		&models.Course{},
-		&models.Category{},
-		&models.CourseCategory{},
-		&models.Chapter{},
-		&models.Lesson{},
-		&models.LessonLearner{},
-		&models.CourseLearner{},
-		&models.Test{},
-		&models.Question{},
-		&models.Option{},
-		&models.TestResult{},
-		&models.File{},
-		&models.Comment{},
-		&models.Notification{},
-	)
-	if err != nil {
-		return err
-	}
+	// err := Instance.AutoMigrate(
+	// 	&models.User{},
+	// 	&models.Author{},
+	// 	&models.Course{},
+	// 	&models.Category{},
+	// 	&models.CourseCategory{},
+	// 	&models.Chapter{},
+	// 	&models.Lesson{},
+	// 	&models.LessonLearner{},
+	// 	&models.CourseLearner{},
+	// 	&models.Test{},
+	// 	&models.Question{},
+	// 	&models.Option{},
+	// 	&models.TestResult{},
+	// 	&models.File{},
+	// 	&models.Comment{},
+	// 	&models.Notification{},
+	// )
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
