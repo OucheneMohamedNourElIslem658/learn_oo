@@ -15,7 +15,7 @@ type config struct {
 var envs = initAPI()
 
 func initAPI() config {
-	godotenv.Load()
+	godotenv.Load("../../.env")
 	return config{
 		publicKey: os.Getenv("IMAGEKIT_PUBLIC_KEY"),
 		privateKey: os.Getenv("IMAGEKIT_PRIVATE_KEY"),

@@ -11,10 +11,12 @@ import (
 	"github.com/imagekit-developer/imagekit-go/api/uploader"
 )
 
-var instance *imagekit.ImageKit
+type FileStorage struct {
+	instance *imagekit.ImageKit
+}
 
-func Init() {
-	instance = imagekit.NewFromParams(imagekit.NewParams{
+func NewFileStorage() *FileStorage {
+	instance := imagekit.NewFromParams(imagekit.NewParams{
 		PrivateKey: envs.privateKey,
 		PublicKey: envs.publicKey,
 		UrlEndpoint: envs.endpointURL,
@@ -23,11 +25,16 @@ func Init() {
 	if instance == nil {
 		log.Fatal("File Storage failed to connect!")
 	}
-
 	fmt.Println("File storage connected succesfully!")
+
+	return &FileStorage{
+		instance: instance,
+	}
 }
 
-func UploadFile(file multipart.File, folder string) (data *uploader.UploadResult, err error) {
+func (fs *FileStorage) UploadFile(file multipart.File, folder string) (data *uploader.UploadResult, err error) {
+	instance := fs.instance
+
 	response, err := instance.Uploader.Upload(
 		context.Background(),
 		file,
@@ -42,7 +49,8 @@ func UploadFile(file multipart.File, folder string) (data *uploader.UploadResult
 	return &response.Data, err
 }
 
-func UploadFiles(files []multipart.File, folder string) (upload []*uploader.UploadResult, errs []string) {
+func (fs *FileStorage) UploadFiles(files []multipart.File, folder string) (upload []*uploader.UploadResult, errs []string) {
+	instance := fs.instance
 	results := make([]*uploader.UploadResult, len(files))
 	errors := make([]string, len(files))
 
@@ -72,7 +80,8 @@ func UploadFiles(files []multipart.File, folder string) (upload []*uploader.Uplo
 	return results, errs
 }
 
-func DeleteFile(id string) error {
+func (fs *FileStorage) DeleteFile(id string) error {
+	instance := fs.instance
 	_, err := instance.Media.DeleteFile(context.Background(), id)
 	return err
 }
