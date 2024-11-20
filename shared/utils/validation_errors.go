@@ -3,6 +3,9 @@ package utils
 import (
 	"errors"
 	"log"
+	"mime/multipart"
+	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -43,4 +46,14 @@ func InitValidators()  {
 	if err := initPasswordValidator(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func IsImage(file multipart.File) bool {
+	buffer := make([]byte, 512)
+	_, err := file.Read(buffer)
+	if err != nil {
+		return false
+	}
+	contentType := http.DetectContentType(buffer)
+	return strings.HasPrefix(contentType, "image/")
 }

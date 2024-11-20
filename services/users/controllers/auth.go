@@ -13,6 +13,7 @@ import (
 
 	repositories "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
+	authUtils "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/utils"
 )
 
 type AuthController struct {
@@ -100,24 +101,31 @@ func (authcontroller *AuthController) VerifyEmail(ctx *gin.Context) {
 
 	idToken := ctx.Param("id-token")
 	authorization := fmt.Sprintf("Bearer %v", idToken)
-	result, err := authRepository.Authorization(authorization)
+	email, isValid, err := authUtils.VerifyIDTokenFromEmail(authorization)
 
-	if err == nil {
-		email := result["email"].(string)
-		if err := authRepository.VerifyEmail(email); err != nil {
-			ctx.JSON(err.StatusCode, gin.H{
-				"message": err.Message,
-			})
-			return
-		}
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Your email has been verified!",
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
 		})
 		return
 	}
 
-	ctx.JSON(err.StatusCode, gin.H{
-		"message": err.Message,
+	if !isValid {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token expired",
+		})
+		return
+	}
+
+	if err := authRepository.VerifyEmail(*email); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Your email has been verified!",
 	})
 }
 
@@ -179,21 +187,30 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 
 	idToken := ctx.Param("id-token")
 	authorization := fmt.Sprintf("Bearer %v", idToken)
-	if result, err := authRepository.Authorization(authorization); err != nil {
+	email, isValid, err := authUtils.VerifyIDTokenFromEmail(authorization)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if !isValid {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token expired",
+		})
+		return
+	}
+
+	newPassword := body.Password
+	if err := authRepository.ResetPassword(*email, newPassword); err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": err.Message,
 		})
-	} else {
-		email := result["email"].(string)
-		newPassword := body.Password
-		if err = authRepository.ResetPassword(email, newPassword); err != nil {
-			ctx.JSON(http.StatusOK, gin.H{
-				"message": err.Message,
-			})
-			return
-		}
-		ctx.Status(http.StatusOK)
+		return
 	}
+	ctx.Status(http.StatusOK)
 }
 
 func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {

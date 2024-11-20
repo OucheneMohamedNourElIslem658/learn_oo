@@ -18,32 +18,32 @@ import (
 )
 
 type AuthRepository struct {
-	database *gorm.DB
+	database  *gorm.DB
 	providers oauthproviders.Providers
 }
 
 func NewAuthRepository() *AuthRepository {
 	return &AuthRepository{
-		database: database.Instance,
+		database:  database.Instance,
 		providers: oauthproviders.Instance,
 	}
 }
 
-func (authRepo *AuthRepository) RegisterWithEmailAndPassword(fullName, email, password string) (apiError *sharedUtils.APIError) {
-	database := authRepo.database
+func (ar *AuthRepository) RegisterWithEmailAndPassword(fullName, email, password string) (apiError *sharedUtils.APIError) {
+	database := ar.database
 
 	var exist bool
 	err := database.Model(&models.User{}).Select("count(*) > 0").Where("email = ?", email).Find(&exist).Error
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 	if exist {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "email already in use",
+			Message:    "email already in use",
 		}
 	}
 
@@ -51,39 +51,39 @@ func (authRepo *AuthRepository) RegisterWithEmailAndPassword(fullName, email, pa
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	err = database.Create(&models.User{
 		FullName: fullName,
 		Password: hashedPassword,
-		Email: email,
+		Email:    email,
 	}).Error
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 	return nil
 }
 
-func (authRepo *AuthRepository) LoginWithEmailAndPassword(email, password string) (result gin.H, apiError *sharedUtils.APIError) {
-	database := authRepo.database
+func (ar *AuthRepository) LoginWithEmailAndPassword(email, password string) (result gin.H, apiError *sharedUtils.APIError) {
+	database := ar.database
 
 	var storedUser models.User
-	err := database.Where("email = ?", email).First(&storedUser).Error
+	err := database.Where("email = ?", email).Preload("AuthorProfile").First(&storedUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &sharedUtils.APIError{
 				StatusCode: http.StatusBadGateway,
-				Message: "email not found",
+				Message:    "email not found",
 			}
 		} else {
 			return nil, &sharedUtils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message: err.Error(),
+				Message:    err.Error(),
 			}
 		}
 	}
@@ -92,26 +92,34 @@ func (authRepo *AuthRepository) LoginWithEmailAndPassword(email, password string
 	if !passwordMatches {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: "wrong password",
+			Message:    "wrong password",
 		}
 	}
 
 	if emailVerified := storedUser.EmailVerified; !emailVerified {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: "email not verified",
+			Message:    "email not verified",
 		}
 	}
 
+	author := storedUser.AuthorProfile
+    authorID := func() *string {
+		if author == nil {
+			return nil
+		}
+		return &author.ID
+	}()
+
 	idToken, err := authUtils.CreateIdToken(
 		storedUser.ID,
-		storedUser.Email,
+		authorID,
 		storedUser.EmailVerified,
 	)
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -119,43 +127,17 @@ func (authRepo *AuthRepository) LoginWithEmailAndPassword(email, password string
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return gin.H{
-		"idToken": idToken,
+		"idToken":      idToken,
 		"refreshToken": refreshToken,
 	}, nil
 }
 
-func (authRepo *AuthRepository) Authorization(authorization string) (result gin.H,apiError *sharedUtils.APIError) {
-	if authorization == "" {
-		return nil, &sharedUtils.APIError{
-			StatusCode: http.StatusBadRequest,
-			Message: "undefined authorization",
-		}
-	}
-	idToken := authorization[len("Bearer "):]
-	claims, err := authUtils.VerifyToken(idToken)
-	if err != nil {
-		return nil, &sharedUtils.APIError{
-			StatusCode: http.StatusUnauthorized,
-			Message: err.Error(),
-		}
-	}
-
-	return gin.H{
-		"email":         claims["email"],
-		"id":            claims["id"],
-		"emailVerified": claims["emailVerified"],
-		"isAdmin":       claims["isAdmin"],
-		"disabled":      claims["disabled"],
-		"idToken":       idToken,
-	}, nil
-}
-
-func (authRepo *AuthRepository) AuthorizationWithEmailVerification(emailVerified bool) (apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) AuthorizationWithEmailVerification(emailVerified bool) (apiError *sharedUtils.APIError) {
 	if !emailVerified {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusUnauthorized,
@@ -165,11 +147,11 @@ func (authRepo *AuthRepository) AuthorizationWithEmailVerification(emailVerified
 	return nil
 }
 
-func (authRepo *AuthRepository) RefreshIdToken(authorization string) (result gin.H, apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) RefreshIdToken(authorization string) (result gin.H, apiError *sharedUtils.APIError) {
 	if authorization == "" {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "undefined authorization",
+			Message:    "undefined authorization",
 		}
 	}
 
@@ -177,7 +159,7 @@ func (authRepo *AuthRepository) RefreshIdToken(authorization string) (result gin
 	if refreshToken == "" {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "undefined refresh token",
+			Message:    "undefined refresh token",
 		}
 	}
 
@@ -185,37 +167,53 @@ func (authRepo *AuthRepository) RefreshIdToken(authorization string) (result gin
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusUnauthorized,
+			Message: "refresh token expired",
 		}
 	}
 
-	database := authRepo.database
+	database := ar.database
 
-	id := uint(claims["id"].(float64))
+	id, ok := claims["id"].(*string)
+	if !ok {
+		return nil, &sharedUtils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message: "casting id failed",
+		}
+	}
+
 	var idToken string
 	var user models.User
-	err = database.Where("id = ?", id).First(&user).Error
+	err = database.Where("id = ?", *id).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &sharedUtils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message:  "user not found",
+				Message:    "user not found",
 			}
 		}
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
+	author := user.AuthorProfile
+    authorID := func() *string {
+		if author == nil {
+			return nil
+		}
+		return &author.ID
+	}()
+
 	idToken, err = authUtils.CreateIdToken(
 		user.ID,
-		user.Email,
+		authorID,
 		user.EmailVerified,
 	)
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -224,12 +222,12 @@ func (authRepo *AuthRepository) RefreshIdToken(authorization string) (result gin
 	}, nil
 }
 
-func (authRepo *AuthRepository) SendEmailVerificationLink(toEmail string, url string) (apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) SendEmailVerificationLink(toEmail string, url string) (apiError *sharedUtils.APIError) {
 	idToken, err := authUtils.CreateIdTokenFromEmail(toEmail)
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -241,15 +239,15 @@ func (authRepo *AuthRepository) SendEmailVerificationLink(toEmail string, url st
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (authRepo *AuthRepository) VerifyEmail(email string) (apiError *sharedUtils.APIError) {
-	database := authRepo.database
+func (ar *AuthRepository) VerifyEmail(email string) (apiError *sharedUtils.APIError) {
+	database := ar.database
 
 	var user models.User
 	err := database.Where("email = ?", email).First(&user).Error
@@ -257,19 +255,19 @@ func (authRepo *AuthRepository) VerifyEmail(email string) (apiError *sharedUtils
 		if err == gorm.ErrRecordNotFound {
 			return &sharedUtils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message: "email not found",
+				Message:    "email not found",
 			}
 		}
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	if user.EmailVerified {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "user already verified",
+			Message:    "user already verified",
 		}
 	}
 
@@ -277,19 +275,19 @@ func (authRepo *AuthRepository) VerifyEmail(email string) (apiError *sharedUtils
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (authRepo *AuthRepository) SendPasswordResetLink(toEmail string, url string) (apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) SendPasswordResetLink(toEmail string, url string) (apiError *sharedUtils.APIError) {
 	idToken, err := authUtils.CreateIdTokenFromEmail(toEmail)
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -300,21 +298,21 @@ func (authRepo *AuthRepository) SendPasswordResetLink(toEmail string, url string
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (authRepo *AuthRepository) ResetPassword(email string, newPassword string) (error *sharedUtils.APIError) {
-	database := authRepo.database
+func (ar *AuthRepository) ResetPassword(email string, newPassword string) (error *sharedUtils.APIError) {
+	database := ar.database
 
 	newPasswordHash, err := authUtils.HashPassword(newPassword)
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -322,46 +320,46 @@ func (authRepo *AuthRepository) ResetPassword(email string, newPassword string) 
 	if err != nil {
 		return &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (authRepo *AuthRepository) OAuth(provider string, successURL string, failureURL string) (result gin.H, apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) OAuth(provider string, successURL string, failureURL string) (result gin.H, apiError *sharedUtils.APIError) {
 	ok := oauthproviders.IsSupportedProvider(provider)
 	if !ok {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "provider not supported",
+			Message:    "provider not supported",
 		}
 	}
-	providers := authRepo.providers
+	providers := ar.providers
 	oauthConfig := providers[provider].Config
 
 	return gin.H{
 		"oauthConfig": oauthConfig,
-	},nil
+	}, nil
 }
 
-func (authRepo *AuthRepository) OAuthCallback(provider string, code string, context context.Context) (result gin.H, apiError *sharedUtils.APIError) {
+func (ar *AuthRepository) OAuthCallback(provider string, code string, context context.Context) (result gin.H, apiError *sharedUtils.APIError) {
 	ok := oauthproviders.IsSupportedProvider(provider)
 	if !ok {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: "provider not supported",
+			Message:    "provider not supported",
 		}
 	}
 
-	authProvider := authRepo.providers[provider]
+	authProvider := ar.providers[provider]
 
 	oauthConfig := authProvider.Config
 	token, err := oauthConfig.Exchange(context, code)
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -370,7 +368,7 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 	defer response.Body.Close()
@@ -379,7 +377,7 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 	if err := json.NewDecoder(response.Body).Decode(&userData); err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -404,13 +402,11 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 		user.FullName = userData["name"].(string)
 		user.Email = userData["email"].(string)
 		user.Image = &models.File{
-			URL: userData["picture"].(map[string]interface {})["data"].
-			    (map[string]interface {})["url"].
-				(string),
+			URL: userData["picture"].(map[string]interface{})["data"].(map[string]interface{})["url"].(string),
 		}
 	}
 
-	var database = authRepo.database
+	var database = ar.database
 
 	var existingUser models.User
 	err = database.Where("email = ?", user.Email).First(&existingUser).Error
@@ -420,14 +416,14 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 			if err != nil {
 				return nil, &sharedUtils.APIError{
 					StatusCode: http.StatusInternalServerError,
-					Message: err.Error(),
+					Message:    err.Error(),
 				}
 			}
 			existingUser = user
 		} else {
 			return nil, &sharedUtils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message: err.Error(),
+				Message:    err.Error(),
 			}
 		}
 	}
@@ -439,7 +435,7 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -447,24 +443,32 @@ func (authRepo *AuthRepository) OAuthCallback(provider string, code string, cont
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
+	author := existingUser.AuthorProfile
+    authorID := func() *string {
+		if author == nil {
+			return nil
+		}
+		return &author.ID
+	}()
+
 	idToken, err := authUtils.CreateIdToken(
 		existingUser.ID,
-		existingUser.Email,
+		authorID,
 		existingUser.EmailVerified,
 	)
 	if err != nil {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return gin.H{
-		"idToken": idToken,
+		"idToken":      idToken,
 		"refreshToken": refreshToken,
 	}, nil
 }

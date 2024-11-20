@@ -5,8 +5,10 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
+	"time"
 
 	gorm "gorm.io/gorm"
+	clause "gorm.io/gorm/clause"
 
 	database "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/database"
 	filestorage "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/file_storage"
@@ -95,12 +97,12 @@ func (pr *ProfilesRepository) UpdateUser(id, fullName string) (apiError *utils.A
 	}
 }
 
-func (pr *ProfilesRepository) UpdateUserImage(image multipart.File, userID string) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) UpdateUserImage(id string, image multipart.File) (apiError *utils.APIError) {
 	database := pr.database
 	filestorage := pr.fileStorage
 
 	var existingImage models.File
-	err := database.Where("user_id = ?", userID).First(&existingImage).Error
+	err := database.Where("user_id = ?", id).First(&existingImage).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -125,7 +127,7 @@ func (pr *ProfilesRepository) UpdateUserImage(image multipart.File, userID strin
 		}
 	}
 
-	path := fmt.Sprintf("learn_oo/images/users/%v", userID)
+	path := fmt.Sprintf("learn_oo/images/users/%v", id)
 	uploadData, err := filestorage.UploadFile(image, path)
 	if err != nil {
 		return &utils.APIError{
@@ -138,7 +140,7 @@ func (pr *ProfilesRepository) UpdateUserImage(image multipart.File, userID strin
 		URL:          uploadData.Url,
 		ImageKitID:   &uploadData.FileId,
 		ThumbnailURL: &uploadData.ThumbnailUrl,
-		UserID:       &userID,
+		UserID:       &id,
 	}
 	if err := database.Create(&newImage).Error; err != nil {
 		return &utils.APIError{
@@ -152,66 +154,85 @@ func (pr *ProfilesRepository) UpdateUserImage(image multipart.File, userID strin
 	}
 }
 
-func (pr *ProfilesRepository) UpgradeToAuthor(id uint) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIError) {
 	database := pr.database
 	var user models.User
-	err := database.Where("id = ?", user).Preload("AuthorProfile").First(&user).Error
+
+	err := database.Where("id = ?", id).Preload("AuthorProfile").First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return &utils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message: "user not found",
+				Message:    "user not found",
 			}
 		}
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
-	if user.AuthorProfile == nil {
-		author := models.Author{
-			UserID: user.ID,
+
+	if user.AuthorProfile != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "user is already an author",
 		}
-		err := database.Create(&author).Error
+	}
+
+	var author models.Author
+	err = database.Unscoped().Where("user_id = ?", user.ID).First(&author).Error
+	if err == nil {
+		author.DeletedAt = gorm.DeletedAt{Time: time.Time{}, Valid: false}
+		err = database.Select(clause.Associations).Save(&author).Error
 		if err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message: err.Error(),
+				Message:    err.Error(),
 			}
 		}
-
 		return nil
+	} else if err != gorm.ErrRecordNotFound {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
 	}
 
-	return &utils.APIError{
-		StatusCode: http.StatusBadRequest,
-		Message: "user is already an author",
+	author = models.Author{UserID: user.ID}
+	err = database.Create(&author).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
 	}
+
+	return nil
 }
 
-func (pr *ProfilesRepository) DowngradeFromAuthor(id, userID string) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) DowngradeFromAuthor(authorID string) (apiError *utils.APIError) {
 	database := pr.database
 	var author models.Author
-	deleteResult := database.Where("id = ? and user_id = ?", id, userID).Unscoped().Delete(&author)
+	deleteResult := database.Where("id = ?", authorID).Select(clause.Associations).Delete(&author)
 	err := deleteResult.Error
 	affectedRows := deleteResult.RowsAffected
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 	if affectedRows == 0 {
 		return &utils.APIError{
 			StatusCode: http.StatusNotFound,
-			Message: "author not found",
+			Message:    "author not found",
 		}
 	}
-	
+
 	return nil
 }
 
-func (pr *ProfilesRepository) UpdateAuthor(id, userID string, bio gin.H) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiError *utils.APIError) {
 	database := pr.database
 
 	var existingAuthor models.Author
@@ -220,13 +241,13 @@ func (pr *ProfilesRepository) UpdateAuthor(id, userID string, bio gin.H) (apiErr
 		if err == gorm.ErrRecordNotFound {
 			return &utils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message: "author not found",
+				Message:    "author not found",
 			}
 		}
 
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
@@ -238,20 +259,20 @@ func (pr *ProfilesRepository) UpdateAuthor(id, userID string, bio gin.H) (apiErr
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (pr *ProfilesRepository) AddAuthorAccomplishments(id string, files []multipart.File) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []multipart.File) (apiError *utils.APIError) {
 	filestorage := pr.fileStorage
-	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/files/authors/%v", id))
+	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/files/authors/%v", authorID))
 	if errs != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: strings.Join(errs, " "),
+			Message:    strings.Join(errs, " "),
 		}
 	}
 
@@ -264,7 +285,7 @@ func (pr *ProfilesRepository) AddAuthorAccomplishments(id string, files []multip
 				URL:          fileUploadData.Url,
 				ThumbnailURL: &fileUploadData.ThumbnailUrl,
 				ImageKitID:   &fileUploadData.FileId,
-				AuthorID:     &id,
+				AuthorID:     &authorID,
 			}
 			accomplishments = append(accomplishments, file)
 		}
@@ -274,31 +295,31 @@ func (pr *ProfilesRepository) AddAuthorAccomplishments(id string, files []multip
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
 	return nil
 }
 
-func (pr *ProfilesRepository) DeleteAuthorAccomplishment(id uint, authorID string) (apiError *utils.APIError) {
+func (pr *ProfilesRepository) DeleteAuthorAccomplishment(authorID, fileID string) (apiError *utils.APIError) {
 	database := pr.database
 	filestorage := pr.fileStorage
 
 	var file models.File
-	deleteResult := database.Where("id = ? and author_id = ?", id, authorID).Unscoped().Delete(&file)
+	deleteResult := database.Where("id = ? and author_id = ?", fileID, authorID).Unscoped().Delete(&file)
 	err := deleteResult.Error
 	affectedRows := deleteResult.RowsAffected
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 	if affectedRows == 0 {
 		return &utils.APIError{
 			StatusCode: http.StatusNotFound,
-			Message: "file not found",
+			Message:    "file not found",
 		}
 	}
 
@@ -314,7 +335,7 @@ func (pr *ProfilesRepository) DeleteAuthorAccomplishment(id uint, authorID strin
 	return nil
 }
 
-func (pr *ProfilesRepository) GetAuthor(id uint, appendWith string) (author *models.Author, apiError *utils.APIError) {
+func (pr *ProfilesRepository) GetAuthor(authorID string, appendWith string) (author *models.Author, apiError *utils.APIError) {
 	database := pr.database
 	query := database.Model(&models.Author{})
 
@@ -328,17 +349,17 @@ func (pr *ProfilesRepository) GetAuthor(id uint, appendWith string) (author *mod
 	}
 
 	var existingAuthor models.Author
-	err := query.Where("id = ?", id).First(&existingAuthor).Error
+	err := query.Where("id = ?", authorID).First(&existingAuthor).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message: "author not found",
+				Message:    "author not found",
 			}
 		}
 		return nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: err.Error(),
+			Message:    err.Error(),
 		}
 	}
 
