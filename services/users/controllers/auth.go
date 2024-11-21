@@ -13,7 +13,6 @@ import (
 
 	repositories "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
-	authUtils "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/utils"
 )
 
 type AuthController struct {
@@ -57,7 +56,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 		Password string `json:"password" binding:"required,password"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})
 		return
@@ -99,25 +98,9 @@ func (authcontroller *AuthController) SendEmailVerificationLink(ctx *gin.Context
 func (authcontroller *AuthController) VerifyEmail(ctx *gin.Context) {
 	authRepository := authcontroller.authRepository
 
-	idToken := ctx.Param("id-token")
-	authorization := fmt.Sprintf("Bearer %v", idToken)
-	email, isValid, err := authUtils.VerifyIDTokenFromEmail(authorization)
+	email := ctx.GetString("email")
 
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	if !isValid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "token expired",
-		})
-		return
-	}
-
-	if err := authRepository.VerifyEmail(*email); err != nil {
+	if err := authRepository.VerifyEmail(email); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
@@ -183,28 +166,12 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 		return
 	}
 
+	email := ctx.GetString("email")
+
 	authRepository := authcontroller.authRepository
 
-	idToken := ctx.Param("id-token")
-	authorization := fmt.Sprintf("Bearer %v", idToken)
-	email, isValid, err := authUtils.VerifyIDTokenFromEmail(authorization)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	if !isValid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "token expired",
-		})
-		return
-	}
-
 	newPassword := body.Password
-	if err := authRepository.ResetPassword(*email, newPassword); err != nil {
+	if err := authRepository.ResetPassword(email, newPassword); err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": err.Message,
 		})

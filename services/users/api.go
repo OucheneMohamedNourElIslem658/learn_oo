@@ -32,9 +32,13 @@ func (server *Server) Run() {
 		ctx.String(http.StatusOK, "Welcome To Learn_oo API V1")
 	})
 
-	subRoute := v1.Group("/users/auth/")
+	subRoute := v1.Group("/users/auth")
 	authRouter := routers.NewAuthRouter(subRoute)
 	authRouter.RegisterRoutes()
+
+	subRoute = v1.Group("/users/profiles")
+	profilesRouter := routers.NewProfilesRouter(subRoute)
+	profilesRouter.RegisterRoutes()
 
 	fmt.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
 	if err := router.Run(server.address); err != nil {

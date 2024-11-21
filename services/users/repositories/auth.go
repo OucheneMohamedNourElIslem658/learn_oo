@@ -173,7 +173,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (result gin.H, ap
 
 	database := ar.database
 
-	id, ok := claims["id"].(*string)
+	id, ok := claims["id"].(string)
 	if !ok {
 		return nil, &sharedUtils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -183,7 +183,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (result gin.H, ap
 
 	var idToken string
 	var user models.User
-	err = database.Where("id = ?", *id).First(&user).Error
+	err = database.Where("id = ?", id).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &sharedUtils.APIError{

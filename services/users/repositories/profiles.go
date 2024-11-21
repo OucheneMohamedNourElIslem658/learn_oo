@@ -29,8 +29,8 @@ func NewProfilesRepository() *ProfilesRepository {
 	}
 }
 
-func (pr *ProfilesRepository) GetUser(id, appendWith string) (user *models.User, apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) GetUser(id, appendWith string) (user *models.User, apiError *utils.APIError) {
+	database := UsersRouter.database
 
 	query := database.Model(&models.User{})
 
@@ -61,8 +61,8 @@ func (pr *ProfilesRepository) GetUser(id, appendWith string) (user *models.User,
 	return &existingUser, nil
 }
 
-func (pr *ProfilesRepository) UpdateUser(id, fullName string) (apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) UpdateUser(id, fullName string) (apiError *utils.APIError) {
+	database := UsersRouter.database
 
 	var existingUser models.User
 	err := database.Where("id = ?", id).First(&existingUser).Error
@@ -92,14 +92,12 @@ func (pr *ProfilesRepository) UpdateUser(id, fullName string) (apiError *utils.A
 		}
 	}
 
-	return &utils.APIError{
-		StatusCode: http.StatusOK,
-	}
+	return nil
 }
 
-func (pr *ProfilesRepository) UpdateUserImage(id string, image multipart.File) (apiError *utils.APIError) {
-	database := pr.database
-	filestorage := pr.fileStorage
+func (UsersRouter *ProfilesRepository) UpdateUserImage(id string, image multipart.File) (apiError *utils.APIError) {
+	database := UsersRouter.database
+	filestorage := UsersRouter.fileStorage
 
 	var existingImage models.File
 	err := database.Where("user_id = ?", id).First(&existingImage).Error
@@ -154,8 +152,8 @@ func (pr *ProfilesRepository) UpdateUserImage(id string, image multipart.File) (
 	}
 }
 
-func (pr *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIError) {
+	database := UsersRouter.database
 	var user models.User
 
 	err := database.Where("id = ?", id).Preload("AuthorProfile").First(&user).Error
@@ -182,8 +180,9 @@ func (pr *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIErr
 	var author models.Author
 	err = database.Unscoped().Where("user_id = ?", user.ID).First(&author).Error
 	if err == nil {
+		fmt.Println("entered")
 		author.DeletedAt = gorm.DeletedAt{Time: time.Time{}, Valid: false}
-		err = database.Select(clause.Associations).Save(&author).Error
+		err = database.Model(models.Author{}).Set("deleted_at", nil).Where("id = ?", author.ID).Error
 		if err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
@@ -210,8 +209,8 @@ func (pr *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIErr
 	return nil
 }
 
-func (pr *ProfilesRepository) DowngradeFromAuthor(authorID string) (apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) DowngradeFromAuthor(authorID string) (apiError *utils.APIError) {
+	database := UsersRouter.database
 	var author models.Author
 	deleteResult := database.Where("id = ?", authorID).Select(clause.Associations).Delete(&author)
 	err := deleteResult.Error
@@ -232,8 +231,8 @@ func (pr *ProfilesRepository) DowngradeFromAuthor(authorID string) (apiError *ut
 	return nil
 }
 
-func (pr *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiError *utils.APIError) {
+	database := UsersRouter.database
 
 	var existingAuthor models.Author
 	err := database.Where("id = ?", id).First(&existingAuthor).Error
@@ -266,8 +265,8 @@ func (pr *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiError *util
 	return nil
 }
 
-func (pr *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []multipart.File) (apiError *utils.APIError) {
-	filestorage := pr.fileStorage
+func (UsersRouter *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []multipart.File) (apiError *utils.APIError) {
+	filestorage := UsersRouter.fileStorage
 	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/files/authors/%v", authorID))
 	if errs != nil {
 		return &utils.APIError{
@@ -276,7 +275,7 @@ func (pr *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []
 		}
 	}
 
-	database := pr.database
+	database := UsersRouter.database
 	var accomplishments []models.File
 
 	for _, fileUploadData := range uploadData {
@@ -335,8 +334,8 @@ func (pr *ProfilesRepository) DeleteAuthorAccomplishment(authorID, fileID string
 	return nil
 }
 
-func (pr *ProfilesRepository) GetAuthor(authorID string, appendWith string) (author *models.Author, apiError *utils.APIError) {
-	database := pr.database
+func (UsersRouter *ProfilesRepository) GetAuthor(authorID string, appendWith string) (author *models.Author, apiError *utils.APIError) {
+	database := UsersRouter.database
 	query := database.Model(&models.Author{})
 
 	validExtentions := utils.GetValidExtentions(

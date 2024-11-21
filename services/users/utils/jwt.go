@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -13,10 +14,10 @@ func CreateIdToken(id string, authorID *string, emailVerified bool) (string, err
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"id":            id,
+			"id":             id,
 			"email_verified": emailVerified,
-			"author_id": authorID,
-			"exp":           time.Now().Add(time.Hour * 24).Unix(),
+			"author_id":      authorID,
+			"exp":            time.Now().Add(time.Hour * 24).Unix(),
 		},
 	)
 
@@ -28,8 +29,8 @@ func CreateIdTokenFromEmail(email string) (string, error) {
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"email":         email,
-			"exp":           time.Now().Add(time.Minute * 5).Unix(),
+			"email": email,
+			"exp":   time.Now().Add(time.Minute * 5).Unix(),
 		},
 	)
 
@@ -38,9 +39,9 @@ func CreateIdTokenFromEmail(email string) (string, error) {
 }
 
 type Claims struct {
-	ID string;
-	EmailVerified bool;
-	AuthorID *string;
+	ID            string
+	EmailVerified bool
+	AuthorID      *string
 }
 
 func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
@@ -65,10 +66,10 @@ func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
 		userClaims.ID = id
 	}
 
-	if authorID, ok := jwtClaims["author_id"].(*string); !ok {
-		return nil, false, errors.New("casting author id failed")
+	if authorID, ok := jwtClaims["author_id"].(string); !ok {
+		userClaims.AuthorID = nil
 	} else {
-		userClaims.AuthorID = authorID
+		userClaims.AuthorID = &authorID
 	}
 
 	if emailVerified, ok := jwtClaims["email_verified"].(bool); !ok {
@@ -103,6 +104,7 @@ func VerifyIDTokenFromEmail(idToken string) (email *string, isValid bool, err er
 }
 
 func CreateRefreshToken(id string) (string, error) {
+	fmt.Println(id)
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
@@ -130,4 +132,3 @@ func VerifyRefreshToken(refreshToken string) (jwt.MapClaims, error) {
 
 	return claims, nil
 }
-

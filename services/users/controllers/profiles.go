@@ -21,11 +21,11 @@ func NewProfilesController() *ProfilesController {
 	}
 }
 
-func (ac *ProfilesController) GetUser(ctx *gin.Context) {
+func (pc *ProfilesController) GetUser(ctx *gin.Context) {
 	id := ctx.GetString("id")
 	appendWith := ctx.Query("append_with")
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	user, err := profilesRepository.GetUser(id, appendWith)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -37,20 +37,20 @@ func (ac *ProfilesController) GetUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (ac *ProfilesController) UpdateUser(ctx *gin.Context) {
+func (pc *ProfilesController) UpdateUser(ctx *gin.Context) {
 	id := ctx.GetString("id")
 	var body struct {
-		FullName string `json:"full_name" binding:"required"`
+		FullName string `json:"full_name"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})
-		fmt.Println(err)
+		fmt.Println(err.Error())
 		return
 	}
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	err := profilesRepository.UpdateUser(id, body.FullName)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -62,7 +62,7 @@ func (ac *ProfilesController) UpdateUser(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) UpdateUserImage(ctx *gin.Context) {
+func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	id := ctx.GetString("id")
 	image, _, err := ctx.Request.FormFile("image")
 
@@ -82,7 +82,7 @@ func (ac *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	}
 	
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	apiError := profilesRepository.UpdateUserImage(id, image)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
@@ -94,10 +94,10 @@ func (ac *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) UpgradeToAuthor(ctx *gin.Context) {
+func (pc *ProfilesController) UpgradeToAuthor(ctx *gin.Context) {
 	id := ctx.GetString("id")
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	err := profilesRepository.UpgradeToAuthor(id)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -109,10 +109,10 @@ func (ac *ProfilesController) UpgradeToAuthor(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) DowngradeFromAuthor(ctx *gin.Context) {
+func (pc *ProfilesController) DowngradeFromAuthor(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	err := profilesRepository.DowngradeFromAuthor(authorID)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -124,14 +124,21 @@ func (ac *ProfilesController) DowngradeFromAuthor(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) UpdateAuthor(ctx *gin.Context) {
+func (pc *ProfilesController) UpdateAuthor(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
 
 	var body struct {
 		Bio gin.H `json:"bio"`
 	}
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": utils.ValidationErrorResponse(err),
+		})
+		fmt.Println(err.Error())
+		return
+	}
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	err := profilesRepository.UpdateAuthor(authorID, body.Bio)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -143,7 +150,7 @@ func (ac *ProfilesController) UpdateAuthor(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
+func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
 
 	form, err := ctx.MultipartForm()
@@ -169,7 +176,7 @@ func (ac *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	}
 	
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	apiError := profilesRepository.AddAuthorAccomplishments(authorID, files)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
@@ -181,12 +188,12 @@ func (ac *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
-	authorID := ctx.Param("author_id")
+func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
+	authorID := ctx.GetString("author_id")
 	fileID := ctx.Param("file_id")
 	
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	err := profilesRepository.DeleteAuthorAccomplishment(authorID, fileID)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -198,11 +205,11 @@ func (ac *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (ac *ProfilesController) GetAuthor(ctx *gin.Context) {
+func (pc *ProfilesController) GetAuthor(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
 	appendWith := ctx.Query("append_with")
 
-	profilesRepository := ac.profilesRepository
+	profilesRepository := pc.profilesRepository
 	user, err := profilesRepository.GetAuthor(authorID, appendWith)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
