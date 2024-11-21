@@ -158,9 +158,9 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 		Password string `json:"password" binding:"required,password"`
 	}
 
-	fmt.Println(body.Password)
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
+		fmt.Println(utils.ValidationErrorResponse(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})
 		return
@@ -172,7 +172,7 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 
 	newPassword := body.Password
 	if err := authRepository.ResetPassword(email, newPassword); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{
+		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
 		return
@@ -234,7 +234,7 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 			host := os.Getenv("HOST")
 			ctx.SetCookie("id_token", idToken, 3600, "/", host, false, true)
 			ctx.SetCookie("refresh_token", refreshToken, 3600, "/", host, false, true)
-			ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
+			// ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 		} else {
 			err := errors.New("casting tokens failed")
 			successURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Error())

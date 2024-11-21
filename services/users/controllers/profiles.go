@@ -67,6 +67,7 @@ func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	image, _, err := ctx.Request.FormFile("image")
 
 	if err != nil {
+		fmt.Println(image)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
@@ -80,9 +81,9 @@ func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 		})
 		return
 	}
-	
 
 	profilesRepository := pc.profilesRepository
+
 	apiError := profilesRepository.UpdateUserImage(id, image)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
@@ -174,7 +175,6 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 		}
 		files = append(files, file)
 	}
-	
 
 	profilesRepository := pc.profilesRepository
 	apiError := profilesRepository.AddAuthorAccomplishments(authorID, files)
@@ -191,7 +191,6 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
 	fileID := ctx.Param("file_id")
-	
 
 	profilesRepository := pc.profilesRepository
 	err := profilesRepository.DeleteAuthorAccomplishment(authorID, fileID)

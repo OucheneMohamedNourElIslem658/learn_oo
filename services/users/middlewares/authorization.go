@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	// "fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,28 +28,31 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 				"message": "undefined authorization",
 			})
 			ctx.Abort()
+			return
 		}
 
 		idToken := authorization[len("Bearer "):]
 		claims, isValid, err := utils.VerifyIDToken(idToken)
 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": err,
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
 			})
-			ctx.Abort()
+			return
 		}
 
 		if !isValid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
+		    ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "id token expired",
 			})
-			ctx.Abort()
+			return
 		}
 
 		ctx.Set("id", claims.ID)
-		ctx.Set("author_id", *claims.AuthorID)
 		ctx.Set("email_verified", claims.EmailVerified)
+		if claims.AuthorID != nil {
+			ctx.Set("author_id", *claims.AuthorID)
+		}
 		ctx.Next()
 	}
 }
@@ -60,10 +62,10 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailVerification() gin.Han
 		emailVerified := ctx.GetBool("email_verified")
 
 		if !emailVerified {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "email is not verified",
 			})
-			ctx.Abort()
+			return
 		}
 
 		ctx.Next()
@@ -75,10 +77,10 @@ func (am *AuthorizationMiddlewares) AuthorizationWithAuthorCheck() gin.HandlerFu
 		authorID := ctx.GetString("author_id")
 
 		if authorID == "" {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "user is not author",
 			})
-			ctx.Abort()
+			return
 		}
 
 		ctx.Next()
@@ -91,17 +93,17 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailCheck() gin.HandlerFun
 		email, isValid, err := utils.VerifyIDTokenFromEmail(idToken)
 
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
+		    ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
-			ctx.Abort()
+			return
 		}
 
 		if !isValid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "token expired",
 			})
-			ctx.Abort()
+		    return
 		}
 
 		ctx.Set("email", *email)

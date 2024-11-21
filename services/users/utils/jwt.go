@@ -66,10 +66,10 @@ func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
 		userClaims.ID = id
 	}
 
-	if authorID, ok := jwtClaims["author_id"].(string); !ok {
-		userClaims.AuthorID = nil
-	} else {
+	if authorID, ok := jwtClaims["author_id"].(string); ok {
 		userClaims.AuthorID = &authorID
+	} else {
+		userClaims.AuthorID = nil
 	}
 
 	if emailVerified, ok := jwtClaims["email_verified"].(bool); !ok {
@@ -83,8 +83,14 @@ func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
 
 func VerifyIDTokenFromEmail(idToken string) (email *string, isValid bool, err error) {
 	jwtIdToken, err := jwt.Parse(idToken, func(t *jwt.Token) (interface{}, error) {
+		// Ensure the signing method matches
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
 		return secretKey, nil
 	})
+
+	fmt.Println(jwtIdToken.Valid)
 
 	if err != nil {
 		return nil, false, err

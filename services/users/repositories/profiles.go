@@ -5,7 +5,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
-	"time"
 
 	gorm "gorm.io/gorm"
 	clause "gorm.io/gorm/clause"
@@ -134,7 +133,8 @@ func (UsersRouter *ProfilesRepository) UpdateUserImage(id string, image multipar
 		}
 	}
 
-	newImage := &models.File{
+	fmt.Println(uploadData.Url)
+	newImage := models.File{
 		URL:          uploadData.Url,
 		ImageKitID:   &uploadData.FileId,
 		ThumbnailURL: &uploadData.ThumbnailUrl,
@@ -147,9 +147,7 @@ func (UsersRouter *ProfilesRepository) UpdateUserImage(id string, image multipar
 		}
 	}
 
-	return &utils.APIError{
-		StatusCode: http.StatusOK,
-	}
+	return nil
 }
 
 func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *utils.APIError) {
@@ -180,16 +178,27 @@ func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *uti
 	var author models.Author
 	err = database.Unscoped().Where("user_id = ?", user.ID).First(&author).Error
 	if err == nil {
-		fmt.Println("entered")
-		author.DeletedAt = gorm.DeletedAt{Time: time.Time{}, Valid: false}
-		err = database.Model(models.Author{}).Set("deleted_at", nil).Where("id = ?", author.ID).Error
+		err = database.Model(models.Author{}).Where("id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error
 		if err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
 				Message:    err.Error(),
 			}
 		}
-		return nil
+
+		if err := database.Model(&models.File{}).Where("author_id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error; err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "failed to restore posts: " + err.Error(),
+			}
+		}
+
+		if err := database.Model(&models.Course{}).Where("author_id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error; err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "failed to restore comments: " + err.Error(),
+			}
+		}
 	} else if err != gorm.ErrRecordNotFound {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -267,6 +276,7 @@ func (UsersRouter *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiEr
 
 func (UsersRouter *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []multipart.File) (apiError *utils.APIError) {
 	filestorage := UsersRouter.fileStorage
+	fmt.Println("upploading")
 	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/files/authors/%v", authorID))
 	if errs != nil {
 		return &utils.APIError{
