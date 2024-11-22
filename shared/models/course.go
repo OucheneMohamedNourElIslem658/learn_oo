@@ -35,8 +35,8 @@ type Course struct {
 	Language       Languages      `gorm:"default:'en'" json:"language"`
 	Level          Level          `gorm:"default:'bigener'" json:"level"`
 	Duration       time.Duration  `gorm:"type:interval" json:"duration"`
-	Requirements   []string       `gorm:"type:text[]" json:"requirments"`
-	Objectives     []string       `gorm:"type:text[]" json:"objectives"`
+	Requirements   []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
+	Objectives     []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
 	Video          *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
 	Image          *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
 	AuthorID       *string        `json:"author_id,omitempty"`
@@ -67,6 +67,26 @@ type CourseCategory struct {
 
 func (CourseCategory) TableName() string {
 	return "course_categories"
+}
+
+type Objective struct {
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Content   string         `json:"content"`
+	CourseID  uint           `json:"course_id,omitempty"`
+	Course    *Course        `json:"course,omitempty"`
+}
+
+type Requirement struct {
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Content   string         `json:"content"`
+	CourseID  uint           `json:"course_id,omitempty"`
+	Course    *Course        `json:"course,omitempty"`
 }
 
 type Chapter struct {
