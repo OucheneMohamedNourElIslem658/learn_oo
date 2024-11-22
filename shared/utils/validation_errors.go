@@ -18,14 +18,16 @@ var ErrorMessages = map[string]string{
 	"password": "its lenght must be greater than 5",
 }
 
-func ValidationErrorResponse(err error) gin.H {
+func ValidationErrorResponse(err error) interface{} {
 	errors := make(gin.H)
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, vErr := range validationErrors {
 			errors[vErr.Field()] = ErrorMessages[vErr.Tag()]
 		}
+		return errors
+	} else {
+		return err.Error()
 	}
-	return errors
 }
 
 func validatePassword(fl validator.FieldLevel) bool {

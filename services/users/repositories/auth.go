@@ -77,7 +77,7 @@ func (ar *AuthRepository) LoginWithEmailAndPassword(email, password string) (res
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &sharedUtils.APIError{
-				StatusCode: http.StatusBadGateway,
+				StatusCode: http.StatusNotFound,
 				Message:    "email not found",
 			}
 		} else {
@@ -91,14 +91,14 @@ func (ar *AuthRepository) LoginWithEmailAndPassword(email, password string) (res
 	passwordMatches := authUtils.VerifyPasswordHash(password, storedUser.Password)
 	if !passwordMatches {
 		return nil, &sharedUtils.APIError{
-			StatusCode: http.StatusInternalServerError,
+			StatusCode: http.StatusBadRequest,
 			Message:    "wrong password",
 		}
 	}
 
 	if emailVerified := storedUser.EmailVerified; !emailVerified {
 		return nil, &sharedUtils.APIError{
-			StatusCode: http.StatusInternalServerError,
+			StatusCode: http.StatusBadRequest,
 			Message:    "email not verified",
 		}
 	}

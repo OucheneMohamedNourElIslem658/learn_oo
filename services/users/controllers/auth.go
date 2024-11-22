@@ -32,10 +32,9 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 		Password string `json:"password" binding:"required,password"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})
-		fmt.Println(err)
 		return
 	}
 
@@ -70,6 +69,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	} else {
 		ctx.SetCookie("id_token", result["idToken"].(string), 3600, "/", "localhost", false, true)
 		ctx.SetCookie("refresh_token", result["refreshToken"].(string), 3600, "/", "localhost", false, true)
+		ctx.Status(http.StatusOK)
 	}
 }
 
@@ -185,27 +185,29 @@ func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
 }
 
 func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
-	var body struct {
-		SuccessURL string `json:"success_url"`
-		FailureURL string `json:"failure_url"`
+	var query struct {
+		SuccessURL string `json:"success_url" binding:"required"`
+		FailureURL string `json:"failure_url" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": utils.ValidationErrorResponse(err),
+		})
+		return
 	}
 
 	provider := ctx.Param("provider")
-	successURL := ctx.Query("success_url")
-	failureURL := ctx.Query("failure_url")
-
-	body.SuccessURL = successURL
-	body.FailureURL = failureURL
-	bodyBytes, _ := json.Marshal(&body)
 
 	authRepository := authcontroller.authRepository
-	if result, err := authRepository.OAuth(provider, successURL, failureURL); err != nil {
+	if result, err := authRepository.OAuth(provider, query.SuccessURL, query.FailureURL); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
 	} else {
 		oauthConfig := result["oauthConfig"].(*oauth2.Config)
-		url := oauthConfig.AuthCodeURL(string(bodyBytes), oauth2.AccessTypeOffline)
+		queryBytes, _ := json.Marshal(&query)
+		url := oauthConfig.AuthCodeURL(string(queryBytes), oauth2.AccessTypeOffline)
 		ctx.Redirect(http.StatusTemporaryRedirect, url)
 	}
 }
