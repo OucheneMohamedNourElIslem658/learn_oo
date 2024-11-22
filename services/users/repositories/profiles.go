@@ -276,8 +276,7 @@ func (UsersRouter *ProfilesRepository) UpdateAuthor(id string, bio gin.H) (apiEr
 
 func (UsersRouter *ProfilesRepository) AddAuthorAccomplishments(authorID string, files []multipart.File) (apiError *utils.APIError) {
 	filestorage := UsersRouter.fileStorage
-	fmt.Println("upploading")
-	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/files/authors/%v", authorID))
+	uploadData, errs := filestorage.UploadFiles(files, fmt.Sprintf("/learn_oo/authors/accomplisments/%v", authorID))
 	if errs != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -315,25 +314,32 @@ func (pr *ProfilesRepository) DeleteAuthorAccomplishment(authorID, fileID string
 	database := pr.database
 	filestorage := pr.fileStorage
 
-	var file models.File
-	deleteResult := database.Where("id = ? and author_id = ?", fileID, authorID).Unscoped().Delete(&file)
-	err := deleteResult.Error
-	affectedRows := deleteResult.RowsAffected
+	var exitingFile models.File
+	err := database.Where("id = ? and author_id = ?", fileID, authorID).First(&exitingFile).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "file not found",
+			}
+		}
+
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	err = database.Delete(&exitingFile).Error
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
 	}
-	if affectedRows == 0 {
-		return &utils.APIError{
-			StatusCode: http.StatusNotFound,
-			Message:    "file not found",
-		}
-	}
 
-	if file.ImageKitID != nil {
-		if err := filestorage.DeleteFile(*file.ImageKitID); err != nil {
+	if exitingFile.ImageKitID != nil {
+		if err := filestorage.DeleteFile(*exitingFile.ImageKitID); err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
 				Message:    err.Error(),
