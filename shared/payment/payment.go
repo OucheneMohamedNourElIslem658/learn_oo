@@ -180,7 +180,7 @@ type Checkout struct {
 	CheckoutURL string `json:"checkout_url"`
 }
 
-func (p *Payment) MakePayment(senderPaymentID, successURL, failureURL string, courses []models.Course) (checkout *Checkout, err error) {
+func (p *Payment) MakePayment(senderPaymentID, successURL, failureURL string, course models.Course) (checkout *Checkout, err error) {
 	instance := p.instance
 
 	user := resty.New()
@@ -191,13 +191,13 @@ func (p *Payment) MakePayment(senderPaymentID, successURL, failureURL string, co
 	}
 
 	var items []gin.H
-	for _, course := range courses {
-		if course.PaymentPriceID != nil {
-			items = append(items, gin.H{
-				"price":    *course.PaymentPriceID,
-				"quantity": 1,
-			})
-		}
+	if course.PaymentPriceID != nil {
+		items = append(items, gin.H{
+			"price":    *course.PaymentPriceID,
+			"quantity": 1,
+		})
+	} else {
+		return nil, fmt.Errorf("course does not have payment price id")
 	}
 
 	if len(items) == 0 {
