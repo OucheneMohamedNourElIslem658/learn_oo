@@ -1,0 +1,568 @@
+[
+    {
+        "path": "host/api/v1/users/profiles/profile",
+        "description": "get user profile",
+        "method": "GET",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "image,author_profile",
+                "required": false,
+                "description": "include some infos associated to the user"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": [
+                    {
+                        "id": "61f244aa-a912-4fd1-98ac-b1df7c59a484",
+                        "created_at": "2024-11-22T00:59:56.311557+08:00",
+                        "updated_at": "2024-11-22T01:53:47.935183+08:00",
+                        "deleted_at": null,
+                        "email": "mohamedouchene996@gmail.com",
+                        "password": "$2a$10$oSAXVysFdiiqlzyktuTii.9IzhdWeSwwKAHiWjUSe8EtnwIAqHIaO",
+                        "full_name": "ouchene mohamed nour el islam",
+                        "email_verified": true,
+                        "image": {
+                            "id": 7,
+                            "created_at": "2024-11-22T22:08:42.484775+08:00",
+                            "updated_at": "2024-11-22T22:08:42.484775+08:00",
+                            "deleted_at": null,
+                            "url": "https://ik.imagekit.io/cdejmhtxd/learn_oo/images/users/61f244aa-a912-4fd1-98ac-b1df7c59a484/image_B6s3pGhUm",
+                            "thumbnail_url": "",
+                            "image_kit_id": "67409063e375273f6000a1f8",
+                            "user_id": "61f244aa-a912-4fd1-98ac-b1df7c59a484"
+                        },
+                        "author_profile": {
+                            "id": "132e85c5-b0de-4516-997d-48ad58ce4583",
+                            "created_at": "2024-11-22T01:55:35.866383+08:00",
+                            "updated_at": "2024-11-22T01:55:35.866383+08:00",
+                            "deleted_at": null,
+                            "user_id": "61f244aa-a912-4fd1-98ac-b1df7c59a484"
+                        }
+                    }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "user not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/profile",
+        "description": "update user profile",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "request_body": {
+            "type": "json",
+            "body": {
+                "full_name": "the lenght needs to be greater than 0"
+            }
+        },
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "user not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/profile/image",
+        "description": "update user profile image",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "request_body": {
+            "type": "form data",
+            "body": [
+                {
+                    "name": "image",
+                    "type": "file",
+                    "required": true,
+                    "description": "profile image as file"
+                }
+            ]
+        },
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    },
+                    {
+                        "message": "multipart request error"
+                    },
+                    {
+                        "message": "the file is not an image"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+    
+    {
+        "path": "host/api/v1/users/authors/upgrade",
+        "description": "add author profile to the current user",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    },
+                    {
+                        "message": "user is already an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "user not found"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/authors/downgrade",
+        "description": "soft delete author profile of the current user",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "author not found"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/authors/profile",
+        "description": "get author profile",
+        "method": "GET",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "user,accomplishments",
+                "required": false,
+                "description": "include some infos associated to the author"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": [
+                    {
+                        "id": "132e85c5-b0de-4516-997d-48ad58ce4583",
+                        "created_at": "2024-11-22T01:55:35.866383+08:00",
+                        "updated_at": "2024-11-22T01:55:35.866383+08:00",
+                        "deleted_at": null,
+                        "user_id": "61f244aa-a912-4fd1-98ac-b1df7c59a484",
+                        "user": {
+                            "id": "61f244aa-a912-4fd1-98ac-b1df7c59a484",
+                            "created_at": "2024-11-22T00:59:56.311557+08:00",
+                            "updated_at": "2024-11-22T01:53:47.935183+08:00",
+                            "deleted_at": null,
+                            "email": "mohamedouchene996@gmail.com",
+                            "password": "$2a$10$oSAXVysFdiiqlzyktuTii.9IzhdWeSwwKAHiWjUSe8EtnwIAqHIaO",
+                            "full_name": "ouchene mohamed nour el islam",
+                            "email_verified": true
+                        },
+                        "accomplishments": [
+                            {
+                            "id": 8,
+                            "created_at": "2024-11-23T15:10:59.355227+08:00",
+                            "updated_at": "2024-11-23T15:10:59.355227+08:00",
+                            "deleted_at": null,
+                            "url": "https://ik.imagekit.io/cdejmhtxd/learn_oo/authors/accomplisments/132e85c5-b0de-4516-997d-48ad58ce4583/image_x0UhcF0v8",
+                            "thumbnail_url": "",
+                            "image_kit_id": "67418002e375273f60a9884c",
+                            "author_id": "132e85c5-b0de-4516-997d-48ad58ce4583"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "author not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/authors/profile",
+        "description": "update author profile",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "request_body": {
+            "type": "json",
+            "body": {
+                "bio": "needs to be in json format (description of the rich text)"
+            }
+        },
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "author not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/author/profile/accomplishments",
+        "description": "add accomplishments to the author profile",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "request_body": {
+            "type": "form data",
+            "body": [
+                {
+                    "name": "accomplishments",
+                    "type": "list of files",
+                    "required": true,
+                    "description": "list of files as accomplishemtn for this author"
+                }
+            ]
+        },
+        "reponses": [
+            {
+                "code": "created"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "message": "undefined authorization"
+                    },
+                    {
+                        "message": "multipart request error"
+                    },
+                    {
+                        "message": "accomplishments list can not be empty"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/users/profiles/author/profile/accomplishments/:id",
+        "description": "delete an author accomplishment by id",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "path_params": [
+            {
+                "name": "id",
+                "description": "id of the accomplishment to delete",
+                "required": true
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok"
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "message": "file not found"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -189,14 +189,14 @@ func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *uti
 		if err := database.Model(&models.File{}).Where("author_id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error; err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message:    "failed to restore posts: " + err.Error(),
+				Message:    err.Error(),
 			}
 		}
 
 		if err := database.Model(&models.Course{}).Where("author_id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error; err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message:    "failed to restore comments: " + err.Error(),
+				Message:    err.Error(),
 			}
 		}
 	} else if err != gorm.ErrRecordNotFound {

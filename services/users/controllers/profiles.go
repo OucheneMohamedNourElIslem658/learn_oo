@@ -68,7 +68,7 @@ func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 
 	if err != nil {
 		fmt.Println(image)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -156,7 +156,7 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 
 	form, err := ctx.MultipartForm()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
 		return
@@ -168,12 +168,19 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	for _, fileHeader := range filesHeaders {
 		file, err := fileHeader.Open()
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
+			ctx.JSON(http.StatusBadRequest, gin.H{
 				"message": err.Error(),
 			})
 			return
 		}
 		files = append(files, file)
+	}
+
+	if len(files) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "accomplishments can not be empty",
+		})
+		return
 	}
 
 	profilesRepository := pc.profilesRepository
@@ -185,7 +192,7 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusCreated)
 }
 
 func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
