@@ -17,12 +17,13 @@ type User struct {
 	Password          string         `json:"password"`
 	FullName          string         `gorm:"not null" json:"full_name"`
 	EmailVerified     bool           `json:"email_verified"`
-	PaymentCustomerID string         `gorm:"unique" json:"payment_customer_id,omitempty"`
+	PaymentCustomerID string         `json:"payment_customer_id,omitempty"`
 	Image             *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
 	AuthorProfile     *Author        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"author_profile,omitempty"`
 	Courses           []Course       `gorm:"many2many:course_learners;" json:"courses,omitempty"`
 	Lessons           []Lesson       `gorm:"many2many:lesson_learners;" json:"lessons,omitempty"`
 	Tests             []Test         `gorm:"many2many:test_results;" json:"tests,omitempty"`
+	AnsweredQuestions []Question     `gorm:"many2many:question_answers" json:"question_answers,omitempty"`
 }
 
 type Author struct {
@@ -32,7 +33,7 @@ type Author struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Bio             gin.H          `gorm:"json" json:"bio,omitempty"`
 	Balance         uint           `gorm:"-" json:"balance,omitempty"`
-	UserID          string        `json:"user_id,omitempty"`
+	UserID          string         `json:"user_id,omitempty"`
 	User            *User          `json:"user,omitempty"`
 	Accomplishments []File         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"accomplishments,omitempty"`
 	Courses         []Course       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"courses,omitempty"`
