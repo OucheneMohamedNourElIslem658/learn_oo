@@ -186,11 +186,13 @@ func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
 
 func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 	var query struct {
-		SuccessURL string `json:"success_url" binding:"required"`
-		FailureURL string `json:"failure_url" binding:"required"`
+		SuccessURL string `form:"success_url" binding:"required"`
+		FailureURL string `form:"failure_url" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
+		fmt.Println(query.FailureURL)
+		fmt.Println(query.FailureURL)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})

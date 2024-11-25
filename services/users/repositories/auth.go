@@ -387,8 +387,6 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 		EmailVerified: emailVerified,
 	}
 
-	fmt.Println(userData)
-
 	// Handle the profile pic url:
 
 	switch provider {
