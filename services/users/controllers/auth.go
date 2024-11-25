@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -62,13 +61,13 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	}
 
 	authRepository := authcontroller.authRepository
-	if result, err := authRepository.LoginWithEmailAndPassword(body.Email, body.Password); err != nil {
+	if idToken, refreshToken, err := authRepository.LoginWithEmailAndPassword(body.Email, body.Password); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
 	} else {
-		ctx.SetCookie("id_token", result["idToken"].(string), 3600, "/", "localhost", false, true)
-		ctx.SetCookie("refresh_token", result["refreshToken"].(string), 3600, "/", "localhost", false, true)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "localhost", false, true)
 		ctx.Status(http.StatusOK)
 	}
 }
@@ -121,13 +120,13 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 
 	repository := authcontroller.authRepository
 
-	if result, err := repository.RefreshIdToken(authorization); err != nil {
+	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
 	} else {
 		ctx.Status(http.StatusOK)
-		ctx.SetCookie("id_token", result["idToken"].(string), 3600, "/", "localhost", false, true)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
 	}
 }
 
@@ -227,22 +226,14 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 
 	authRepository := authcontroller.authRepository
 
-	if result, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
+	if idToken, refreshToken, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
-		idToken, okIdToken := result["idToken"].(string)
-		refreshToken, okRefreshToken := result["refreshToken"].(string)
-		if okIdToken && okRefreshToken {
-			godotenv.Load("../../.env")
-			host := os.Getenv("HOST")
-			ctx.SetCookie("id_token", idToken, 3600, "/", host, false, true)
-			ctx.SetCookie("refresh_token", refreshToken, 3600, "/", host, false, true)
-			// ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
-		} else {
-			err := errors.New("casting tokens failed")
-			successURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Error())
-			ctx.Redirect(http.StatusInternalServerError, successURL)
-		}
+		godotenv.Load("../../.env")
+		host := os.Getenv("HOST")
+		ctx.SetCookie("id_token", *idToken, 3600, "/", host, false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", host, false, true)
+		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 	}
 }
