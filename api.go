@@ -6,7 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	routers "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/routers"
+	coursesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/routers"
+	usersRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/routers"
 )
 
 type Server struct {
@@ -33,13 +34,19 @@ func (server *Server) Run() {
 		ctx.String(http.StatusOK, "Welcome To Learn_oo API V1")
 	})
 
-	subRoute := v1.Group("/users/auth")
-	authRouter := routers.NewAuthRouter(subRoute)
+	usersRouter := v1.Group("/users")
+
+	subRoute := usersRouter.Group("/auth")
+	authRouter := usersRouters.NewAuthRouter(subRoute)
 	authRouter.RegisterRoutes()
 
-	subRoute = v1.Group("/users/profiles")
-	profilesRouter := routers.NewProfilesRouter(subRoute)
+	subRoute = usersRouter.Group("/profiles")
+	profilesRouter := usersRouters.NewProfilesRouter(subRoute)
 	profilesRouter.RegisterRoutes()
+
+	subRoute = v1.Group("/courses")
+	coursesRouter := coursesRouters.NewCoursesRouter(subRoute)
+	coursesRouter.RegisterRoutes()
 
 	fmt.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
 	if err := router.Run(server.address); err != nil {

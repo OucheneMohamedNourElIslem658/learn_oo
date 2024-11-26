@@ -13,7 +13,7 @@ type CoursesRouter struct {
 	authMiddlewares   *middlewares.AuthorizationMiddlewares
 }
 
-func NewAuthRouter(router *gin.RouterGroup) *CoursesRouter {
+func NewCoursesRouter(router *gin.RouterGroup) *CoursesRouter {
 	return &CoursesRouter{
 		Router:          router,
 		coursesController:  controllers.NewCoursesController(),
