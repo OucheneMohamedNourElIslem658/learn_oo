@@ -15,7 +15,7 @@ type config struct {
 var mailerConfig = initAPI()
 
 func initAPI() config {
-	if err := godotenv.Load("../../.env");err != nil {
+	if err := godotenv.Load();err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 	return config{

@@ -24,7 +24,8 @@ func (server *Server) Run() {
 	router := gin.New()
 
 	router.Use(gin.Logger())
-	router.LoadHTMLGlob("./views/*")
+	// services\users\views
+	router.LoadHTMLGlob("services/users/views/*")
 
 	v1 := router.Group("/api/v1")
 

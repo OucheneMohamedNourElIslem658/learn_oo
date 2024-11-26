@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	controllers "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/controllers"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/middlewares"
+	middlewares "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/middlewares"
 )
 
 type AuthRouter struct {
@@ -21,11 +21,11 @@ func NewAuthRouter(router *gin.RouterGroup) *AuthRouter {
 	}
 }
 
-func (authRouter *AuthRouter) RegisterRoutes() {
-	router := authRouter.Router
-	authController := authRouter.authController
+func (ar *AuthRouter) RegisterRoutes() {
+	router := ar.Router
+	authController := ar.authController
 
-	authMiddlewares := authRouter.authMiddlewares
+	authMiddlewares := ar.authMiddlewares
 	authorizationWithEmailCheck := authMiddlewares.AuthorizationWithEmailCheck()
 
 	router.POST("/register-with-email-and-password", authController.RegisterWithEmailAndPassword)

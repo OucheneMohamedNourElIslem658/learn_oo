@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/utils"
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
 )
 
 type AuthorizationMiddlewares struct {

@@ -1,0 +1,33 @@
+package routers
+
+import (
+	"github.com/gin-gonic/gin"
+
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/controllers"
+	middlewares "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/middlewares"
+)
+
+type CoursesRouter struct {
+	Router            *gin.RouterGroup
+	coursesController *controllers.CoursesController
+	authMiddlewares   *middlewares.AuthorizationMiddlewares
+}
+
+func NewAuthRouter(router *gin.RouterGroup) *CoursesRouter {
+	return &CoursesRouter{
+		Router:          router,
+		coursesController:  controllers.NewCoursesController(),
+		authMiddlewares: middlewares.NewAuthorizationMiddlewares(),
+	}
+}
+
+func (cr *CoursesRouter) RegisterRoutes() {
+	router := cr.Router
+	coursesController := cr.coursesController
+
+	// authMiddlewares := cr.authMiddlewares
+	// authorizationWithEmailCheck := authMiddlewares.AuthorizationWithEmailCheck()
+
+	router.POST("/create-course", coursesController.CreateCourse)
+}
+

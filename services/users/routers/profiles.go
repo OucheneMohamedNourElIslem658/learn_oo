@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/controllers"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/middlewares"
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/middlewares"
 )
 
 type ProfilesRouter struct {

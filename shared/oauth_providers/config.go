@@ -1,6 +1,7 @@
 package oauthproviders
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -24,7 +25,8 @@ type config struct {
 var envs = initAPI()
 
 func initAPI() config {
-	if err := godotenv.Load("../../.env");err != nil {
+	if err := godotenv.Load();err != nil {
+		fmt.Println("here")
 		log.Fatalf("Error loading .env file")
 	}
 
