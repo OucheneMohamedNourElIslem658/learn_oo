@@ -49,3 +49,47 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 
 	ctx.Status(http.StatusCreated)
 }
+
+func (cc *CoursesController) GetCourse(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	appendWith := ctx.Query("append_with")
+
+	coursesRepository := cc.coursesRepository
+
+	if course, err := coursesRepository.GetCourse(id, appendWith); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	} else {
+		ctx.JSON(http.StatusOK, course)
+	}
+}
+
+func (cc *CoursesController) GetCourses(ctx *gin.Context) {
+	var filters repositories.CourseSearchDTO
+
+	if err := ctx.ShouldBindQuery(&filters); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": utils.ValidationErrorResponse(err),
+		})
+		return
+	}
+
+	coursesRepository := cc.coursesRepository
+
+	if courses, currentPage, count, maxPages, err := coursesRepository.GetCourses(filters); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{
+			"courses":      courses,
+			"current_page": currentPage,
+			"count":        count,
+			"max_pages":    maxPages,
+		})
+	}
+}

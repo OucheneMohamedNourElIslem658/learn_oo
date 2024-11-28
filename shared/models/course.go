@@ -35,7 +35,8 @@ type Course struct {
 	PaymentProductID *string        `gorm:"unique" json:"payment_product_id"`
 	Language         Languages      `gorm:"default:'en'" json:"language"`
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
-	Duration         time.Duration  `gorm:"type:interval" json:"duration"`
+	Duration         time.Duration  `json:"duration"`
+	Rate             float64        `gorm:"rate" json:"rate"`
 	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
 	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
 	Video            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`

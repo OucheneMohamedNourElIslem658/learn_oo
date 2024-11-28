@@ -2,8 +2,10 @@ package repositories
 
 import (
 	"fmt"
+	"math"
 	"mime/multipart"
 	"net/http"
+	"strings"
 	"time"
 
 	gorm "gorm.io/gorm"
@@ -129,4 +131,145 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	}
 
 	return nil
+}
+
+func (ar *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Course, apiError *utils.APIError) {
+	database := ar.database
+
+	query := database.Model(&models.Course{})
+
+	validExtentions := utils.GetValidExtentions(
+		appendWith,
+		"author",
+		"image",
+		"video",
+		"requirements",
+		"objectives",
+		"categories",
+		"chapters",
+		"learners",
+	)
+
+	for _, extention := range validExtentions {
+		query.Preload(extention)
+	}
+
+	var existingCourse models.Course
+	err := query.Where("id = ?", ID).First(&existingCourse).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "course not found",
+			}
+		}
+		return nil, &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return &existingCourse, nil
+}
+
+type CourseSearchDTO struct {
+	Title         string           `form:"title"`
+	FreeOrPaid    string           `form:"free_or_paid" binding:"omitempty,oneof='free' 'paid'"`
+	Language      models.Languages `form:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
+	Level         models.Level     `form:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
+	MinDuration   time.Duration    `form:"min_duration" binding:"min=0"`
+	MaxDuration   time.Duration    `form:"max_duration" binding:"min=0"`
+	PageSize      uint             `form:"page_size,default=10" binding:"min=1"`
+	Page          uint             `form:"page,default=1" binding:"min=1"`
+	AppendWith    string           `form:"append_with,omitempty"`
+	CategoriesIDs string           `form:"categories_ids,omitempty"`
+}
+
+func (ar *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
+	database := ar.database
+
+	query := database.Model(&models.Course{})
+
+	title := filters.Title
+	language := filters.Language
+	level := filters.Level
+	minDuration := filters.MinDuration
+	maxDuration := filters.MaxDuration
+	appendWith := filters.AppendWith
+	freePaid := filters.FreeOrPaid
+	pageSize := filters.PageSize
+	page := filters.Page
+
+	var categoriesIDs []string
+	if len(filters.CategoriesIDs) > 0 {
+		categoriesIDs = strings.Split(filters.CategoriesIDs, ",")
+	}
+
+	validExtentions := utils.GetValidExtentions(
+		appendWith,
+		"author",
+		"image",
+		"video",
+		"categories",
+	)
+
+	for _, extention := range validExtentions {
+		query.Preload(extention)
+	}
+
+	if title != "" {
+		query = query.Where("title LIKE ?", "%"+title+"%")
+	}
+
+	if freePaid == "free" {
+		query = query.Where("price = ?", 0)
+	} else if freePaid == "paid" {
+		query = query.Where("price <> ?", 0)
+	}
+
+	if language != "" {
+		query = query.Where("language = ?", language)
+	}
+
+	if level != "" {
+		query = query.Where("level = ?", level)
+	}
+
+	if minDuration > 0 {
+		query = query.Where("duration >= ?", minDuration.Seconds())
+	}
+
+	if maxDuration > 0 {
+		query = query.Where("duration <= ?", maxDuration.Seconds())
+	}
+
+	if len(categoriesIDs) > 0 {
+		query = query.Joins("JOIN course_categories ON course_categories.course_id = courses.id").
+			Where("course_categories.category_id IN (?)", categoriesIDs)
+	}
+
+	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate").
+		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
+		Group("courses.id").
+		Order("courses.rate DESC, price DESC, created_at DESC, duration DESC")
+
+	var totalRecords int64
+	database.Model(&models.User{}).Count(&totalRecords)
+	totalPages := uint(math.Ceil(float64(totalRecords) / float64(pageSize)))
+
+	offset := (page - 1) * pageSize
+	query.Limit(int(pageSize)).Offset(int(offset))
+
+	var coursesList []models.Course
+	err := query.Find(&coursesList).Error
+	if err != nil {
+		return nil, nil, nil, nil, &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	coursesListLenght := uint(len(coursesList))
+
+	return coursesList, &page, &coursesListLenght, &totalPages, nil
 }

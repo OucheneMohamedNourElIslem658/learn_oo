@@ -13,7 +13,7 @@ import (
 	email "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/email"
 	models "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 	oauthproviders "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/oauth_providers"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
+	payment "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
 )
 
@@ -68,9 +68,9 @@ func (ar *AuthRepository) RegisterWithEmailAndPassword(fullName, email, password
 	}
 
 	err = database.Create(&models.User{
-		FullName: fullName,
-		Password: hashedPassword,
-		Email:    email,
+		FullName:          fullName,
+		Password:          hashedPassword,
+		Email:             email,
 		PaymentCustomerID: customer.ID,
 	}).Error
 	if err != nil {

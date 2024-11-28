@@ -15,9 +15,9 @@ type CoursesRouter struct {
 
 func NewCoursesRouter(router *gin.RouterGroup) *CoursesRouter {
 	return &CoursesRouter{
-		Router:          router,
-		coursesController:  controllers.NewCoursesController(),
-		authMiddlewares: middlewares.NewAuthorizationMiddlewares(),
+		Router:            router,
+		coursesController: controllers.NewCoursesController(),
+		authMiddlewares:   middlewares.NewAuthorizationMiddlewares(),
 	}
 }
 
@@ -32,5 +32,6 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	AuthorizationWithAuthorCheck := authMiddlewares.AuthorizationWithAuthorCheck()
 
 	router.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
+	router.GET("/:id", coursesController.GetCourse)
+	router.GET("/", coursesController.GetCourses)
 }
-
