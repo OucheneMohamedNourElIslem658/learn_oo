@@ -2,7 +2,6 @@ package filestorage
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"mime/multipart"
 	"sync"
@@ -25,7 +24,6 @@ func NewFileStorage() *FileStorage {
 	if instance == nil {
 		log.Fatal("File Storage failed to connect!")
 	}
-	fmt.Println("File storage connected succesfully!")
 
 	return &FileStorage{
 		instance: instance,
@@ -43,6 +41,7 @@ func (fs *FileStorage) UploadFile(file multipart.File, folder string) (data *upl
 			FileName: "image",
 		},
 	)
+
 	if err != nil {
 		return nil, err
 	}

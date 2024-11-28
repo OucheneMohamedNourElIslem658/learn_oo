@@ -64,18 +64,23 @@ func (pc *ProfilesController) UpdateUser(ctx *gin.Context) {
 
 func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	id := ctx.GetString("id")
-	image, _, err := ctx.Request.FormFile("image")
+	image, imageHeader, err := ctx.Request.FormFile("image")
 
 	if err != nil {
-		fmt.Println(image)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
 		return
 	}
-	defer image.Close()
 
-	if !utils.IsImage(image) {
+	if imageHeader == nil || image == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "image not provided",
+		})
+		return
+	}
+
+	if !utils.IsImage(*imageHeader) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "the file is not an image",
 		})

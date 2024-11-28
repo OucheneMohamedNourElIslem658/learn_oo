@@ -24,26 +24,27 @@ const (
 )
 
 type Course struct {
-	ID             uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Title          string         `gorm:"unique;not null" json:"title"`
-	Description    string         `json:"description"`
-	Price          float64        `json:"price"`
-	PaymentPriceID *string        `gorm:"unique" json:"payment_price_id"`
-	Language       Languages      `gorm:"default:'en'" json:"language"`
-	Level          Level          `gorm:"default:'bigener'" json:"level"`
-	Duration       time.Duration  `gorm:"type:interval" json:"duration"`
-	Requirements   []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
-	Objectives     []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
-	Video          *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
-	Image          *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
-	AuthorID       *string        `json:"author_id,omitempty"`
-	Author         *Author        `json:"author,omitempty"`
-	Categories     []Category     `gorm:"many2many:course_categories;" json:"categories,omitempty"`
-	Chapters       []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters,omitempty"`
-	Learners       []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners,omitempty"`
+	ID               uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt        time.Time      `json:"created_at"`
+	UpdatedAt        time.Time      `json:"updated_at"`
+	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Title            string         `gorm:"not null" json:"title"`
+	Description      string         `json:"description"`
+	Price            float64        `json:"price"`
+	PaymentPriceID   *string        `gorm:"unique" json:"payment_price_id"`
+	PaymentProductID *string        `gorm:"unique" json:"payment_product_id"`
+	Language         Languages      `gorm:"default:'en'" json:"language"`
+	Level            Level          `gorm:"default:'bigener'" json:"level"`
+	Duration         time.Duration  `gorm:"type:interval" json:"duration"`
+	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
+	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
+	Video            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
+	Image            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
+	AuthorID         *string        `json:"author_id,omitempty"`
+	Author           *Author        `json:"author,omitempty"`
+	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories,omitempty"`
+	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters,omitempty"`
+	Learners         []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners,omitempty"`
 }
 
 type Category struct {

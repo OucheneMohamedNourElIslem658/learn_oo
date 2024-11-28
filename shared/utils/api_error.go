@@ -1,11 +1,11 @@
 package utils
 
 type APIError struct {
-    Message    string
+    Message    any
     StatusCode int
 }
 
-func NewAPIError(message string, statusCode int) *APIError {
+func NewAPIError(message any, statusCode int) *APIError {
     return &APIError{
         Message:    message,
         StatusCode: statusCode,

@@ -25,9 +25,12 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	router := cr.Router
 	coursesController := cr.coursesController
 
-	// authMiddlewares := cr.authMiddlewares
-	// authorizationWithEmailCheck := authMiddlewares.AuthorizationWithEmailCheck()
+	authMiddlewares := cr.authMiddlewares
 
-	router.POST("/create-course", coursesController.CreateCourse)
+	authorization := authMiddlewares.Authorization()
+	authorizationWithEmailVerification := authMiddlewares.AuthorizationWithEmailVerification()
+	AuthorizationWithAuthorCheck := authMiddlewares.AuthorizationWithAuthorCheck()
+
+	router.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
 }
 

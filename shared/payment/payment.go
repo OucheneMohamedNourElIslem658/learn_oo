@@ -164,7 +164,7 @@ func (p *Payment) createPrice(amount int, currency, productID string) (price *Pr
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		return nil, fmt.Errorf("failed to create price")
+		return nil, fmt.Errorf(resp.String())
 	}
 
 	var createdPrice Price

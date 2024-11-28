@@ -32,28 +32,15 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&course); err != nil {
 		message := utils.ValidationErrorResponse(err)
-
-		if message["Image"] == nil {
-			imageFile, _ := course.Image.Open()
-			if !utils.IsImage(imageFile) {
-				message["Image"] = "file not an image"
-			}
-		}
-
-		if message["Video"] == nil {
-			videoFile, _ := course.Video.Open()
-			if !utils.IsVideo(videoFile) {
-				message["Video"] = "file not a video"
-			}
-		}
-
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": message,
 		})
 		return
 	}
 
-	if err := coursesRepository.CreateCourse(course); err != nil {
+	authorID := ctx.GetString("author_id")
+
+	if err := coursesRepository.CreateCourse(authorID, course); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})

@@ -12,7 +12,7 @@ type File struct {
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	URL          string         `json:"url"`
-	ThumbnailURL *string         `json:"thumbnail_url"`
+	ThumbnailURL *string        `json:"thumbnail_url"`
 	ImageKitID   *string        `json:"image_kit_id,omitempty"`
 	UserID       *string        `json:"user_id,omitempty"`
 	User         *User          `json:"user,omitempty"`

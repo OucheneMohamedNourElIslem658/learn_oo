@@ -13,18 +13,21 @@ import (
 	email "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/email"
 	models "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 	oauthproviders "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/oauth_providers"
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
 )
 
 type AuthRepository struct {
 	database  *gorm.DB
 	providers oauthproviders.Providers
+	payment   *payment.Payment
 }
 
 func NewAuthRepository() *AuthRepository {
 	return &AuthRepository{
 		database:  database.Instance,
 		providers: oauthproviders.Instance,
+		payment:   payment.NewPayment(),
 	}
 }
 
@@ -54,10 +57,21 @@ func (ar *AuthRepository) RegisterWithEmailAndPassword(fullName, email, password
 		}
 	}
 
+	payment := ar.payment
+
+	customer, err := payment.CreateCustomer(email, fullName)
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
 	err = database.Create(&models.User{
 		FullName: fullName,
 		Password: hashedPassword,
 		Email:    email,
+		PaymentCustomerID: customer.ID,
 	}).Error
 	if err != nil {
 		return &utils.APIError{
@@ -103,7 +117,7 @@ func (ar *AuthRepository) LoginWithEmailAndPassword(email, password string) (idT
 	}
 
 	author := storedUser.AuthorProfile
-    authorID := func() *string {
+	authorID := func() *string {
 		if author == nil {
 			return nil
 		}
@@ -163,7 +177,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (idToken *string,
 	if err != nil {
 		return nil, &utils.APIError{
 			StatusCode: http.StatusUnauthorized,
-			Message: "refresh token expired",
+			Message:    "refresh token expired",
 		}
 	}
 
@@ -173,7 +187,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (idToken *string,
 	if !ok {
 		return nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
-			Message: "casting id failed",
+			Message:    "casting id failed",
 		}
 	}
 
@@ -193,7 +207,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (idToken *string,
 	}
 
 	author := user.AuthorProfile
-    authorID := func() *string {
+	authorID := func() *string {
 		if author == nil {
 			return nil
 		}
@@ -350,7 +364,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	oauthConfig := authProvider.Config
 	token, err := oauthConfig.Exchange(context, code)
 	if err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
@@ -359,7 +373,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	client := oauthConfig.Client(context, token)
 	response, err := client.Get(authProvider.UserInfoURL)
 	if err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
@@ -368,7 +382,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 
 	userData := gin.H{}
 	if err := json.NewDecoder(response.Body).Decode(&userData); err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
@@ -403,16 +417,26 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	err = database.Where("email = ?", user.Email).Preload("Image").First(&existingUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
+			payment := ar.payment
+			customer, err := payment.CreateCustomer(user.Email, user.FullName)
+			if err != nil {
+				return nil, nil, &utils.APIError{
+					StatusCode: http.StatusInternalServerError,
+					Message:    err.Error(),
+				}
+			}
+
+			user.PaymentCustomerID = customer.ID
 			err = database.Create(&user).Error
 			if err != nil {
-				return  nil, nil, &utils.APIError{
+				return nil, nil, &utils.APIError{
 					StatusCode: http.StatusInternalServerError,
 					Message:    err.Error(),
 				}
 			}
 			existingUser = user
 		} else {
-			return  nil, nil, &utils.APIError{
+			return nil, nil, &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
 				Message:    err.Error(),
 			}
@@ -426,7 +450,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	}
 	err = database.Session(&gorm.Session{FullSaveAssociations: true}).Save(&existingUser).Error
 	if err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
@@ -434,14 +458,14 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 
 	createdRefreshToken, err := utils.CreateRefreshToken(existingUser.ID)
 	if err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
 	}
 
 	author := existingUser.AuthorProfile
-    authorID := func() *string {
+	authorID := func() *string {
 		if author == nil {
 			return nil
 		}
@@ -454,7 +478,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 		existingUser.EmailVerified,
 	)
 	if err != nil {
-		return  nil, nil, &utils.APIError{
+		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}

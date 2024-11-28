@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"mime/multipart"
-	"net/http"
 	"strings"
 	"time"
 
@@ -29,6 +28,9 @@ func ValidationErrorResponse(err error) gin.H {
 			case "oneof":
 				allowedValues := vErr.Param()
 				errors[vErr.Field()] = fmt.Sprintf("The value must be one of the following: %s", allowedValues)
+			case "min":
+				minValue := vErr.Param()
+				errors[vErr.Field()] = fmt.Sprintf("The value must be at least: %s", minValue)
 			default:
 				errors[vErr.Field()] = ErrorMessages[vErr.Tag()]
 			}
@@ -72,22 +74,23 @@ func InitValidators() {
 	}
 }
 
-func IsImage(file multipart.File) bool {
-	buffer := make([]byte, 512)
-	_, err := file.Read(buffer)
-	if err != nil {
-		return false
+func IsImage(fileHeader multipart.FileHeader) bool {
+	imageExtensions := []string{".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"}
+	for _, ext := range imageExtensions {
+		if strings.HasSuffix(fileHeader.Filename, ext) {
+			return true
+		}
 	}
-	contentType := http.DetectContentType(buffer)
-	return strings.HasPrefix(contentType, "image/")
+
+	return false
 }
 
-func IsVideo(file multipart.File) bool {
-	buffer := make([]byte, 512)
-	_, err := file.Read(buffer)
-	if err != nil {
-		return false
+func IsVideo(fileHeader multipart.FileHeader) bool {
+	videoExtensions := []string{".mp4", ".mkv", ".avi", ".mov", ".wmv", ".flv", ".webm"}
+	for _, ext := range videoExtensions {
+		if strings.HasSuffix(fileHeader.Filename, ext) {
+			return true
+		}
 	}
-	contentType := http.DetectContentType(buffer)
-	return strings.HasPrefix(contentType, "video/")
+	return false
 }

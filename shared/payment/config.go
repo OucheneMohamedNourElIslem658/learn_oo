@@ -15,7 +15,7 @@ type Config struct {
 var envs = initAPI()
 
 func initAPI() Config {
-	if err := godotenv.Load("../../.env");err != nil {
+	if err := godotenv.Load();err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 
