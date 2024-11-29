@@ -37,7 +37,7 @@ type CreatedCourseDTO struct {
 	Price       float64               `form:"price" binding:"price"`
 	Language    models.Languages      `form:"language" binding:"required,oneof='ar' 'fr' 'en'"`
 	Level       models.Level          `form:"level" binding:"required,oneof='bigener' 'medium' 'advanced'"`
-	Duration    time.Duration         `form:"duration"`
+	Duration    time.Duration         `form:"duration" binding:"omitempty,min=300000000"`
 	Video       *multipart.FileHeader `form:"video,omitempty" binding:"required"`
 	Image       *multipart.FileHeader `form:"image,omitempty" binding:"required"`
 }
@@ -278,7 +278,7 @@ type UpdateCourseDTO struct {
 	Price         *float64         `json:"price" binding:"omitempty,price"`
 	Language      models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
 	Level         models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
-	Duration      time.Duration    `json:"duration"`
+	Duration      time.Duration    `json:"duration" binding:"omitempty,min=300000000"`
 	CategoriesIDs string           `json:"categories_ids"`
 }
 

@@ -139,7 +139,7 @@ func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
 func (cc *CoursesController) GetCategories(ctx *gin.Context) {
 	coursesRepository := cc.coursesRepository
 
-	categories, err := coursesRepository.GetCategories();
+	categories, err := coursesRepository.GetCategories()
 
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -149,8 +149,8 @@ func (cc *CoursesController) GetCategories(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"categories":      categories,
-		"count":        len(categories),
+		"categories": categories,
+		"count":      len(categories),
 	})
 }
 
@@ -167,7 +167,7 @@ func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	err := coursesRepository.CreateCategory(category);
+	err := coursesRepository.CreateCategory(category)
 
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
