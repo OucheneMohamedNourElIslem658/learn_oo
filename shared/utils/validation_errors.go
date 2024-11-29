@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
+	// "github.com/golodash/galidator"
 )
 
 var ErrorMessages = map[string]string{
@@ -18,10 +19,17 @@ var ErrorMessages = map[string]string{
 	"email":          "invalid",
 	"password":       "its lenght must be greater than 5",
 	"couse_duration": "must be more than 5 min",
+	"price":          "must be 0 or greater than 50",
 }
+
+// var (
+// 	g          = galidator.New()
+// 	customizer = g.Validator()
+//   )
 
 func ValidationErrorResponse(err error) gin.H {
 	errors := make(gin.H)
+	// return galida
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, vErr := range validationErrors {
 			switch vErr.Tag() {
@@ -49,27 +57,29 @@ func validatePassword(fl validator.FieldLevel) bool {
 }
 
 func validateDuration(fl validator.FieldLevel) bool {
-	duration := fl.Field().String()
-
-	if duration, err := time.ParseDuration(duration); err != nil {
-		return false
-	} else {
-		return duration.Minutes() >= 5
-	}
+	durationStr := fl.Field().String()
+	duration, err := time.ParseDuration(durationStr)
+	return err == nil && duration.Minutes() > 5
 }
 
-func initPasswordValidator() (err error) {
+func ValidatePrice(fl validator.FieldLevel) bool {
+	price := fl.Field().Float()
+	return price == 0 || price >= 50
+}
+
+func registerValidators() (err error) {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); !ok {
 		return errors.New("validator initialization failed")
 	} else {
 		v.RegisterValidation("password", validatePassword)
 		v.RegisterValidation("course_duration", validateDuration)
+		v.RegisterValidation("price", ValidatePrice)
 	}
 	return nil
 }
 
 func InitValidators() {
-	if err := initPasswordValidator(); err != nil {
+	if err := registerValidators(); err != nil {
 		log.Fatal(err)
 	}
 }

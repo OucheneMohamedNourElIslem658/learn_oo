@@ -36,7 +36,7 @@ type Course struct {
 	Language         Languages      `gorm:"default:'en'" json:"language"`
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
 	Duration         time.Duration  `json:"duration"`
-	Rate             float64        `gorm:"rate" json:"rate"`
+	Rate             float64        `gorm:"-:migration;->" json:"rate"`
 	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
 	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
 	Video            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`

@@ -32,7 +32,7 @@ type Author struct {
 	UpdatedAt       time.Time      `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Bio             gin.H          `gorm:"json" json:"bio,omitempty"`
-	Balance         uint           `gorm:"-" json:"balance,omitempty"`
+	Balance         uint           `gorm:"-:migration;->" json:"balance,omitempty"`
 	UserID          string         `json:"user_id,omitempty"`
 	User            *User          `json:"user,omitempty"`
 	Accomplishments []File         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"accomplishments,omitempty"`

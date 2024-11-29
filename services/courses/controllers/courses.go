@@ -93,3 +93,103 @@ func (cc *CoursesController) GetCourses(ctx *gin.Context) {
 		})
 	}
 }
+
+func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
+	coursesRepository := cc.coursesRepository
+
+	var course repositories.UpdateCourseDTO
+
+	if err := ctx.ShouldBind(&course); err != nil {
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": message,
+		})
+		return
+	}
+
+	ID := ctx.Param("id")
+	authorID := ctx.GetString("author_id")
+
+	if err := coursesRepository.UpdateCourse(ID, authorID, course); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
+	ID := ctx.Param("id")
+	authorID := ctx.GetString("author_id")
+
+	coursesRepository := cc.coursesRepository
+
+	if err := coursesRepository.DeleteCourse(ID, authorID); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (cc *CoursesController) GetCategories(ctx *gin.Context) {
+	coursesRepository := cc.coursesRepository
+
+	categories, err := coursesRepository.GetCategories();
+
+	if err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"categories":      categories,
+		"count":        len(categories),
+	})
+}
+
+func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
+	coursesRepository := cc.coursesRepository
+
+	var category repositories.CreatedCategoryDTO
+
+	if err := ctx.ShouldBind(&category); err != nil {
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": message,
+		})
+		return
+	}
+
+	err := coursesRepository.CreateCategory(category);
+
+	if err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusCreated)
+}
+
+func (cc *CoursesController) DeleteCategory(ctx *gin.Context) {
+	ID := ctx.Param("id")
+
+	coursesRepository := cc.coursesRepository
+
+	if err := coursesRepository.DeleteCategory(ID); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}

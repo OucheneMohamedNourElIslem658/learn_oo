@@ -34,7 +34,7 @@ func NewAuthRepository() *CoursesRepository {
 type CreatedCourseDTO struct {
 	Title       string                `form:"title" binding:"required"`
 	Description string                `form:"description" binding:"required"`
-	Price       float64               `form:"price" binding:"min=50"`
+	Price       float64               `form:"price" binding:"price"`
 	Language    models.Languages      `form:"language" binding:"required,oneof='ar' 'fr' 'en'"`
 	Level       models.Level          `form:"level" binding:"required,oneof='bigener' 'medium' 'advanced'"`
 	Duration    time.Duration         `form:"duration"`
@@ -86,8 +86,6 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		}
 	}
 
-	// Create Payment Product:
-
 	courseToCreate := models.Course{
 		AuthorID:    &authorID,
 		Title:       course.Title,
@@ -106,7 +104,7 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		},
 	}
 
-	if course.Price > 0 {
+	if course.Price >= 50 {
 		payment := ar.payment
 		product, err := payment.CreateProduct(courseToCreate)
 		if err != nil {
@@ -181,8 +179,8 @@ type CourseSearchDTO struct {
 	MaxDuration   time.Duration    `form:"max_duration" binding:"min=0"`
 	PageSize      uint             `form:"page_size,default=10" binding:"min=1"`
 	Page          uint             `form:"page,default=1" binding:"min=1"`
-	AppendWith    string           `form:"append_with,omitempty"`
-	CategoriesIDs string           `form:"categories_ids,omitempty"`
+	AppendWith    string           `form:"append_with"`
+	CategoriesIDs string           `form:"categories_ids"`
 }
 
 func (ar *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
@@ -251,7 +249,7 @@ func (ar *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate").
 		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
 		Group("courses.id").
-		Order("courses.rate DESC, price DESC, created_at DESC, duration DESC")
+		Order("rate DESC, price DESC, created_at DESC, duration DESC")
 
 	var totalRecords int64
 	database.Model(&models.User{}).Count(&totalRecords)
@@ -272,4 +270,206 @@ func (ar *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	coursesListLenght := uint(len(coursesList))
 
 	return coursesList, &page, &coursesListLenght, &totalPages, nil
+}
+
+type UpdateCourseDTO struct {
+	Title         string           `json:"title"`
+	Description   string           `json:"description"`
+	Price         *float64         `json:"price" binding:"omitempty,price"`
+	Language      models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
+	Level         models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
+	Duration      time.Duration    `json:"duration"`
+	CategoriesIDs string           `json:"categories_ids"`
+}
+
+func (ar *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCourseDTO) (apiError *utils.APIError) {
+	database := ar.database
+
+	var existingCourse models.Course
+	err := database.Where("id = ? and author_id = ?", ID, authorID).Preload("Image").Preload("Video").First(&existingCourse).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "Course not found",
+			}
+		}
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	if course.Title != "" {
+		existingCourse.Title = course.Title
+	}
+
+	if course.Description != "" {
+		existingCourse.Description = course.Description
+	}
+
+	if course.Language != "" {
+		existingCourse.Language = course.Language
+	}
+
+	if course.Level != "" {
+		existingCourse.Level = course.Level
+	}
+
+	if course.Duration > 0 {
+		existingCourse.Duration = course.Duration
+	}
+
+	fmt.Println(course.Price)
+
+	if course.Price != nil {
+		existingCourse.Price = *course.Price
+		fmt.Println(existingCourse.Price)
+		if *course.Price >= 50 {
+			payment := ar.payment
+			product, err := payment.CreateProduct(existingCourse)
+			if err != nil {
+				return &utils.APIError{
+					StatusCode: http.StatusInternalServerError,
+					Message:    err.Error(),
+				}
+			}
+			existingCourse.PaymentPriceID = &product.PriceID
+			existingCourse.PaymentProductID = &product.ID
+		}
+	}
+
+	if course.CategoriesIDs != "" {
+		categoryIDs := strings.Split(course.CategoriesIDs, ",")
+		var categories []models.Category
+		err = database.Where("id IN (?)", categoryIDs).Find(&categories).Error
+		if err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    err.Error(),
+			}
+		}
+
+		err = database.Model(&existingCourse).Association("Categories").Replace(categories)
+		if err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    "Failed to update categories: " + err.Error(),
+			}
+		}
+	}
+
+	err = database.Save(&existingCourse).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (ar *CoursesRepository) DeleteCourse(ID, authorID string) (apiError *utils.APIError) {
+	database := ar.database
+
+	var existingCourse models.Course
+	err := database.Where("id = ? and author_id = ?", ID, authorID).First(&existingCourse).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "course not found",
+			}
+		}
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	err = database.Unscoped().Delete(&existingCourse).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (ar *CoursesRepository) GetCategories() ([]models.Category, *utils.APIError) {
+	database := ar.database
+
+	var categories []models.Category
+
+	err := database.Find(&categories).Error
+	if err != nil {
+		return nil, &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return categories, nil
+}
+
+type CreatedCategoryDTO struct {
+	Name string `form:"name" binding:"required"`
+}
+
+func (ar *CoursesRepository) CreateCategory(category CreatedCategoryDTO) (apiError *utils.APIError) {
+	database := ar.database
+
+	var existingCategory models.Category
+
+	err := database.Where("name = ?", category.Name).First(&existingCategory).Error
+	if err == nil {
+		return &utils.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "categoriy name already exists",
+		}
+	}
+
+	newCategory := models.Category{Name: category.Name}
+	err = database.Create(&newCategory).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (ar *CoursesRepository) DeleteCategory(ID string) *utils.APIError {
+	database := ar.database
+
+	var category models.Category
+
+	err := database.Where("id = ?", ID).First(&category).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "category not found",
+			}
+		}
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	err = database.Delete(&category).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
 }
