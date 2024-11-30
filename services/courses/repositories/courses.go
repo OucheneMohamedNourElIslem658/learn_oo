@@ -23,7 +23,7 @@ type CoursesRepository struct {
 	payment     *payment.Payment
 }
 
-func NewAuthRepository() *CoursesRepository {
+func NewCoursesRepository() *CoursesRepository {
 	return &CoursesRepository{
 		database:    database.Instance,
 		filestorage: filestorage.NewFileStorage(),
@@ -42,10 +42,10 @@ type CreatedCourseDTO struct {
 	Image       *multipart.FileHeader `form:"image,omitempty" binding:"required"`
 }
 
-func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseDTO) (apiError *utils.APIError) {
+func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseDTO) (apiError *utils.APIError) {
 	// Upload Image And Video:
 
-	filestorage := ar.filestorage
+	filestorage := cr.filestorage
 
 	image, _ := course.Image.Open()
 	defer image.Close()
@@ -100,12 +100,12 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		},
 		Video: &models.File{
 			URL:          videoUploadResult.Url,
-			ThumbnailURL: &imageUploadResult.ThumbnailUrl,
+			ThumbnailURL: &videoUploadResult.ThumbnailUrl,
 		},
 	}
 
 	if course.Price >= 50 {
-		payment := ar.payment
+		payment := cr.payment
 		product, err := payment.CreateProduct(courseToCreate)
 		if err != nil {
 			return &utils.APIError{
@@ -118,7 +118,7 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	}
 
 	// Create Course:
-	database := ar.database
+	database := cr.database
 
 	err = database.Create(&courseToCreate).Error
 	if err != nil {
@@ -131,8 +131,8 @@ func (ar *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	return nil
 }
 
-func (ar *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Course, apiError *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Course, apiError *utils.APIError) {
+	database := cr.database
 
 	query := database.Model(&models.Course{})
 
@@ -151,6 +151,10 @@ func (ar *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Co
 	for _, extention := range validExtentions {
 		query.Preload(extention)
 	}
+
+	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate").
+		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
+		Group("courses.id")
 
 	var existingCourse models.Course
 	err := query.Where("id = ?", ID).First(&existingCourse).Error
@@ -183,8 +187,8 @@ type CourseSearchDTO struct {
 	CategoriesIDs string           `form:"categories_ids"`
 }
 
-func (ar *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
+	database := cr.database
 
 	query := database.Model(&models.Course{})
 
@@ -282,8 +286,8 @@ type UpdateCourseDTO struct {
 	CategoriesIDs string           `json:"categories_ids"`
 }
 
-func (ar *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCourseDTO) (apiError *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCourseDTO) (apiError *utils.APIError) {
+	database := cr.database
 
 	var existingCourse models.Course
 	err := database.Where("id = ? and author_id = ?", ID, authorID).Preload("Image").Preload("Video").First(&existingCourse).Error
@@ -326,7 +330,7 @@ func (ar *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 		existingCourse.Price = *course.Price
 		fmt.Println(existingCourse.Price)
 		if *course.Price >= 50 {
-			payment := ar.payment
+			payment := cr.payment
 			product, err := payment.CreateProduct(existingCourse)
 			if err != nil {
 				return &utils.APIError{
@@ -370,8 +374,8 @@ func (ar *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 	return nil
 }
 
-func (ar *CoursesRepository) DeleteCourse(ID, authorID string) (apiError *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) DeleteCourse(ID, authorID string) (apiError *utils.APIError) {
+	database := cr.database
 
 	var existingCourse models.Course
 	err := database.Where("id = ? and author_id = ?", ID, authorID).First(&existingCourse).Error
@@ -399,8 +403,8 @@ func (ar *CoursesRepository) DeleteCourse(ID, authorID string) (apiError *utils.
 	return nil
 }
 
-func (ar *CoursesRepository) GetCategories() ([]models.Category, *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) GetCategories() ([]models.Category, *utils.APIError) {
+	database := cr.database
 
 	var categories []models.Category
 
@@ -419,8 +423,8 @@ type CreatedCategoryDTO struct {
 	Name string `form:"name" binding:"required"`
 }
 
-func (ar *CoursesRepository) CreateCategory(category CreatedCategoryDTO) (apiError *utils.APIError) {
-	database := ar.database
+func (cr *CoursesRepository) CreateCategory(category CreatedCategoryDTO) (apiError *utils.APIError) {
+	database := cr.database
 
 	var existingCategory models.Category
 
@@ -444,8 +448,8 @@ func (ar *CoursesRepository) CreateCategory(category CreatedCategoryDTO) (apiErr
 	return nil
 }
 
-func (ar *CoursesRepository) DeleteCategory(ID string) *utils.APIError {
-	database := ar.database
+func (cr *CoursesRepository) DeleteCategory(ID string) *utils.APIError {
+	database := cr.database
 
 	var category models.Category
 

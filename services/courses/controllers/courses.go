@@ -14,7 +14,7 @@ type CoursesController struct {
 
 func NewCoursesController() *CoursesController {
 	return &CoursesController{
-		coursesRepository: repositories.NewAuthRepository(),
+		coursesRepository: repositories.NewCoursesRepository(),
 	}
 }
 
