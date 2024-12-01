@@ -41,19 +41,19 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	CheckCourseExistance := chaptersMiddlewares.CheckCourseExistance()
 
 	router.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
-	router.PUT("/:id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
-	router.DELETE("/:id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
-	router.GET("/:id", coursesController.GetCourse)
+	router.PUT("/:course_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
+	router.DELETE("/:course_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
+	router.GET("/:course_id", coursesController.GetCourse)
 	router.GET("/", coursesController.GetCourses)
 
 	categoriesRouter := router.Group("/categories")
 	categoriesRouter.POST("/", coursesController.CreateCategory)
-	categoriesRouter.DELETE("/:id", coursesController.DeleteCategory)
+	categoriesRouter.DELETE("/:category_id", coursesController.DeleteCategory)
 	categoriesRouter.GET("/", coursesController.GetCategories)
 
 	chaptersRouter := router.Group("/:course_id/chapters")
 	chaptersRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.CreateChapter)
-	chaptersRouter.PUT("/:id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.UpdateChapter)
-	chaptersRouter.DELETE("/:id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.DeleteChapter)
-	chaptersRouter.GET("/:id", chaptersController.GetChapter)
+	chaptersRouter.PUT("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.UpdateChapter)
+	chaptersRouter.DELETE("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.DeleteChapter)
+	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter)
 }

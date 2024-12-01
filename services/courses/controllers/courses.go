@@ -51,7 +51,7 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 }
 
 func (cc *CoursesController) GetCourse(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("course_id")
 
 	appendWith := ctx.Query("append_with")
 
@@ -107,7 +107,7 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 		return
 	}
 
-	ID := ctx.Param("id")
+	ID := ctx.Param("course_id")
 	authorID := ctx.GetString("author_id")
 
 	if err := coursesRepository.UpdateCourse(ID, authorID, course); err != nil {
@@ -121,7 +121,7 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 }
 
 func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
-	ID := ctx.Param("id")
+	ID := ctx.Param("course_id")
 	authorID := ctx.GetString("author_id")
 
 	coursesRepository := cc.coursesRepository
@@ -180,7 +180,7 @@ func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
 }
 
 func (cc *CoursesController) DeleteCategory(ctx *gin.Context) {
-	ID := ctx.Param("id")
+	ID := ctx.Param("category_id")
 
 	coursesRepository := cc.coursesRepository
 

@@ -44,7 +44,7 @@ func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
 }
 
 func (cc *ChaptersController) GetChapter(ctx *gin.Context) {
-	id := ctx.Param("id")
+	id := ctx.Param("chapter_id")
 
 	appendWith := ctx.Query("append_with")
 
@@ -71,7 +71,7 @@ func (cc *ChaptersController) UpdateChapter(ctx *gin.Context) {
 		return
 	}
 
-	ID := ctx.Param("id")
+	ID := ctx.Param("chapter_id")
 
 	chaptersRepository := cc.chaptersRepository
 
@@ -86,7 +86,7 @@ func (cc *ChaptersController) UpdateChapter(ctx *gin.Context) {
 }
 
 func (cc *ChaptersController) DeleteChapter(ctx *gin.Context) {
-	ID := ctx.Param("id")
+	ID := ctx.Param("chapter_id")
 
 	chaptersRepository := cc.chaptersRepository
 
