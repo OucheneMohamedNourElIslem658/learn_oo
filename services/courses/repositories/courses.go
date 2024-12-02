@@ -50,7 +50,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	image, _ := course.Image.Open()
 	defer image.Close()
 
-	video, _ := course.Image.Open()
+	video, _ := course.Video.Open()
 	defer video.Close()
 
 	message := make(map[string]any)
@@ -78,7 +78,10 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		}
 	}
 
+	fmt.Println("entered")
+
 	videoUploadResult, err := filestorage.UploadFile(video, fmt.Sprintf("/learn_oo/authors/%v/courses/videos", authorID))
+	fmt.Println(videoUploadResult.Url)
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -134,7 +137,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 func (cr *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Course, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{})
+	query := database.Model(&models.Course{}).Where("is_completed = true")
 
 	validExtentions := utils.GetValidExtentions(
 		appendWith,
@@ -190,7 +193,7 @@ type CourseSearchDTO struct {
 func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{})
+	query := database.Model(&models.Course{}).Where("is_completed = true")
 
 	title := filters.Title
 	language := filters.Language

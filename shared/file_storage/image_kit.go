@@ -38,7 +38,7 @@ func (fs *FileStorage) UploadFile(file multipart.File, folder string) (data *upl
 		file,
 		uploader.UploadParam{
 			Folder: folder,
-			FileName: "image",
+			FileName: "file",
 		},
 	)
 

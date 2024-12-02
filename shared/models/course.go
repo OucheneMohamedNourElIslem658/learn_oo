@@ -37,10 +37,11 @@ type Course struct {
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
 	Duration         time.Duration  `json:"duration"`
 	Rate             float64        `gorm:"-:migration;->" json:"rate"`
+	IsCompleted      bool           `json:"is_completed"`
 	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
 	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
-	Video            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
-	Image            *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
+	Video            *File          `gorm:"foreignKey:VideoCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
+	Image            *File          `gorm:"foreignKey:ImageCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
 	AuthorID         *string        `json:"author_id,omitempty"`
 	Author           *Author        `json:"author,omitempty"`
 	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories,omitempty"`

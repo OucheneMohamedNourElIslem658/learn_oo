@@ -20,6 +20,6 @@ type File struct {
 	Author       *Author        `json:"author,omitempty"`
 	LessonID     *int           `json:"lesson_id,omitempty"`
 	Lesson       *Lesson        `json:"lesson,omitempty"`
-	CourseID     *int           `json:"course_id,omitempty"`
-	Course       *Course        `json:"course,omitempty"`
+	VideoCourseID *uint          `gorm:"index" json:"video_course_id,omitempty"`
+    ImageCourseID *uint          `gorm:"index" json:"image_course_id,omitempty"`
 }
