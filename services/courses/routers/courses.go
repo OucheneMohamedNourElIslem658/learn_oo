@@ -34,6 +34,7 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	authMiddlewares := cr.authMiddlewares
 
 	authorization := authMiddlewares.Authorization()
+	authorizationWithIDCheck := authMiddlewares.AuthorizationWithIDCheck()
 	authorizationWithEmailVerification := authMiddlewares.AuthorizationWithEmailVerification()
 	AuthorizationWithAuthorCheck := authMiddlewares.AuthorizationWithAuthorCheck()
 
@@ -41,11 +42,11 @@ func (cr *CoursesRouter) RegisterRoutes() {
 
 	CheckCourseExistance := chaptersMiddlewares.CheckCourseExistance()
 
-	router.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
-	router.PUT("/:course_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
-	router.DELETE("/:course_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
-	router.GET("/:course_id", coursesController.GetCourse)
-	router.GET("/", coursesController.GetCourses)
+	router.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
+	router.PUT("/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
+	router.DELETE("/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
+	router.GET("/:course_id", authorization, authorizationWithIDCheck, coursesController.GetCourse)
+	router.GET("/", authorization, coursesController.GetCourses)
 
 	categoriesRouter := router.Group("/categories")
 	categoriesRouter.POST("/", coursesController.CreateCategory)
@@ -56,5 +57,5 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	chaptersRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.CreateChapter)
 	chaptersRouter.PUT("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.UpdateChapter)
 	chaptersRouter.DELETE("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.DeleteChapter)
-	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter)
+	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter) //if author then get if not course must be completed (and free don't forget it!)
 }

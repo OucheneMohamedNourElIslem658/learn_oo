@@ -27,23 +27,24 @@ func (pr *ProfilesRouter) RegisterRoutes() {
 
 	authMiddlewares := pr.authMiddlewares
 	authorization := authMiddlewares.Authorization()
+	authorizationWithIDCheck := authMiddlewares.AuthorizationWithIDCheck()
 	authorizationWithEmailVerification := authMiddlewares.AuthorizationWithEmailVerification()
 	authorizationWithAuthorCheck := authMiddlewares.AuthorizationWithAuthorCheck()
 
 	profileRouter := router.Group("/profile")
-	profileRouter.GET("/", authorization, authorizationWithEmailVerification, usersController.GetUser)
-	profileRouter.PUT("/image", authorization, authorizationWithEmailVerification, usersController.UpdateUserImage)
+	profileRouter.GET("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, usersController.GetUser)
+	profileRouter.PUT("/image", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, usersController.UpdateUserImage)
 	profileRouter.PUT("/", authorization, authorizationWithEmailVerification, usersController.UpdateUser)
 
 	authorsRouter := router.Group("/authors")
-	authorsRouter.PUT("/upgrade", authorization, authorizationWithEmailVerification, usersController.UpgradeToAuthor)
-	authorsRouter.DELETE("/downgrade", authorization, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.DowngradeFromAuthor)
+	authorsRouter.PUT("/upgrade", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, usersController.UpgradeToAuthor)
+	authorsRouter.DELETE("/downgrade", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.DowngradeFromAuthor)
 
 	authorProfileRouter := authorsRouter.Group("/profile")
-	authorProfileRouter.GET("/", authorization, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.GetAuthor)
-	authorProfileRouter.PUT("/", authorization, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.UpdateAuthor)
+	authorProfileRouter.GET("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.GetAuthor)
+	authorProfileRouter.PUT("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.UpdateAuthor)
 
 	authorAccomplishments := authorProfileRouter.Group("/accomplishments")
-	authorAccomplishments.POST("/", authorization, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.AddAuthorAccomplishments)
-	authorAccomplishments.DELETE("/:file_id", authorization, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.DeleteAuthorAccomplishment)
+	authorAccomplishments.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.AddAuthorAccomplishments)
+	authorAccomplishments.DELETE("/:file_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, authorizationWithAuthorCheck, usersController.DeleteAuthorAccomplishment)
 }

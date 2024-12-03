@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,36 +24,50 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorization := ctx.GetHeader("Authorization")
 
-		if authorization == "" {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "undefined authorization",
+		if authorization != "" {
+			idToken := authorization[len("Bearer "):]
+
+			if idToken != "" {
+				claims, isValid, err := utils.VerifyIDToken(idToken)
+
+				if err != nil {
+					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+						"message": "invalid id token",
+					})
+					return
+				}
+
+				if !isValid {
+					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+						"message": "id token expired",
+					})
+					return
+				}
+
+				fmt.Println(claims.AuthorID)
+
+				ctx.Set("id", claims.ID)
+				ctx.Set("email_verified", claims.EmailVerified)
+				if claims.AuthorID != nil {
+					ctx.Set("author_id", *claims.AuthorID)
+				}
+			}
+		}
+		ctx.Next()
+	}
+}
+
+func (am *AuthorizationMiddlewares) AuthorizationWithIDCheck() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authorID := ctx.GetString("id")
+
+		if authorID == "" {
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"message": "id token doesn't contain id",
 			})
-			ctx.Abort()
 			return
 		}
 
-		idToken := authorization[len("Bearer "):]
-		claims, isValid, err := utils.VerifyIDToken(idToken)
-
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-
-		if !isValid {
-		    ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "id token expired",
-			})
-			return
-		}
-
-		ctx.Set("id", claims.ID)
-		ctx.Set("email_verified", claims.EmailVerified)
-		if claims.AuthorID != nil {
-			ctx.Set("author_id", *claims.AuthorID)
-		}
 		ctx.Next()
 	}
 }
@@ -93,7 +108,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailCheck() gin.HandlerFun
 		email, isValid, err := utils.VerifyIDTokenFromEmail(idToken)
 
 		if err != nil {
-		    ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
 			return
@@ -103,7 +118,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailCheck() gin.HandlerFun
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "token expired",
 			})
-		    return
+			return
 		}
 
 		ctx.Set("email", *email)

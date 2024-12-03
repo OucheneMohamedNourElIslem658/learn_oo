@@ -134,10 +134,10 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	return nil
 }
 
-func (cr *CoursesRepository) GetCourse(ID, appendWith string, isCompleted bool) (course *models.Course, apiError *utils.APIError) {
+func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course *models.Course, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{}) //.Where("is_completed = ?", isCompleted)
+	query := database.Model(&models.Course{})
 
 	validExtentions := utils.GetValidExtentions(
 		appendWith,
@@ -153,6 +153,12 @@ func (cr *CoursesRepository) GetCourse(ID, appendWith string, isCompleted bool) 
 
 	for _, extention := range validExtentions {
 		query.Preload(extention)
+	}
+
+	if authorID != "" {
+		query.Where("author_id = ?", authorID)
+	} else {
+		query.Where("is_completed = ?", true)
 	}
 
 	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate").
@@ -193,7 +199,7 @@ type CourseSearchDTO struct {
 func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{}) //.Where("is_completed = true")
+	query := database.Model(&models.Course{}).Where("is_completed = true")
 
 	title := filters.Title
 	language := filters.Language

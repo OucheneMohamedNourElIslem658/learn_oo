@@ -39,7 +39,7 @@ type Option struct {
 	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
 	QuestionID      uint             `json:"question_id"`
 	Question        *Question        `json:"question,omitempty"`
-	QuestionAnswers []QuestionAnswer `gorm:"many2many:question_answer_selections" json:"question_answer_selections,omitempty"`
+	QuestionAnswers []QuestionAnswer `gorm:"many2many:option_selections" json:"question_answer_selections,omitempty"`
 }
 
 type QuestionAnswer struct {
@@ -51,10 +51,10 @@ type QuestionAnswer struct {
 	LearnerID       uint           `json:"learner_id"`
 	Question        *Question      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"question"`
 	Learner         *User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner"`
-	SelectedOptions []Option       `gorm:"many2many:question_answer_selections" json:"selected_options,omitempty"`
+	SelectedOptions []Option       `gorm:"many2many:option_selections" json:"selected_options,omitempty"`
 }
 
-type QuestionAnswerSelection struct {
+type OptionSelection struct {
 	CreatedAt        time.Time       `json:"created_at"`
 	UpdatedAt        time.Time       `json:"updated_at"`
 	DeletedAt        gorm.DeletedAt  `gorm:"index" json:"deleted_at"`

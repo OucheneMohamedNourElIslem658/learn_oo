@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/repositories"
@@ -53,11 +54,15 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 func (cc *CoursesController) GetCourse(ctx *gin.Context) {
 	id := ctx.Param("course_id")
 
+	authorID := ctx.GetString("author_id")
+
 	appendWith := ctx.Query("append_with")
 
 	coursesRepository := cc.coursesRepository
 
-	if course, err := coursesRepository.GetCourse(id, appendWith, true); err != nil {
+	fmt.Println(authorID)
+
+	if course, err := coursesRepository.GetCourse(id, authorID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
@@ -66,23 +71,6 @@ func (cc *CoursesController) GetCourse(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, course)
 	}
 }
-
-// func (cc *CoursesController) GetAuthorCourse(ctx *gin.Context) {
-// 	id := ctx.Param("course_id")
-
-// 	appendWith := ctx.Query("append_with")
-
-// 	coursesRepository := cc.coursesRepository
-
-// 	if course, err := coursesRepository.GetCourse(id, appendWith); err != nil {
-// 		ctx.JSON(err.StatusCode, gin.H{
-// 			"message": err.Message,
-// 		})
-// 		return
-// 	} else {
-// 		ctx.JSON(http.StatusOK, course)
-// 	}
-// }
 
 func (cc *CoursesController) GetCourses(ctx *gin.Context) {
 	var filters repositories.CourseSearchDTO

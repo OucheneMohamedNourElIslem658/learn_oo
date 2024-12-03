@@ -414,7 +414,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	var database = ar.database
 
 	var existingUser models.User
-	err = database.Where("email = ?", user.Email).Preload("Image").First(&existingUser).Error
+	err = database.Where("email = ?", user.Email).Preload("Image").Preload("AuthorProfile").First(&existingUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			payment := ar.payment
