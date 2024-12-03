@@ -134,10 +134,10 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	return nil
 }
 
-func (cr *CoursesRepository) GetCourse(ID, appendWith string) (course *models.Course, apiError *utils.APIError) {
+func (cr *CoursesRepository) GetCourse(ID, appendWith string, isCompleted bool) (course *models.Course, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{}).Where("is_completed = true")
+	query := database.Model(&models.Course{}) //.Where("is_completed = ?", isCompleted)
 
 	validExtentions := utils.GetValidExtentions(
 		appendWith,
@@ -193,7 +193,7 @@ type CourseSearchDTO struct {
 func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{}).Where("is_completed = true")
+	query := database.Model(&models.Course{}) //.Where("is_completed = true")
 
 	title := filters.Title
 	language := filters.Language

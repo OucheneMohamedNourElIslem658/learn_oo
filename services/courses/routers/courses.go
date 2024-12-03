@@ -11,7 +11,7 @@ import (
 type CoursesRouter struct {
 	Router              *gin.RouterGroup
 	coursesController   *controllers.CoursesController
-	chaptersControllers *controllers.ChaptersController
+	chaptersController  *controllers.ChaptersController
 	authMiddlewares     *authMiddlewares.AuthorizationMiddlewares
 	ChaptersMiddlewares *middlewares.ChaptersMiddlewares
 }
@@ -20,6 +20,7 @@ func NewCoursesRouter(router *gin.RouterGroup) *CoursesRouter {
 	return &CoursesRouter{
 		Router:              router,
 		coursesController:   controllers.NewCoursesController(),
+		chaptersController:  controllers.NewChaptersController(),
 		authMiddlewares:     authMiddlewares.NewAuthorizationMiddlewares(),
 		ChaptersMiddlewares: middlewares.NewChaptersMiddlewares(),
 	}
@@ -28,7 +29,7 @@ func NewCoursesRouter(router *gin.RouterGroup) *CoursesRouter {
 func (cr *CoursesRouter) RegisterRoutes() {
 	router := cr.Router
 	coursesController := cr.coursesController
-	chaptersController := cr.chaptersControllers
+	chaptersController := cr.chaptersController
 
 	authMiddlewares := cr.authMiddlewares
 

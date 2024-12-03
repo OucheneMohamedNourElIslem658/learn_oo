@@ -31,8 +31,8 @@ type Course struct {
 	Title            string         `gorm:"not null" json:"title"`
 	Description      string         `json:"description"`
 	Price            float64        `json:"price"`
-	PaymentPriceID   *string        `gorm:"unique" json:"payment_price_id"`
-	PaymentProductID *string        `gorm:"unique" json:"payment_product_id"`
+	PaymentPriceID   *string        `gorm:"unique" json:"payment_price_id,omitempty"`
+	PaymentProductID *string        `gorm:"unique" json:"payment_product_id,omitempty"`
 	Language         Languages      `gorm:"default:'en'" json:"language"`
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
 	Duration         time.Duration  `json:"duration"`

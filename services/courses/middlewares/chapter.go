@@ -28,8 +28,8 @@ func (cm *ChaptersMiddlewares) CheckCourseExistance() gin.HandlerFunc {
 
 		database := cm.database
 
-		var exists bool
-		err := database.Model(models.Course{}).Where("course_id = ? and author_id = ?", courseID, authorID).Scan(&exists).Error
+		var count int64
+		err := database.Model(models.Course{}).Where("id = ? and author_id = ?", courseID, authorID).Count(&count).Error
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -37,7 +37,7 @@ func (cm *ChaptersMiddlewares) CheckCourseExistance() gin.HandlerFunc {
 			return
 		}
 
-		if !exists {
+		if count == 0 {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
 				"message": "course not found",
 			})
