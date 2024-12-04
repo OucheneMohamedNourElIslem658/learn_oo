@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/repositories"
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
@@ -118,6 +119,90 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 	if err := coursesRepository.UpdateCourse(ID, authorID, course); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
+	idString := ctx.Param("course_id")
+	id, _ := strconv.Atoi(idString)
+
+	image, imageHeader, err := ctx.Request.FormFile("image")
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if imageHeader == nil || image == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "image not provided",
+		})
+		return
+	}
+
+	if !utils.IsImage(*imageHeader) {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "the file is not an image",
+		})
+		return
+	}
+
+	authorID := ctx.GetString("author_id")
+
+	profilesRepository := cc.coursesRepository
+
+	apiError := profilesRepository.UpdateCourseImage(uint(id), authorID, image)
+	if apiError != nil {
+		ctx.JSON(apiError.StatusCode, gin.H{
+			"message": apiError.Message,
+		})
+		return
+	}
+
+	ctx.Status(http.StatusOK)
+}
+
+func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
+	idString := ctx.Param("course_id")
+	id, _ := strconv.Atoi(idString)
+
+	video, videoHeader, err := ctx.Request.FormFile("video")
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if videoHeader == nil || video == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "image not provided",
+		})
+		return
+	}
+
+	if !utils.IsVideo(*videoHeader) {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "the file is not a video",
+		})
+		return
+	}
+
+	authorID := ctx.GetString("author_id")
+
+	profilesRepository := cc.coursesRepository
+
+	apiError := profilesRepository.UpdateCourseVideo(uint(id), authorID, video)
+	if apiError != nil {
+		ctx.JSON(apiError.StatusCode, gin.H{
+			"message": apiError.Message,
 		})
 		return
 	}

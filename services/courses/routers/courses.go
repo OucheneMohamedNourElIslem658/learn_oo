@@ -48,6 +48,8 @@ func (cr *CoursesRouter) RegisterRoutes() {
 
 	router.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
 	router.PUT("/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
+	router.PUT("/:course_id/image", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, coursesController.UpdateCourseImage)
+	router.PUT("/:course_id/video", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, coursesController.UpdateCourseVideo)
 	router.DELETE("/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
 	router.GET("/:course_id", authorization, authorizationWithIDCheck, coursesController.GetCourse)
 	router.GET("/", authorization, coursesController.GetCourses)

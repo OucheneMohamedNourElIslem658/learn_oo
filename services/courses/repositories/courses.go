@@ -12,8 +12,8 @@ import (
 
 	database "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/database"
 	filestorage "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/file_storage"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
-	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
+	models "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
+	payment "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
 	utils "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
 )
 
@@ -333,8 +333,6 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 		existingCourse.Duration = course.Duration
 	}
 
-	fmt.Println(course.Price)
-
 	if course.Price != nil {
 		existingCourse.Price = *course.Price
 		fmt.Println(existingCourse.Price)
@@ -374,6 +372,116 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 
 	err = database.Save(&existingCourse).Error
 	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (cr *CoursesRepository) UpdateCourseImage(ID uint, authorID string, image multipart.File) (apiError *utils.APIError) {
+	database := cr.database
+	filestorage := cr.filestorage
+
+	var existingImage models.File
+	err := database.Where("image_course_id = ?", ID).First(&existingImage).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	if err == nil {
+		if err := database.Where("id = ?", existingImage.ID).Unscoped().Delete(&existingImage).Error; err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    err.Error(),
+			}
+		}
+		if existingImage.ImageKitID != nil {
+			if err := filestorage.DeleteFile(*existingImage.ImageKitID); err != nil {
+				return &utils.APIError{
+					StatusCode: http.StatusInternalServerError,
+					Message:    err.Error(),
+				}
+			}
+		}
+	}
+
+	path := fmt.Sprintf("/learn_oo/authors/%v/courses/images", authorID)
+	uploadData, err := filestorage.UploadFile(image, path)
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	newImage := models.File{
+		URL:          uploadData.Url,
+		ImageKitID:   &uploadData.FileId,
+		ThumbnailURL: &uploadData.ThumbnailUrl,
+		ImageCourseID:     &ID,
+	}
+	if err := database.Create(&newImage).Error; err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+func (cr *CoursesRepository) UpdateCourseVideo(ID uint, authorID string, video multipart.File) (apiError *utils.APIError) {
+	database := cr.database
+	filestorage := cr.filestorage
+
+	var existingVideo models.File
+	err := database.Where("video_course_id = ?", ID).First(&existingVideo).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	if err == nil {
+		if err := database.Where("id = ?", existingVideo.ID).Unscoped().Delete(&existingVideo).Error; err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    err.Error(),
+			}
+		}
+		if existingVideo.ImageKitID != nil {
+			if err := filestorage.DeleteFile(*existingVideo.ImageKitID); err != nil {
+				return &utils.APIError{
+					StatusCode: http.StatusInternalServerError,
+					Message:    err.Error(),
+				}
+			}
+		}
+	}
+
+	path := fmt.Sprintf("/learn_oo/authors/%v/courses/videos", authorID)
+	uploadData, err := filestorage.UploadFile(video, path)
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	newVideo := models.File{
+		URL:          uploadData.Url,
+		ImageKitID:   &uploadData.FileId,
+		ThumbnailURL: &uploadData.ThumbnailUrl,
+		VideoCourseID:     &ID,
+	}
+	if err := database.Create(&newVideo).Error; err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
