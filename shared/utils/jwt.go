@@ -17,7 +17,7 @@ func CreateIdToken(id string, authorID *string, emailVerified bool) (string, err
 			"id":             id,
 			"email_verified": emailVerified,
 			"author_id":      authorID,
-			"exp":            time.Now().Add(time.Hour * 24 * 2).Unix(),
+			"exp":            time.Now().Add(time.Hour * 24).Unix(),
 		},
 	)
 
@@ -53,6 +53,10 @@ func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
 		return nil, false, err
 	}
 
+	if !jwtIdToken.Valid {
+		return nil, false, nil
+	}
+
 	userClaims := &Claims{}
 	jwtClaims, _ := jwtIdToken.Claims.(jwt.MapClaims)
 
@@ -72,10 +76,6 @@ func VerifyIDToken(idToken string) (claims *Claims, isValid bool, err error) {
 		return nil, false, errors.New("casting email verified id failed")
 	} else {
 		userClaims.EmailVerified = emailVerified
-	}
-
-	if !isValid {
-		return userClaims, false, nil
 	}
 
 	return userClaims, true, nil
@@ -107,4 +107,34 @@ func VerifyIDTokenFromEmail(idToken string) (email *string, isValid bool, err er
 	} else {
 		return &emailToVerify, true, nil
 	}
+}
+
+func CreateRefreshToken(id string) (string, error) {
+	fmt.Println(id)
+	jwtIdToken := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"id": id,
+		},
+	)
+	idToken, err := jwtIdToken.SignedString(secretKey)
+	return idToken, err
+}
+
+func VerifyRefreshToken(refreshToken string) (jwt.MapClaims, error) {
+	jwtRefreshToken, err := jwt.Parse(refreshToken, func(t *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if !jwtRefreshToken.Valid {
+		return nil, errors.New("INVALID_REFRESH_TOKEN")
+	}
+
+	claims, _ := jwtRefreshToken.Claims.(jwt.MapClaims)
+
+	return claims, nil
 }

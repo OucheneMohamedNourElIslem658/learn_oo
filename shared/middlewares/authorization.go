@@ -12,13 +12,11 @@ import (
 
 type AuthorizationMiddlewares struct {
 	authRepository *repositories.AuthRepository
-	profilesRepository *repositories.ProfilesRepository
 }
 
 func NewAuthorizationMiddlewares() *AuthorizationMiddlewares {
 	return &AuthorizationMiddlewares{
 		authRepository: repositories.NewAuthRepository(),
-		profilesRepository: repositories.NewProfilesRepository(),
 	}
 }
 
@@ -40,40 +38,13 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 				}
 
 				if !isValid {
-					fmt.Println("entered")
-					profilesRepository := am.profilesRepository
-					fmt.Println(claims.ID)
-					user, apiError := profilesRepository.GetUser(claims.ID, "author_profile")
-					if apiError != nil {
-						ctx.AbortWithStatusJSON(apiError.StatusCode, gin.H{
-							"message": apiError.Message,
-						})
-						return
-					}
-
-					authorID := func() *string {
-						if user.AuthorProfile == nil {
-							return nil
-						}
-						return &user.AuthorProfile.ID
-					}()
-
-					idToken, err := utils.CreateIdToken(user.ID, authorID, user.EmailVerified)
-					if err != nil {
-						ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-							"message": err.Error(),
-						})
-						return
-					}
-
-					ctx.Set("id", user.ID)
-					ctx.Set("email_verified", user.EmailVerified)
-					if authorID != nil {
-						ctx.Set("author_id", authorID)
-					}
-					ctx.SetCookie("id_token", idToken, 2*24*60*60, "/", "localhost", false, true)
-					ctx.Next()
+					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+						"message": "id token expired",
+					})
+					return
 				}
+
+				fmt.Println(claims.AuthorID)
 
 				ctx.Set("id", claims.ID)
 				ctx.Set("email_verified", claims.EmailVerified)

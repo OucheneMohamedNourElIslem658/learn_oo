@@ -77,7 +77,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 			Message:    err.Error(),
 		}
 	}
-	
+
 	videoUploadResult, err := filestorage.UploadFile(video, fmt.Sprintf("/learn_oo/authors/%v/courses/videos", authorID))
 	fmt.Println(videoUploadResult.Url)
 	if err != nil {
@@ -363,7 +363,7 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 		if err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
-				Message:    "Failed to update categories: " + err.Error(),
+				Message:    err.Error(),
 			}
 		}
 	}

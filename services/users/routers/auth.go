@@ -33,6 +33,7 @@ func (ar *AuthRouter) RegisterRoutes() {
 	router.POST("/send-email-verification-link", authController.SendEmailVerificationLink)
 	router.GET("/serve-email-verification-template/:id_token", authController.ServeEmailVerificationTemplate)
 	router.GET("/verify-email/:id_token", authorizationWithEmailCheck, authController.VerifyEmail)
+	router.GET("/refresh-id-token", authController.RefreshIdToken)
 	router.POST("/send-password-reset-link", authController.SendPasswordResetLink)
 	router.GET("/serve-reset-password-form/:id_token", authController.ServeResetPasswordForm)
 	router.POST("/reset-password/:id_token", authorizationWithEmailCheck, authController.ResetPassword)

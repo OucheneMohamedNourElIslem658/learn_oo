@@ -61,12 +61,13 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	}
 
 	authRepository := authcontroller.authRepository
-	if idToken, err := authRepository.LoginWithEmailAndPassword(body.Email, body.Password); err != nil {
+	if idToken, refreshToken, err := authRepository.LoginWithEmailAndPassword(body.Email, body.Password); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})
 	} else {
-		ctx.SetCookie("id_token", *idToken, 2*24*60*60, "/", "localhost", false, true)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "localhost", false, true)
 		ctx.Status(http.StatusOK)
 	}
 }
@@ -113,6 +114,36 @@ func (authcontroller *AuthController) VerifyEmail(ctx *gin.Context) {
 func (authcontroller *AuthController) ServeEmailVerificationTemplate(ctx *gin.Context) {
 	ctx.HTML(http.StatusOK, "email_verification.html", nil)
 }
+
+func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
+	authorization := ctx.GetHeader("Authorization")
+
+	repository := authcontroller.authRepository
+
+	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"message": err.Message,
+		})
+	} else {
+		ctx.Status(http.StatusOK)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
+	}
+}
+
+// func (authcontroller *AuthController) GetUserData(ctx *gin.Context) {
+// 	authorization := ctx.GetHeader("Authorization")
+
+// 	repository := authcontroller.authRepository
+
+// 	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
+// 		ctx.JSON(err.StatusCode, gin.H{
+// 			"message": err.Message,
+// 		})
+// 	} else {
+// 		ctx.Status(http.StatusOK)
+// 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
+// 	}
+// }
 
 func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 	var body struct {
@@ -169,11 +200,13 @@ func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
 
 func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 	var query struct {
-		SuccessURL string `json:"success_url" form:"success_url" binding:"required"`
-		FailureURL string `json:"failure_url" form:"failure_url" binding:"required"`
+		SuccessURL string `form:"success_url" binding:"required"`
+		FailureURL string `form:"failure_url" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
+		fmt.Println(query.FailureURL)
+		fmt.Println(query.FailureURL)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": utils.ValidationErrorResponse(err),
 		})
@@ -208,14 +241,14 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 
 	authRepository := authcontroller.authRepository
 
-	if idToken, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
+	if idToken, refreshToken, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
 		godotenv.Load("../../.env")
 		host := os.Getenv("HOST")
-		ctx.SetCookie("id_token", *idToken, 2*24*60*60, "/", host, false, true)
-		fmt.Println(metadata.SuccessURL)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", host, false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", host, false, true)
 		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 	}
 }

@@ -110,6 +110,7 @@ type Lesson struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	Order       int           `json:"order"`
 	Title       string         `gorm:"not null" json:"title"`
 	Description string         `json:"description"`
 	Content     gin.H          `gorm:"json" json:"content,omitempty"`
