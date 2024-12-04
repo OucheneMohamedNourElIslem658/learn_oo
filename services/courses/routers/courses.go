@@ -54,6 +54,14 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	router.GET("/:course_id", authorization, authorizationWithIDCheck, coursesController.GetCourse)
 	router.GET("/", authorization, coursesController.GetCourses)
 
+	objectivesRouter := router.Group("/:course_id/objectives")
+	objectivesRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateObjective)
+	objectivesRouter.DELETE("/:objective_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteObjective)
+
+	requirementsRouter := router.Group("/:course_id/requirements")
+	requirementsRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateRequirement)
+	requirementsRouter.DELETE("/:requirement_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteRequirement)
+
 	categoriesRouter := router.Group("/categories")
 	categoriesRouter.POST("/", coursesController.CreateCategory)
 	categoriesRouter.DELETE("/:category_id", coursesController.DeleteCategory)
@@ -63,13 +71,5 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	chaptersRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.CreateChapter)
 	chaptersRouter.PUT("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.UpdateChapter)
 	chaptersRouter.DELETE("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.DeleteChapter)
-	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter) //if author then get if not course must be completed (and free don't forget it!)
-
-	objectivesRouter := router.Group("/:course_id/objectives")
-	objectivesRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateObjective)
-	objectivesRouter.DELETE("/:objective_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteObjective)
-
-	requirementsRouter := router.Group("/:course_id/requirements")
-	requirementsRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateRequirement)
-	requirementsRouter.DELETE("/:requirement_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteRequirement)
+	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter)
 }

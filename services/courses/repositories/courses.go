@@ -77,9 +77,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 			Message:    err.Error(),
 		}
 	}
-
-	fmt.Println("entered")
-
+	
 	videoUploadResult, err := filestorage.UploadFile(video, fmt.Sprintf("/learn_oo/authors/%v/courses/videos", authorID))
 	fmt.Println(videoUploadResult.Url)
 	if err != nil {

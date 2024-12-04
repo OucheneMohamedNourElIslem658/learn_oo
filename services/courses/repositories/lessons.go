@@ -29,14 +29,13 @@ func NewLessonsRepository() *LessonsRepository {
 	}
 }
 
-type CreatedLessonDTO struct {
+type CreatedLessonWithVideoDTO struct {
 	Title       string                `form:"title" binding:"required"`
 	Description string                `form:"description" binding:"required"`
-	Content     gin.H                 `form:"content"`
-	Video       *multipart.FileHeader `form:"video,omitempty"`
+	Video       *multipart.FileHeader `form:"video,omitempty" binding:"required"`
 }
 
-func (ar *LessonsRepository) CreateLesson(authorID, courseID string, chapterID uint, lesson CreatedLessonDTO) (apiError *utils.APIError) {
+func (ar *LessonsRepository) CreateLessonWithVideo(chapterID uint, authorID string, lesson CreatedLessonWithVideoDTO) (apiError *utils.APIError) {
 	filestorage := ar.filestorage
 
 	video, _ := lesson.Video.Open()
@@ -67,7 +66,6 @@ func (ar *LessonsRepository) CreateLesson(authorID, courseID string, chapterID u
 		ChapterID:   chapterID,
 		Title:       lesson.Title,
 		Description: lesson.Description,
-		Content:     lesson.Content,
 		Video: &models.File{
 			URL:          videoUploadResult.Url,
 			ThumbnailURL: &videoUploadResult.ThumbnailUrl,
@@ -84,4 +82,36 @@ func (ar *LessonsRepository) CreateLesson(authorID, courseID string, chapterID u
 	}
 
 	return nil
+}
+
+type CreatedLessonWithContentDTO struct {
+	Title       string `form:"title" binding:"required"`
+	Description string `form:"description" binding:"required"`
+	Content     gin.H  `form:"content,omitempty" binding:"required"`
+}
+
+func (ar *LessonsRepository) CreateLessonWithContent(chapterID uint, lesson CreatedLessonWithContentDTO) (apiError *utils.APIError) {
+	lessonToCreate := models.Lesson{
+		ChapterID:   chapterID,
+		Title:       lesson.Title,
+		Description: lesson.Description,
+		Content: lesson.Content,
+	}
+
+	database := ar.database
+	err := database.Create(&lessonToCreate).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	return nil
+}
+
+type UpdateLessonWithContentDTO struct {
+	Title       string `form:"title" binding:"required"`
+	Description string `form:"description" binding:"required"`
+	Content     gin.H  `form:"content,omitempty" binding:"required"`
 }
