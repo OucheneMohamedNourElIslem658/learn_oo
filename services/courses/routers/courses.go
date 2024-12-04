@@ -9,27 +9,31 @@ import (
 )
 
 type CoursesRouter struct {
-	Router              *gin.RouterGroup
-	coursesController   *controllers.CoursesController
-	chaptersController  *controllers.ChaptersController
-	authMiddlewares     *authMiddlewares.AuthorizationMiddlewares
-	ChaptersMiddlewares *middlewares.ChaptersMiddlewares
+	Router                              *gin.RouterGroup
+	coursesController                   *controllers.CoursesController
+	chaptersController                  *controllers.ChaptersController
+	objectivesAndRequirementsController *controllers.ObjectivesAndRequirementsController
+	authMiddlewares                     *authMiddlewares.AuthorizationMiddlewares
+	ChaptersMiddlewares                 *middlewares.ChaptersMiddlewares
 }
 
 func NewCoursesRouter(router *gin.RouterGroup) *CoursesRouter {
 	return &CoursesRouter{
-		Router:              router,
-		coursesController:   controllers.NewCoursesController(),
-		chaptersController:  controllers.NewChaptersController(),
-		authMiddlewares:     authMiddlewares.NewAuthorizationMiddlewares(),
-		ChaptersMiddlewares: middlewares.NewChaptersMiddlewares(),
+		Router:                              router,
+		coursesController:                   controllers.NewCoursesController(),
+		chaptersController:                  controllers.NewChaptersController(),
+		objectivesAndRequirementsController: controllers.NewObjectivesAndRequirementsController(),
+		authMiddlewares:                     authMiddlewares.NewAuthorizationMiddlewares(),
+		ChaptersMiddlewares:                 middlewares.NewChaptersMiddlewares(),
 	}
 }
 
 func (cr *CoursesRouter) RegisterRoutes() {
 	router := cr.Router
+
 	coursesController := cr.coursesController
 	chaptersController := cr.chaptersController
+	objectivesAndRequirementsController := cr.objectivesAndRequirementsController
 
 	authMiddlewares := cr.authMiddlewares
 
@@ -58,4 +62,12 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	chaptersRouter.PUT("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.UpdateChapter)
 	chaptersRouter.DELETE("/:chapter_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, chaptersController.DeleteChapter)
 	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter) //if author then get if not course must be completed (and free don't forget it!)
+
+	objectivesRouter := router.Group("/:course_id/objectives")
+	objectivesRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateObjective)
+	objectivesRouter.DELETE("/:objective_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteObjective)
+
+	requirementsRouter := router.Group("/:course_id/requirements")
+	requirementsRouter.POST("/", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.CreateRequirement)
+	requirementsRouter.DELETE("/:requirement_id", authorization, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, CheckCourseExistance, objectivesAndRequirementsController.DeleteRequirement)
 }

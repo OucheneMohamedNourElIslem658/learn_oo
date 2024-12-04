@@ -358,6 +358,7 @@ func (UsersRouter *ProfilesRepository) GetAuthor(authorID string, appendWith str
 		appendWith,
 		"accomplishments",
 		"user",
+		"courses",
 	)
 	for _, extention := range validExtentions {
 		query.Preload(extention)

@@ -18,7 +18,7 @@ type User struct {
 	FullName          string         `gorm:"not null" json:"full_name"`
 	EmailVerified     bool           `json:"email_verified"`
 	PaymentCustomerID string         `json:"payment_customer_id,omitempty"`
-	Image             *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image,omitempty"`
+	Image             *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
 	AuthorProfile     *Author        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"author_profile,omitempty"`
 	Courses           []Course       `gorm:"many2many:course_learners;" json:"courses,omitempty"`
 	Lessons           []Lesson       `gorm:"many2many:lesson_learners;" json:"lessons,omitempty"`
@@ -35,7 +35,7 @@ type Author struct {
 	Balance         uint           `gorm:"-:migration;->" json:"balance,omitempty"`
 	UserID          string         `json:"user_id,omitempty"`
 	User            *User          `json:"user,omitempty"`
-	Accomplishments []File         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"accomplishments,omitempty"`
+	Accomplishments []File         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"accomplishments"`
 	Courses         []Course       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"courses,omitempty"`
 }
 
