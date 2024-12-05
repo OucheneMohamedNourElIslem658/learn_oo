@@ -22,13 +22,6 @@ func NewLessonsController() *LessonsController {
 func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 	LessonsRepository := lc.lessonsRepository
 
-	if ctx.ContentType() != "multipart/form-data" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "content type must be multipart/form-data",
-		})
-		return
-	}
-
 	var lesson repositories.CreatedLessonWithContentDTO
 
 	if err := ctx.ShouldBind(&lesson); err != nil {
@@ -133,7 +126,7 @@ func (lc *LessonsController) UpdateLesson(ctx *gin.Context) {
 }
 
 func (lc *LessonsController) UpdateLessonVideo(ctx *gin.Context) {
-	idString := ctx.Param("course_id")
+	idString := ctx.Param("lesson_id")
 	id, _ := strconv.Atoi(idString)
 
 	image, imageHeader, err := ctx.Request.FormFile("video")

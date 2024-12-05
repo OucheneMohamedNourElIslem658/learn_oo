@@ -78,10 +78,10 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter)
 
 	lessonsRouter := chaptersRouter.Group("/:chapter_id/lessons")
-	lessonsRouter.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.CreateLessonWithContent)
-	lessonsRouter.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.CreateLessonWithVideo)
+	lessonsRouter.POST("/create-with-content", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.CreateLessonWithContent)
+	lessonsRouter.POST("/create-with-video", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.CreateLessonWithVideo)
 	lessonsRouter.PUT("/:lesson_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.UpdateLesson)
-	lessonsRouter.PUT("/:lesson_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.UpdateLessonVideo)
+	lessonsRouter.PUT("/:lesson_id/video", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.UpdateLessonVideo)
 	lessonsRouter.DELETE("/:lesson_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.DeleteLesson)
 	lessonsRouter.GET("/:lesson_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, lessonsController.GetLesson)
 }

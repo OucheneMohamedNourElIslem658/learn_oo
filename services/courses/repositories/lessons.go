@@ -188,27 +188,35 @@ func (ar *LessonsRepository) UpdateLessonVideo(ID int, authorID, chapterID strin
 	filestorage := ar.filestorage
 
 	var existingVideo models.File
-	err := database.Where("id = ?", ID).First(&existingVideo).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
+	err := database.Joins("LEFT JOIN lessons ON lessons.id = files.lesson_id").
+		Where("files.lesson_id = ? AND lessons.content IS NULL", ID).
+		First(&existingVideo).
+		Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "lesson is not a video",
+			}
+		}
+
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
 	}
 
-	if err == nil {
-		if err := database.Where("id = ?", existingVideo.ID).Unscoped().Delete(&existingVideo).Error; err != nil {
+	if err := database.Where("id = ?", existingVideo.ID).Unscoped().Delete(&existingVideo).Error; err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+	if existingVideo.ImageKitID != nil {
+		if err := filestorage.DeleteFile(*existingVideo.ImageKitID); err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
 				Message:    err.Error(),
-			}
-		}
-		if existingVideo.ImageKitID != nil {
-			if err := filestorage.DeleteFile(*existingVideo.ImageKitID); err != nil {
-				return &utils.APIError{
-					StatusCode: http.StatusInternalServerError,
-					Message:    err.Error(),
-				}
 			}
 		}
 	}
@@ -245,7 +253,6 @@ func (ar *LessonsRepository) GetLesson(ID, authorID, userID, appendWith string) 
 
 	validExtentions := utils.GetValidExtentions(
 		appendWith,
-		"video",
 		"chapter",
 		"learners",
 	)
@@ -254,16 +261,18 @@ func (ar *LessonsRepository) GetLesson(ID, authorID, userID, appendWith string) 
 		query.Preload(extention)
 	}
 
+	query.Preload("Video")
+
 	query.Select("lessons.*, courses.is_completed, courses.author_id").
 		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
 		Joins("JOIN courses ON courses.id = chapters.course_id").
 		Where("lessons.id = ?", ID).
 		Where("courses.author_id = ? OR (courses.is_completed = ? AND ? IN (SELECT learner_id FROM course_learners WHERE course_id = courses.id))",
 			authorID, true, userID).
-		Order("lessons.order, lessons.updated_at")
+		Order("lessons.updated_at")
 
 	var existingLesson models.Lesson
-	err := query.Where("id = ?", ID).First(&existingLesson).Error
+	err := query.First(&existingLesson).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -283,7 +292,7 @@ func (ar *LessonsRepository) GetLesson(ID, authorID, userID, appendWith string) 
 func (ar *LessonsRepository) DeleteLesson(ID string) (apiError *utils.APIError) {
 	database := ar.database
 
-	deleteResult := database.Where("id = ?", ID).First(&models.Lesson{})
+	deleteResult := database.Where("id = ?", ID).Unscoped().Delete(&models.Lesson{})
 
 	err := deleteResult.Error
 	if err != nil {

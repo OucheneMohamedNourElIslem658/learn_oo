@@ -105,7 +105,8 @@ func (cr *ChaptersRepository) GetChapter(ID, appendWith string) (chapter *models
 	for _, extention := range validExtentions {
 		if extention == "Lessons" {
 			query.Preload(extention, func(db *gorm.DB) *gorm.DB {
-				return db.Select("id, title, description, chapter_id")
+				return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video").
+					Joins("LEFT JOIN files ON lessons.id = files.lesson_id")
 			})
 		} else {
 			query.Preload(extention)

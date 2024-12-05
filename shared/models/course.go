@@ -110,11 +110,12 @@ type Lesson struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Order       int           `json:"order"`
+	Order       int            `json:"order"`
 	Title       string         `gorm:"not null" json:"title"`
 	Description string         `json:"description"`
-	Content     gin.H          `gorm:"json" json:"content,omitempty"`
-	Video       *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
+	IsVideo     bool           `gorm:"-:migration;->" json:"is_video"`
+	Content     gin.H          `gorm:"json" json:"content"`
+	Video       *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
 	ChapterID   uint           `json:"chapter_id,omitempty"`
 	Chapter     *Chapter       `json:"chapter,omitempty"`
 	Learners    []User         `gorm:"many2many:lesson_learners;association_foreignkey:LearnerID" json:"learners,omitempty"`

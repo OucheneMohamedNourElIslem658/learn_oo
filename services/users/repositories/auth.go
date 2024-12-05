@@ -448,7 +448,7 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	if user.Image == nil {
 		existingUser.Image = user.Image
 	}
-	err = database.Session(&gorm.Session{FullSaveAssociations: true}).Save(&existingUser).Error
+	err = database.Omit("AuthorProfile").Save(&existingUser).Error
 	if err != nil {
 		return nil, nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

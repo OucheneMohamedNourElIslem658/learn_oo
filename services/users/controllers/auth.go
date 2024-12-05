@@ -200,8 +200,8 @@ func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
 
 func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 	var query struct {
-		SuccessURL string `form:"success_url" binding:"required"`
-		FailureURL string `form:"failure_url" binding:"required"`
+		SuccessURL string `form:"success_url" json:"success_url" binding:"required"`
+		FailureURL string `form:"failure_url" json:"failure_url" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {

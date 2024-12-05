@@ -60,13 +60,12 @@ func (cm *ChaptersMiddlewares) CheckChapterExistance() gin.HandlerFunc {
 		database := cm.database
 
 		var count int64
-		err := database.Model(models.Chapter{}).
-		Select("courses.id, courses.author_id, chapters.id").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
-		Joins("JOIN courses ON courses.id = chapters.course_id").
-		Where("authors.id = ? AND courses.id = ? AND chapters.id", authorID, courseID, chapterID).
-		Count(&count).
-		Error
+		err := database.Model(&models.Chapter{}).
+			Select("courses.id, courses.author_id, chapters.id").
+			Joins("JOIN courses ON courses.id = chapters.course_id").
+			Where("courses.author_id = ? AND courses.id = ? AND chapters.id = ?", authorID, courseID, chapterID).
+			Count(&count).
+			Error
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
