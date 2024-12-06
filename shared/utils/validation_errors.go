@@ -22,25 +22,30 @@ var ErrorMessages = map[string]string{
 	"price":          "must be 0 or greater than 50",
 }
 
-// var (
-// 	g          = galidator.New()
-// 	customizer = g.Validator()
-//   )
-
 func ValidationErrorResponse(err error) gin.H {
 	errors := make(gin.H)
-	// return galida
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, vErr := range validationErrors {
+			field := func() string {
+				var result []rune
+				for i, r := range vErr.Field() {
+					if i > 0 && r >= 'A' && r <= 'Z' {
+						result = append(result, '_')
+					}
+					result = append(result, r)
+				}
+				return strings.ToLower(string(result))
+			}()
+
 			switch vErr.Tag() {
 			case "oneof":
 				allowedValues := vErr.Param()
-				errors[vErr.Field()] = fmt.Sprintf("The value must be one of the following: %s", allowedValues)
+				errors[field] = fmt.Sprintf("The value must be one of the following: %s", allowedValues)
 			case "min":
 				minValue := vErr.Param()
-				errors[vErr.Field()] = fmt.Sprintf("The value must be at least: %s", minValue)
+				errors[field] = fmt.Sprintf("The value must be at least: %s", minValue)
 			default:
-				errors[vErr.Field()] = ErrorMessages[vErr.Tag()]
+				errors[field] = ErrorMessages[vErr.Tag()]
 			}
 		}
 		return errors

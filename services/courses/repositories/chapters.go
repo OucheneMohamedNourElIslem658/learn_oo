@@ -24,8 +24,8 @@ func NewChaptersRepository() *ChaptersRepository {
 }
 
 type CreatedChapterDTO struct {
-	Title       string `form:"title" binding:"required"`
-	Description string `form:"description" binding:"required"`
+	Title       string `json:"title" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 func (cr *ChaptersRepository) CreateChapter(courseID uint, chapter CreatedChapterDTO) (apiError *utils.APIError) {

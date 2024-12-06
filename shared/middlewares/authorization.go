@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -43,8 +42,6 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 					})
 					return
 				}
-
-				fmt.Println(claims.AuthorID)
 
 				ctx.Set("id", claims.ID)
 				ctx.Set("email_verified", claims.EmailVerified)

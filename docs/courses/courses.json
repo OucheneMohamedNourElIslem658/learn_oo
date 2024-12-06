@@ -1,0 +1,110 @@
+[
+    {
+        "path": "host/api/v1/courses",
+        "description": "create course",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token"
+            }
+        ],
+        "request_body": {
+            "type": "json",
+            "body": {
+                "title": "course title",
+                "description": "course desc",
+                "price": "0 or positive float",  
+                "language": "one of en or ar or fr",
+                "level": "one of bigener or medium or advanced",
+                "duration": "in microsecs min is 300000000",
+                "video": "video file",
+                "image": "image file"
+            }
+        },
+        "reponses": [
+            {
+                "code": "created"
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "title": "required",
+                        "description": "required",
+                        "language": "The value must be one of the following: (ar, fr, en)",
+                        "level": "The value must be one of the following: (bigener, medium, advanced)",
+                        "duration": "The value must be at least: 300000000",
+                        "video": "required, file is not a video",
+                        "image": "required, image is not a video"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "message": "id token expired"
+                    },
+                    {
+                        "message": "invalid id token"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "message": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id",
+        "description": "get course",
+        "method": "GET",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "image,author_profile",
+                "required": false,
+                "description": "include some infos associated to the user"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": []
+            },
+            {
+                "code": "unauthorized",
+                "responses": []
+            },
+            {
+                "code": "not found",
+                "responses": []
+            },
+            {
+                "code": "internal server error",
+                "responses": []
+            }
+        ]
+    }
+]
