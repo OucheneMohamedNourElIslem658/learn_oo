@@ -19,7 +19,7 @@ func NewChaptersController() *ChaptersController {
 }
 
 func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
-	courseID := ctx.GetUint("course_id")
+	courseID := ctx.GetInt("course_id")
 
 	var chapter repositories.CreatedChapterDTO
 
@@ -33,7 +33,7 @@ func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
 
 	chaptersRepository := cc.chaptersRepository
 
-	if err := chaptersRepository.CreateChapter(courseID, chapter); err != nil {
+	if err := chaptersRepository.CreateChapter(uint(courseID), chapter); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"message": err.Message,
 		})

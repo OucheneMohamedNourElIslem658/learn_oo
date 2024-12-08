@@ -32,8 +32,7 @@ func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 		return
 	}
 
-	chapterIDString := ctx.Param("chapter_id")
-	chapterID, _ := strconv.Atoi(chapterIDString)
+	chapterID := ctx.GetInt("chapter_id")
 
 	if err := LessonsRepository.CreateLessonWithContent(uint(chapterID), lesson); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -67,8 +66,7 @@ func (lc *LessonsController) CreateLessonWithVideo(ctx *gin.Context) {
 
 	authorID := ctx.GetString("author_id")
 
-	chapterIDString := ctx.Param("chapter_id")
-	chapterID, _ := strconv.Atoi(chapterIDString)
+	chapterID := ctx.GetInt("chapter_id")
 
 	if err := LessonsRepository.CreateLessonWithVideo(uint(chapterID), authorID, lesson); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{

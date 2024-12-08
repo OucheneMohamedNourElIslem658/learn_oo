@@ -72,6 +72,17 @@ func ValidatePrice(fl validator.FieldLevel) bool {
 	return price == 0 || price >= 50
 }
 
+func ValidateQuestionOptionsList(fl validator.FieldLevel) bool {
+	options, ok := fl.Field().Interface().([]struct {
+		Content   string
+		IsCorrect bool
+	})
+	if !ok {
+		return false
+	}
+	return len(options) >= 2
+}
+
 func registerValidators() (err error) {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); !ok {
 		return errors.New("validator initialization failed")
@@ -79,6 +90,7 @@ func registerValidators() (err error) {
 		v.RegisterValidation("password", validatePassword)
 		v.RegisterValidation("course_duration", validateDuration)
 		v.RegisterValidation("price", ValidatePrice)
+		v.RegisterValidation("question_options_list", ValidateQuestionOptionsList)
 	}
 	return nil
 }

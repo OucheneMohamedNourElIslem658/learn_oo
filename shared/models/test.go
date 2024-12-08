@@ -23,6 +23,8 @@ type Question struct {
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`
 	Content          string         `json:"content"`
+	Description      string         `json:"description"`
+	Duration         time.Duration  `json:"duration"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	TestID           uint           `json:"test_id"`
 	Test             *Test          `json:"test,omitempty"`

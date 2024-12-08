@@ -11,17 +11,17 @@ import (
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 )
 
-type ChaptersMiddlewares struct {
+type CoursesMiddlewares struct {
 	database *gorm.DB
 }
 
-func NewChaptersMiddlewares() *ChaptersMiddlewares {
-	return &ChaptersMiddlewares{
+func NewCoursesMiddlewares() *CoursesMiddlewares {
+	return &CoursesMiddlewares{
 		database: database.Instance,
 	}
 }
 
-func (cm *ChaptersMiddlewares) CheckCourseExistance() gin.HandlerFunc {
+func (cm *CoursesMiddlewares) CheckCourseExistance() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorID := ctx.GetString("author_id")
 		courseID := ctx.Param("course_id")
@@ -51,7 +51,7 @@ func (cm *ChaptersMiddlewares) CheckCourseExistance() gin.HandlerFunc {
 	}
 }
 
-func (cm *ChaptersMiddlewares) CheckChapterExistance() gin.HandlerFunc {
+func (cm *CoursesMiddlewares) CheckChapterExistance() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorID := ctx.GetString("author_id")
 		courseID := ctx.Param("course_id")
@@ -83,6 +83,84 @@ func (cm *ChaptersMiddlewares) CheckChapterExistance() gin.HandlerFunc {
 		chapterIDInt, _ := strconv.Atoi(chapterID)
 
 		ctx.Set("chapter_id", chapterIDInt)
+		ctx.Next()
+	}
+}
+
+func (cm *CoursesMiddlewares) CheckTestExistance() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authorID := ctx.GetString("author_id")
+		courseID := ctx.Param("course_id")
+		chapterID := ctx.Param("chapter_id")
+		testID := ctx.Param("test_id")
+
+		database := cm.database
+
+		var count int64
+		err := database.Model(&models.Test{}).
+			Select("courses.id, courses.author_id, chapters.id, tests.id").
+			Joins("JOIN chapters ON chapters.id = tests.chapter_id").
+			Joins("JOIN courses ON courses.id = chapters.course_id").
+			Where("courses.author_id = ? AND courses.id = ? AND chapters.id = ? AND tests.id = ?", authorID, courseID, chapterID, testID).
+			Count(&count).
+			Error
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		if count == 0 {
+			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"message": "test not found",
+			})
+			return
+		}
+
+		testIDInt, _ := strconv.Atoi(testID)
+
+		ctx.Set("test_id", testIDInt)
+		ctx.Next()
+	}
+}
+
+func (cm *CoursesMiddlewares) CheckQuestionExistance() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		authorID := ctx.GetString("author_id")
+		courseID := ctx.Param("course_id")
+		chapterID := ctx.Param("chapter_id")
+		testID := ctx.Param("test_id")
+		questionID := ctx.Param("test_id")
+
+		database := cm.database
+
+		var count int64
+		err := database.Model(&models.Question{}).
+			Select("courses.id, courses.author_id, chapters.id, tests.id, questions.id").
+			Joins("JOIN tests ON tests.id = questions.test_id").
+			Joins("JOIN chapters ON chapters.id = tests.chapter_id").
+			Joins("JOIN courses ON courses.id = chapters.course_id").
+			Where("courses.author_id = ? AND courses.id = ? AND chapters.id = ? AND tests.id = ? ANS questions.id", authorID, courseID, chapterID, testID, questionID).
+			Count(&count).
+			Error
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		if count == 0 {
+			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+				"message": "question not found",
+			})
+			return
+		}
+
+		questionIDInt, _ := strconv.Atoi(questionID)
+
+		ctx.Set("question_id", questionIDInt)
 		ctx.Next()
 	}
 }
