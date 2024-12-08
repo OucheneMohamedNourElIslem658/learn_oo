@@ -145,9 +145,10 @@ type CourseLearner struct {
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	CourseID      uint           `gorm:"primaryKey" json:"course_id"`
-	LearnerID     uint           `gorm:"primaryKey" json:"learner_id"`
+	LearnerID     string         `gorm:"primaryKey" json:"learner_id"`
 	Course        *Course        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"course"`
 	Learner       *User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner"`
 	LeaningStatus LearningStatus `gorm:"default:'learning'" json:"language"`
 	Rate          *float64       `json:"rate"`
+	CheckoutID    *string        `json:"checkout_id"`
 }

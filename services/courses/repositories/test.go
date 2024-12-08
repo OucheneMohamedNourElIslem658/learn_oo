@@ -232,7 +232,7 @@ func (cr *TestsRepository) DeleteTest(ID string) (apiError *utils.APIError) {
 type CreatedQuestionDTO struct {
 	Content     string        `json:"content" binding:"required"`
 	Description string        `json:"description" binding:"required"`
-	Duration    time.Duration `form:"duration" binding:"omitempty,min=10000000"`
+	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
 	Options     []struct {
 		Content   string `json:"content" binding:"required"`
 		IsCorrect bool   `json:"is_correct" binding:"required"`
