@@ -51,7 +51,6 @@ func ValidationErrorResponse(err error) gin.H {
 		}
 		return errors
 	} else {
-		panic(err)
 		return gin.H{
 			"request": err.Error(),
 		}
