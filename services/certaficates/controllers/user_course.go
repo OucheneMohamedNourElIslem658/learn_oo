@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -54,16 +53,11 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 }
 
 func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
-	var body gin.H
-	ctx.Bind(&body)
-	fmt.Println(body)
 	var checkout repositories.CheckoutDTO
 
-	if err := ctx.ShouldBind(&checkout); err != nil {
-		message := utils.ValidationErrorResponse(err)
-		fmt.Println("message")
+	if err := ctx.Bind(&checkout); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
+			"message": err.Error(),
 		})
 		return
 	}
