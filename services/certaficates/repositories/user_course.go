@@ -26,7 +26,7 @@ func NewUserCourseRepository() *UserCourseRepository {
 
 type CreatedSessionDTO struct {
 	PaymentSuccessUrl string `json:"payment_success_url" binding:"required"`
-	PaymentFailUrl     string `json:"payment_fail_url" binding:"required"`
+	PaymentFailUrl    string `json:"payment_fail_url" binding:"required"`
 }
 
 func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, session CreatedSessionDTO) (paymentURL *string, apiError *utils.APIError) {
@@ -99,6 +99,7 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 
 type CheckoutDTO struct {
 	Data struct {
+		ID       string  `json:"id"`
 		Status   string  `json:"status"`
 		Metadata []gin.H `json:"metadata"`
 	} `json:"data"`
@@ -117,8 +118,9 @@ func (ucr *UserCourseRepository) PayForCourse(checkout CheckoutDTO) (apiError *u
 	metadata := checkout.Data.Metadata[0]
 
 	courseLearner := models.CourseLearner{
-		CourseID:  uint(metadata["course_id"].(float64)),
-		LearnerID: metadata["user_id"].(string),
+		CourseID:   uint(metadata["course_id"].(float64)),
+		LearnerID:  metadata["user_id"].(string),
+		CheckoutID: &checkout.Data.ID,
 	}
 
 	err := database.Create(&courseLearner).Error
