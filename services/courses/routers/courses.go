@@ -53,7 +53,6 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	checkCourseExistance := coursesMiddlewares.CheckCourseExistance()
 	checkChapterExistance := coursesMiddlewares.CheckChapterExistance()
 	checkTestExistance := coursesMiddlewares.CheckTestExistance()
-	checkQuestionExistance := coursesMiddlewares.CheckQuestionExistance()
 
 	router.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
 	router.PUT("/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
@@ -101,8 +100,4 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	questionsRouter.PUT("/:question_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkTestExistance, testsController.UpdateQuestion)
 	questionsRouter.DELETE("/:question_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkTestExistance, testsController.DeleteQuestion)
 	questionsRouter.GET("/:question_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, testsController.GetQuestion)
-
-	optionsRouter := questionsRouter.Group("/:question_id/options")
-	optionsRouter.POST("/", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkQuestionExistance, testsController.CreateOption)
-	optionsRouter.DELETE("/:option_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, AuthorizationWithAuthorCheck, checkQuestionExistance, testsController.DeleteOption)
 }

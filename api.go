@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	certaficatesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/certaficates/routers"
 	coursesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/routers"
 	usersRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/routers"
 )
@@ -47,6 +48,10 @@ func (server *Server) Run() {
 	subRoute = v1.Group("/courses")
 	coursesRouter := coursesRouters.NewCoursesRouter(subRoute)
 	coursesRouter.RegisterRoutes()
+
+	subRoute = v1.Group("/user-courses")
+	userCoursesRouter := certaficatesRouters.NewUserCourseRouter(subRoute)
+	userCoursesRouter.RegisterRoutes()
 
 	fmt.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
 	if err := router.Run(server.address); err != nil {

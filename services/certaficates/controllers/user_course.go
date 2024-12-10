@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/services/certaficates/repositories"
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
@@ -19,8 +20,10 @@ func NewUserCourseController() *UserCourseController {
 }
 
 func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
-	courseID := ctx.GetInt("course_id")
-	userID := ctx.GetString("user_id")
+	courseIDString := ctx.Param("course_id")
+	courseID, _ := strconv.Atoi(courseIDString)
+
+	userID := ctx.GetString("id")
 
 	var session repositories.CreatedSessionDTO
 

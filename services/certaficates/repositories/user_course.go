@@ -9,6 +9,7 @@ import (
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/payment"
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type UserCourseRepository struct {
@@ -24,15 +25,35 @@ func NewUserCourseRepository() *UserCourseRepository {
 }
 
 type CreatedSessionDTO struct {
-	PaymentSuccessURL string `json:"payment_success_url" binding:"required"`
-	PaymenFailURL     string `json:"payment_fail_url" binding:"required"`
+	PaymentSuccessUrl string `json:"payment_success_url" binding:"required"`
+	PaymentFailUrl     string `json:"payment_fail_url" binding:"required"`
 }
 
 func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, session CreatedSessionDTO) (paymentURL *string, apiError *utils.APIError) {
 	database := ucr.database
 
+	learner := false
+	err := database.Model(&models.CourseLearner{}).
+		Select("count(*) > 0").
+		Where("learner_id = ? AND course_id = ?", userID, courseID).
+		Scan(&learner).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	if learner {
+		return nil, &utils.APIError{
+			StatusCode: http.StatusBadRequest,
+			Message:    "user is already a learner",
+		}
+	}
+
 	var course models.Course
-	err := database.Model(&models.Course{}).Where("id = ?", courseID).First(&course).Error
+	err = database.Model(&models.Course{}).Where("id = ?", courseID).First(&course).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -46,27 +67,10 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 		}
 	}
 
-	var user models.User
-	err = database.Model(&models.User{}).Where("id = ?", user).First(&user).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, &utils.APIError{
-				StatusCode: http.StatusNotFound,
-				Message:    "user not found",
-			}
-		}
-		return nil, &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
 	payment := ucr.payment
 
 	if course.Price > 0 {
-		// store customer id in the checkout metadata
-		// hash customer id in the id token and add middleware authorizationWithCustomerCheck
-		checkout, err := payment.MakePayment(session.PaymenFailURL, session.PaymentSuccessURL, user.PaymentCustomerID, course)
+		checkout, err := payment.MakePayment(session.PaymentSuccessUrl, session.PaymentFailUrl, userID, course)
 		if err != nil {
 			return nil, &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
@@ -94,57 +98,30 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 }
 
 type CheckoutDTO struct {
-	ProductID  string `json:"id"`
-	Status     string `json:"status"`
-	CustomerID string `json:"customer_id"`
+	Data struct {
+		Status   string  `json:"status"`
+		Metadata []gin.H `json:"metadata"`
+	} `json:"data"`
 }
 
 func (ucr *UserCourseRepository) PayForCourse(checkout CheckoutDTO) (apiError *utils.APIError) {
 	database := ucr.database
 
-	if checkout.Status != "paid" {
+	if checkout.Data.Status != "paid" {
 		return &utils.APIError{
 			StatusCode: http.StatusNotFound,
 			Message:    "course not paid",
 		}
 	}
 
-	var course models.Course
-	err := database.Model(&models.Course{}).Where("payment_product_id = ?", checkout.ProductID).First(&course).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return &utils.APIError{
-				StatusCode: http.StatusNotFound,
-				Message:    "course not found",
-			}
-		}
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	var user models.User
-	err = database.Model(&models.User{}).Where("payment_customer_id = ?", checkout.CustomerID).First(&user).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return &utils.APIError{
-				StatusCode: http.StatusNotFound,
-				Message:    "user not found",
-			}
-		}
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
+	metadata := checkout.Data.Metadata[0]
 
 	courseLearner := models.CourseLearner{
-		CourseID:  course.ID,
-		LearnerID: user.ID,
+		CourseID:  uint(metadata["course_id"].(float64)),
+		LearnerID: metadata["user_id"].(string),
 	}
 
-	err = database.Create(&courseLearner).Error
+	err := database.Create(&courseLearner).Error
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

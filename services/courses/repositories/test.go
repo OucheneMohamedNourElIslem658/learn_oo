@@ -25,23 +25,23 @@ func NewTestsRepository() *TestsRepository {
 }
 
 type CreatedTestDTO struct {
-	MaxChances uint `json:"max_chances" binding:"omitempty,min=1"`
+	MaxChances *int `json:"max_chances" binding:"omitempty,min=1"`
 }
 
 func (cr *TestsRepository) CreateTest(chapterID uint, test CreatedTestDTO) (apiError *utils.APIError) {
 	database := cr.database
 
-	maxChances := func() uint {
-		if test.MaxChances == 0 {
+	maxChances := func() int {
+		if test.MaxChances == nil || *test.MaxChances == 0 {
 			return 1
 		} else {
-			return 0
+			return *test.MaxChances
 		}
 	}()
 
 	testToCreate := models.Test{
 		ChapterID:  chapterID,
-		MaxChances: maxChances,
+		MaxChances: uint(maxChances),
 	}
 
 	err := database.Create(&testToCreate).Error
@@ -56,7 +56,7 @@ func (cr *TestsRepository) CreateTest(chapterID uint, test CreatedTestDTO) (apiE
 }
 
 type UpdateTestDTO struct {
-	MaxChances uint `json:"max_chances" binding:"omitempty,min=1"`
+	MaxChances *int `json:"max_chances" binding:"omitempty,min=1"`
 }
 
 func (cr *TestsRepository) UpdateTest(ID string, test UpdateTestDTO) (apiError *utils.APIError) {
@@ -77,8 +77,8 @@ func (cr *TestsRepository) UpdateTest(ID string, test UpdateTestDTO) (apiError *
 		}
 	}
 
-	if test.MaxChances != 0 {
-		existingTest.MaxChances = test.MaxChances
+	if test.MaxChances != nil {
+		existingTest.MaxChances = uint(*test.MaxChances)
 	}
 
 	err = database.Save(&existingTest).Error
@@ -110,86 +110,7 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 
 	var existingTest models.Test
 
-	// Check if the user is the author of the course
-	isAuthor := false
-	err := database.Model(&models.Course{}).
-		Select("id").
-		Where("author_id = ? AND id = (SELECT chapter.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", authorID, ID).
-		Scan(&isAuthor).Error
-
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	// If the user is the author, fetch the test without restrictions
-	if isAuthor {
-		err := query.Where("id = ?", ID).First(&test).Error
-		if err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return nil, &utils.APIError{
-					StatusCode: http.StatusNotFound,
-					Message:    "test not found",
-				}
-			}
-			return nil, &utils.APIError{
-				StatusCode: http.StatusInternalServerError,
-				Message:    err.Error(),
-			}
-		}
-		return &existingTest, nil
-	}
-
-	// Check if the user is a learner
-	learner := false
-	err = database.Model(&models.CourseLearner{}).
-		Select("learner_id").
-		Where("learner_id = ? AND course_id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", userID, ID).
-		Scan(&learner).Error
-
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	if !learner {
-		return nil, &utils.APIError{
-			StatusCode: http.StatusForbidden,
-			Message:    "user is neither author nor learner",
-		}
-	}
-
-	// Check if the user has comleted the lessons of the current chapter
-	var allLessonsLearned bool
-	err = database.Raw(`
-		SELECT NOT EXISTS (
-			SELECT 1
-			FROM lessons l
-			LEFT JOIN lesson_learners ll ON ll.lesson_id = l.id AND ll.learner_id = ?
-			WHERE l.chapter_id = (SELECT chapter_id FROM tests WHERE id = ?)
-			AND (ll.learned = false OR ll.learned IS NULL)
-		) AS all_learned
-	`, userID, ID).Scan(&allLessonsLearned).Error
-
-	if err != nil {
-		return nil, &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	if !allLessonsLearned {
-		return nil, &utils.APIError{
-			StatusCode: http.StatusForbidden,
-			Message:    "user has not completed all lessons in the current chapter",
-		}
-	}
-
-	err = query.Where("id = ?", ID).First(&test).Error
+	err := query.Where("id = ?", ID).First(&existingTest).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -200,6 +121,69 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 		return nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
+		}
+	}
+
+	// Check if the user is the author of the course
+	isAuthor := false
+	err = database.Model(&models.Course{}).
+		Select("count(*) > 0").
+		Where("author_id = ? AND id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", authorID, ID).
+		Scan(&isAuthor).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	// Check if the user is a learner
+	if !isAuthor {
+		learner := false
+		err = database.Model(&models.CourseLearner{}).
+			Select("count(*) > 0").
+			Where("learner_id = ? AND course_id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", userID, ID).
+			Scan(&learner).Error
+
+		if err != nil && err != gorm.ErrRecordNotFound {
+			return nil, &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    err.Error(),
+			}
+		}
+
+		if !learner {
+			return nil, &utils.APIError{
+				StatusCode: http.StatusForbidden,
+				Message:    "user is neither author nor learner",
+			}
+		} else {
+			// Check if the user has comleted the lessons of the current chapter
+			var allLessonsLearned bool
+			err = database.Raw(`
+				SELECT NOT EXISTS (
+					SELECT 1
+					FROM lessons l
+					LEFT JOIN lesson_learners ll ON ll.lesson_id = l.id AND ll.learner_id = ?
+					WHERE l.chapter_id = (SELECT chapter_id FROM tests WHERE id = ?)
+					AND (ll.learned = false OR ll.learned IS NULL)
+				) AS all_learned
+			`, userID, ID).Scan(&allLessonsLearned).Error
+
+			if err != nil {
+				return nil, &utils.APIError{
+					StatusCode: http.StatusInternalServerError,
+					Message:    err.Error(),
+				}
+			}
+
+			if !isAuthor && learner && !allLessonsLearned {
+				return nil, &utils.APIError{
+					StatusCode: http.StatusForbidden,
+					Message:    "user has not completed all lessons in the current chapter",
+				}
+			}
 		}
 	}
 
@@ -235,8 +219,8 @@ type CreatedQuestionDTO struct {
 	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
 	Options     []struct {
 		Content   string `json:"content" binding:"required"`
-		IsCorrect bool   `json:"is_correct" binding:"required"`
-	} `json:"options" binding:"required,question_options_list"`
+		IsCorrect *bool   `json:"is_correct" binding:"required"`
+	} `json:"options" binding:"question_options_list,dive,required"`
 }
 
 func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionDTO) (apiError *utils.APIError) {
@@ -247,7 +231,7 @@ func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionD
 	for _, option := range question.Options {
 		options = append(options, models.Option{
 			Content:   option.Content,
-			IsCorrect: option.IsCorrect,
+			IsCorrect: *option.IsCorrect,
 		})
 	}
 
@@ -306,15 +290,20 @@ func (cr *TestsRepository) GetQuestion(ID string, appendWith string) (question *
 }
 
 type UpdatedQuestionDTO struct {
-	Content     string `json:"content"`
-	Description string `json:"description"`
+	Content     string        `json:"content"`
+	Description string        `json:"description"`
+	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
+	Options     []struct {
+		Content   string `json:"content" binding:"required"`
+		IsCorrect *bool   `json:"is_correct" binding:"required"`
+	} `json:"options" binding:"omitempty,question_options_list,omitempty,dive,required"`
 }
 
 func (cr *TestsRepository) UpdateQuestion(ID string, question UpdatedQuestionDTO) (apiError *utils.APIError) {
 	database := cr.database
 
 	var existingQuestion models.Question
-	err := database.Where("id = ?", ID).First(&existingQuestion).Error
+	err := database.Where("id = ?", ID).Preload("Options").First(&existingQuestion).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return &utils.APIError{
@@ -336,55 +325,26 @@ func (cr *TestsRepository) UpdateQuestion(ID string, question UpdatedQuestionDTO
 		existingQuestion.Description = question.Description
 	}
 
+	if len(question.Options) != 0 {
+		var options []models.Option
+
+		for _, option := range question.Options {
+			options = append(options, models.Option{
+				Content:   option.Content,
+				IsCorrect: *option.IsCorrect,
+			})
+		}
+
+		err = database.Model(&existingQuestion).Association("Options").Replace(options)
+		if err != nil {
+			return &utils.APIError{
+				StatusCode: http.StatusInternalServerError,
+				Message:    err.Error(),
+			}
+		}
+	}
+
 	err = database.Save(&existingQuestion).Error
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	return nil
-}
-
-type CreatedOptionDTO struct {
-	Content   string `json:"content" binding:"required"`
-	IsCorrect bool   `json:"is_correct" binding:"required"`
-}
-
-func (cr *TestsRepository) CreateOption(questionID uint, option CreatedOptionDTO) (apiError *utils.APIError) {
-	database := cr.database
-
-	optionToCreate := models.Option{
-		QuestionID: questionID,
-		Content:    option.Content,
-		IsCorrect:  option.IsCorrect,
-	}
-
-	err := database.Create(&optionToCreate).Error
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	return nil
-}
-
-func (cr *TestsRepository) DeleteOption(ID string) (apiError *utils.APIError) {
-	database := cr.database
-
-	deleteResult := database.Where("id = ?", ID).Unscoped().Delete(models.Option{})
-
-	if deleteResult.RowsAffected == 0 {
-		return &utils.APIError{
-			StatusCode: http.StatusNotFound,
-			Message:    "option not found",
-		}
-	}
-
-	err := deleteResult.Error
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

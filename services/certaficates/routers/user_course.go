@@ -32,6 +32,6 @@ func (ucr *UserCourseRouter) RegisterRoutes() {
 	authorizationWithIDCheck := authMiddlewares.AuthorizationWithIDCheck()
 	authorizationWithEmailVerification := authMiddlewares.AuthorizationWithEmailVerification()
 
-	router.POST("/start-course", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, userCourseController.StartCourse)
+	router.POST("/start-course/:course_id", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, userCourseController.StartCourse)
 	router.POST("/pay-for-course", authorization, authorizationWithIDCheck, authorizationWithEmailVerification, userCourseController.PayForCourse)
 }

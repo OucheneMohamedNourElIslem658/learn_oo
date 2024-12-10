@@ -15,11 +15,12 @@ import (
 )
 
 var ErrorMessages = map[string]string{
-	"required":       "required",
-	"email":          "invalid",
-	"password":       "its lenght must be greater than 5",
-	"couse_duration": "must be more than 5 min",
-	"price":          "must be 0 or greater than 50",
+	"required":              "required",
+	"email":                 "invalid",
+	"password":              "its lenght must be greater than 5",
+	"couse_duration":        "must be more than 5 min",
+	"price":                 "must be 0 or greater than 50",
+	"question_options_list": "must at least contain two elements",
 }
 
 func ValidationErrorResponse(err error) gin.H {
@@ -73,13 +74,19 @@ func ValidatePrice(fl validator.FieldLevel) bool {
 }
 
 func ValidateQuestionOptionsList(fl validator.FieldLevel) bool {
+	// if fl.Field().IsNil() || fl.Field().Len() == 0 {
+	// 	return true
+	// }
+
 	options, ok := fl.Field().Interface().([]struct {
-		Content   string
-		IsCorrect bool
+		Content   string `json:"content" binding:"required"`
+		IsCorrect *bool   `json:"is_correct" binding:"required"`
 	})
 	if !ok {
 		return false
 	}
+	fmt.Println("===================")
+	fmt.Println(len(options))
 	return len(options) >= 2
 }
 

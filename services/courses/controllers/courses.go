@@ -34,6 +34,7 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&course); err != nil {
 		message := utils.ValidationErrorResponse(err)
+		fmt.Println(message)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": message,
 		})
