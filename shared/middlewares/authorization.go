@@ -87,7 +87,6 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailVerification() gin.Han
 func (am *AuthorizationMiddlewares) AuthorizationWithAuthorCheck() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authorID := ctx.GetString("author_id")
-
 		if authorID == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"message": "user is not author",

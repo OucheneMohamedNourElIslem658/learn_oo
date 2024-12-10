@@ -192,7 +192,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (idToken *string,
 	}
 
 	var user models.User
-	err = database.Where("id = ?", id).First(&user).Error
+	err = database.Where("id = ?", id).Preload("AuthorProfile").First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -211,7 +211,7 @@ func (ar *AuthRepository) RefreshIdToken(authorization string) (idToken *string,
 		if author == nil {
 			return nil
 		}
-		return &author.ID
+		return &(author.ID)
 	}()
 
 	createdIDToken, err := utils.CreateIdToken(
