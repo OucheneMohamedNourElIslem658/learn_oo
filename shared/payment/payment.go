@@ -185,7 +185,7 @@ func (p *Payment) MakePayment(successURL, failureURL, userID string, course mode
 
 	user := resty.New()
 
-	requestBody := gin.H{
+	requestBody := map[string]interface{}{
 		"success_url": successURL,
 		"failure_url": failureURL,
 	}
@@ -195,12 +195,6 @@ func (p *Payment) MakePayment(successURL, failureURL, userID string, course mode
 		items = append(items, gin.H{
 			"price":    *course.PaymentPriceID,
 			"quantity": 1,
-			"metadata": []gin.H{
-				{
-					"user_id": userID,
-					"course_id": course.ID,
-				},
-			},
 		})
 	} else {
 		return nil, fmt.Errorf("course does not have payment price id")
@@ -212,8 +206,14 @@ func (p *Payment) MakePayment(successURL, failureURL, userID string, course mode
 
 	requestBody["items"] = items
 
-	requestBytes, _ := json.MarshalIndent(&requestBody, "\t", "")
-	fmt.Println(string(requestBytes))
+	metadata := []gin.H{
+		{
+			"user_id": userID,
+			"course_id": course.ID,
+		},
+	}
+
+	requestBody["metadata"] = metadata
 
 	resp, err := user.R().
 		SetHeader("Authorization", fmt.Sprintf("Bearer %v", instance.SecretKey)).
@@ -226,10 +226,8 @@ func (p *Payment) MakePayment(successURL, failureURL, userID string, course mode
 	}
 
 	if resp.StatusCode() != http.StatusOK {
-		fmt.Println(resp.StatusCode())
 		var result gin.H
 		json.Unmarshal(resp.Body(), &result)
-		fmt.Println(result)
 		return nil, fmt.Errorf("failed to create checkout")
 	}
 

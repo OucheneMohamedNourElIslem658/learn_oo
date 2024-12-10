@@ -54,13 +54,12 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 }
 
 func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
+	var body gin.H
+	ctx.Bind(&body)
+	fmt.Println(body)
 	var checkout repositories.CheckoutDTO
 
-	var check gin.H
-	ctx.Bind(&check)
-
 	if err := ctx.ShouldBind(&checkout); err != nil {
-		fmt.Println(check)
 		message := utils.ValidationErrorResponse(err)
 		fmt.Println("message")
 		ctx.JSON(http.StatusBadRequest, gin.H{
