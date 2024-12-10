@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 
 	repositories "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/repositories"
@@ -245,8 +243,7 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
-		godotenv.Load("../../.env")
-		host := os.Getenv("HOST")
+		host := ctx.Request.Host
 		ctx.SetCookie("id_token", *idToken, 3600, "/", host, false, true)
 		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", host, false, true)
 		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
