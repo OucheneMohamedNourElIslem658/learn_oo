@@ -15,6 +15,6 @@ func init() {
 }
 
 func main() {
-	server := NewServer("127.0.0.1:8000")
+	server := NewServer("0.0.0.0:8000")
 	server.Run()
 }
