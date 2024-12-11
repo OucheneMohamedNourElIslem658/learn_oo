@@ -132,7 +132,11 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 	)
 
 	for _, extention := range validExtentions {
-		query.Preload(extention)
+		if extention == "Author" {
+			query.Preload("Author.User")
+		} else {
+			query.Preload(extention)
+		}
 	}
 
 	if authorID != "" {
