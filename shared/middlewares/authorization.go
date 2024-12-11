@@ -44,6 +44,7 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 				}
 
 				ctx.Set("id", claims.ID)
+				// ctx.Set("email_verified", claims.EmailVerified)
 				if claims.AuthorID != nil {
 					ctx.Set("author_id", *claims.AuthorID)
 				}
@@ -67,6 +68,21 @@ func (am *AuthorizationMiddlewares) AuthorizationWithIDCheck() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+// func (am *AuthorizationMiddlewares) AuthorizationWithEmailVerification() gin.HandlerFunc {
+// 	return func(ctx *gin.Context) {
+// 		emailVerified := ctx.GetBool("email_verified")
+
+// 		if !emailVerified {
+// 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+// 				"message": "email is not verified",
+// 			})
+// 			return
+// 		}
+
+// 		ctx.Next()
+// 	}
+// }
 
 func (am *AuthorizationMiddlewares) AuthorizationWithAuthorCheck() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
