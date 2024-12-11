@@ -70,7 +70,7 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 	payment := ucr.payment
 
 	if course.Price > 0 {
-		checkout, err := payment.MakePayment(session.PaymentSuccessUrl, session.PaymentFailUrl, userID, course)
+		checkout, err := payment.MakePayment(session.PaymentSuccessUrl, session.PaymentFailUrl, userID, course.AuthorID, course)
 		if err != nil {
 			return nil, &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
@@ -100,6 +100,7 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 type CheckoutDTO struct {
 	Data struct {
 		ID       string  `json:"id"`
+		Amount   uint    `json:"amount"`
 		Status   string  `json:"status"`
 		Metadata []gin.H `json:"metadata"`
 	} `json:"data"`
@@ -117,13 +118,24 @@ func (ucr *UserCourseRepository) PayForCourse(checkout CheckoutDTO) (apiError *u
 
 	metadata := checkout.Data.Metadata[0]
 
+	amount := float64(checkout.Data.Amount) * 0.9
+	authorID := metadata["author_id"].(string)
+
+	err := database.Model(models.Author{}).Where("id = ?", authorID).Update("balance", gorm.Expr("balance + ?", amount)).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
 	courseLearner := models.CourseLearner{
 		CourseID:   uint(metadata["course_id"].(float64)),
 		LearnerID:  metadata["user_id"].(string),
 		CheckoutID: &checkout.Data.ID,
 	}
 
-	err := database.Create(&courseLearner).Error
+	err = database.Create(&courseLearner).Error
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

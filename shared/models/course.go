@@ -42,7 +42,7 @@ type Course struct {
 	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
 	Video            *File          `gorm:"foreignKey:VideoCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
 	Image            *File          `gorm:"foreignKey:ImageCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
-	AuthorID         *string        `json:"author_id,omitempty"`
+	AuthorID         string        `json:"author_id,omitempty"`
 	Author           *Author        `json:"author,omitempty"`
 	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories,omitempty"`
 	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters,omitempty"`

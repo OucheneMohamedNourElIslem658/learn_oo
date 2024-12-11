@@ -88,7 +88,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	}
 
 	courseToCreate := models.Course{
-		AuthorID:    &authorID,
+		AuthorID:    authorID,
 		Title:       course.Title,
 		Description: course.Description,
 		Price:       course.Price,

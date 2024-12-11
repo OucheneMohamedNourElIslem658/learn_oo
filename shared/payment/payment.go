@@ -180,7 +180,7 @@ type Checkout struct {
 	CheckoutURL string `json:"checkout_url"`
 }
 
-func (p *Payment) MakePayment(successURL, failureURL, userID string, course models.Course) (checkout *Checkout, err error) {
+func (p *Payment) MakePayment(successURL, failureURL, userID, authorID string, course models.Course) (checkout *Checkout, err error) {
 	instance := p.instance
 
 	user := resty.New()
@@ -210,6 +210,7 @@ func (p *Payment) MakePayment(successURL, failureURL, userID string, course mode
 		{
 			"user_id": userID,
 			"course_id": course.ID,
+			"author_id": course.AuthorID,
 		},
 	}
 
