@@ -128,31 +128,6 @@ func (cr *ChaptersRepository) GetChapter(ID, appendWith string) (chapter *models
 		}
 	}
 
-	// if existingChapter.Lessons != nil  {
-	// 	var isLearner bool
-	// 	if err := database.Model(models.CourseLearner{}).Where("course_id = ? and learner_id = ?", ID, userID).Scan(&isLearner).Error; err != nil {
-	// 		return nil, &utils.APIError{
-	// 			StatusCode: http.StatusInternalServerError,
-	// 			Message:    err.Error(),
-	// 		}
-	// 	}
-
-	// 	var isAuthorOfChapter bool
-	// 	if err := database.Model(models.Course{}).Where("id = ? and author_id = ?", existingChapter.CourseID, authorID).Scan(&isAuthorOfChapter).Error; err != nil {
-	// 		return nil, &utils.APIError{
-	// 			StatusCode: http.StatusInternalServerError,
-	// 			Message:    err.Error(),
-	// 		}
-	// 	}
-
-	// 	if (!isLearner || !isAuthorOfChapter) {
-	// 		for index := range existingChapter.Lessons {
-	// 			existingChapter.Lessons[index].Content = nil
-	// 			existingChapter.Lessons[index].Video = nil
-	// 		}
-	// 	}
-	// }
-
 	return &existingChapter, nil
 }
 

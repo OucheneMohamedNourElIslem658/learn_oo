@@ -32,7 +32,6 @@ func NewLessonsRepository() *LessonsRepository {
 type CreatedLessonWithVideoDTO struct {
 	Title       string                `form:"title" binding:"required"`
 	Description string                `form:"description" binding:"required"`
-	Order       *int                  `form:"order"`
 	Video       *multipart.FileHeader `form:"video,omitempty" binding:"required"`
 }
 
@@ -67,12 +66,6 @@ func (ar *LessonsRepository) CreateLessonWithVideo(chapterID uint, authorID stri
 		ChapterID:   chapterID,
 		Title:       lesson.Title,
 		Description: lesson.Description,
-		Order: func() int {
-			if lesson.Order == nil {
-				return 0
-			}
-			return *lesson.Order
-		}(),
 		Video: &models.File{
 			URL:          videoUploadResult.Url,
 			ThumbnailURL: &videoUploadResult.ThumbnailUrl,
@@ -94,7 +87,6 @@ func (ar *LessonsRepository) CreateLessonWithVideo(chapterID uint, authorID stri
 type CreatedLessonWithContentDTO struct {
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description" binding:"required"`
-	Order       *int   `form:"order"`
 	Content     gin.H  `json:"content,omitempty" binding:"required"`
 }
 
@@ -103,12 +95,6 @@ func (ar *LessonsRepository) CreateLessonWithContent(chapterID uint, lesson Crea
 		ChapterID:   chapterID,
 		Title:       lesson.Title,
 		Description: lesson.Description,
-		Order: func() int {
-			if lesson.Order == nil {
-				return 0
-			}
-			return *lesson.Order
-		}(),
 		Content: lesson.Content,
 	}
 
@@ -127,7 +113,6 @@ func (ar *LessonsRepository) CreateLessonWithContent(chapterID uint, lesson Crea
 type UpdateLessonDTO struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Order       *int   `form:"order"`
 	Content     gin.H  `json:"content,omitempty"`
 }
 
@@ -155,10 +140,6 @@ func (ar *LessonsRepository) UpdateLesson(id string, lesson UpdateLessonDTO) (ap
 
 	if lesson.Description != "" {
 		existingLesson.Description = lesson.Description
-	}
-
-	if lesson.Order != nil {
-		existingLesson.Order = *lesson.Order
 	}
 
 	if (lesson.Content != nil) && (existingLesson.Video == nil) {
