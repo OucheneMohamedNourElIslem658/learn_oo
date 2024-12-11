@@ -218,7 +218,7 @@ type CreatedQuestionDTO struct {
 	Description string        `json:"description" binding:"required"`
 	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
 	Options     []struct {
-		Content   string `json:"content" binding:"required"`
+		Option   string `json:"option" binding:"required"`
 		IsCorrect *bool   `json:"is_correct" binding:"required"`
 	} `json:"options" binding:"question_options_list,dive,required"`
 }
@@ -230,7 +230,7 @@ func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionD
 
 	for _, option := range question.Options {
 		options = append(options, models.Option{
-			Content:   option.Content,
+			Content:   option.Option,
 			IsCorrect: *option.IsCorrect,
 		})
 	}
@@ -294,7 +294,7 @@ type UpdatedQuestionDTO struct {
 	Description string        `json:"description"`
 	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
 	Options     []struct {
-		Content   string `json:"content" binding:"required"`
+		Option   string `json:"option" binding:"required"`
 		IsCorrect *bool   `json:"is_correct" binding:"required"`
 	} `json:"options" binding:"omitempty,question_options_list,omitempty,dive,required"`
 }
@@ -330,7 +330,7 @@ func (cr *TestsRepository) UpdateQuestion(ID string, question UpdatedQuestionDTO
 
 		for _, option := range question.Options {
 			options = append(options, models.Option{
-				Content:   option.Content,
+				Content:   option.Option,
 				IsCorrect: *option.IsCorrect,
 			})
 		}

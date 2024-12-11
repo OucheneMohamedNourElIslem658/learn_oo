@@ -26,9 +26,7 @@ func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&lesson); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -36,7 +34,7 @@ func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 
 	if err := LessonsRepository.CreateLessonWithContent(uint(chapterID), lesson); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -47,20 +45,11 @@ func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 func (lc *LessonsController) CreateLessonWithVideo(ctx *gin.Context) {
 	LessonsRepository := lc.lessonsRepository
 
-	if ctx.ContentType() != "multipart/form-data" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "content type must be multipart/form-data",
-		})
-		return
-	}
-
 	var lesson repositories.CreatedLessonWithVideoDTO
 
 	if err := ctx.ShouldBind(&lesson); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -70,7 +59,7 @@ func (lc *LessonsController) CreateLessonWithVideo(ctx *gin.Context) {
 
 	if err := LessonsRepository.CreateLessonWithVideo(uint(chapterID), authorID, lesson); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -90,7 +79,7 @@ func (lc *LessonsController) GetLesson(ctx *gin.Context) {
 
 	if lesson, err := lessonsRepository.GetLesson(id, authorID, userID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -105,9 +94,7 @@ func (lc *LessonsController) UpdateLesson(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&lesson); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -115,7 +102,7 @@ func (lc *LessonsController) UpdateLesson(ctx *gin.Context) {
 
 	if err := lessonsRepository.UpdateLesson(ID, lesson); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -131,21 +118,21 @@ func (lc *LessonsController) UpdateLessonVideo(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if imageHeader == nil || image == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "video not provided",
+			"error": "video not provided",
 		})
 		return
 	}
 
 	if !utils.IsVideo(*imageHeader) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "the file is not an video",
+			"error": "the file is not an video",
 		})
 		return
 	}
@@ -158,7 +145,7 @@ func (lc *LessonsController) UpdateLessonVideo(ctx *gin.Context) {
 	apiError := lessonsRepository.UpdateLessonVideo(id, chapterID, authorID, image)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
-			"message": apiError.Message,
+			"error": apiError.Message,
 		})
 		return
 	}
@@ -173,7 +160,7 @@ func (cc *LessonsController) DeleteLesson(ctx *gin.Context) {
 
 	if err := lessonsRepository.DeleteLesson(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

@@ -41,19 +41,6 @@ func (ar *LessonsRepository) CreateLessonWithVideo(chapterID uint, authorID stri
 	video, _ := lesson.Video.Open()
 	defer video.Close()
 
-	message := make(map[string]any)
-
-	if video == nil || !utils.IsVideo(*lesson.Video) {
-		message["Video"] = "file not a video"
-	}
-
-	if len(message) != 0 {
-		return &utils.APIError{
-			StatusCode: http.StatusBadRequest,
-			Message:    message,
-		}
-	}
-
 	videoUploadResult, err := filestorage.UploadFile(video, fmt.Sprintf("/learn_oo/authors/%v/courses/chapters/%v/videos", authorID, chapterID))
 	if err != nil {
 		return &utils.APIError{
@@ -147,9 +134,7 @@ func (ar *LessonsRepository) UpdateLesson(id string, lesson UpdateLessonDTO) (ap
 	} else if (lesson.Content != nil) && (existingLesson.Video != nil) {
 		return &utils.APIError{
 			StatusCode: http.StatusBadRequest,
-			Message: gin.H{
-				"Content": "lesson is a video",
-			},
+			Message: "lesson is a video",
 		}
 	}
 

@@ -25,9 +25,7 @@ func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&chapter); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -65,9 +63,7 @@ func (cc *ChaptersController) UpdateChapter(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&chapter); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 

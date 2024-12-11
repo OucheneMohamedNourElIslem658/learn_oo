@@ -52,23 +52,6 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	video, _ := course.Video.Open()
 	defer video.Close()
 
-	message := make(map[string]any)
-
-	if image == nil || !utils.IsImage(*course.Image) {
-		message["Image"] = "file not an image"
-	}
-
-	if video == nil || !utils.IsVideo(*course.Video) {
-		message["Video"] = "file not a video"
-	}
-
-	if len(message) != 0 {
-		return &utils.APIError{
-			StatusCode: http.StatusBadRequest,
-			Message:    message,
-		}
-	}
-
 	imageUploadResult, err := filestorage.UploadFile(image, fmt.Sprintf("/learn_oo/authors/%v/courses/images", authorID))
 	if err != nil {
 		return &utils.APIError{

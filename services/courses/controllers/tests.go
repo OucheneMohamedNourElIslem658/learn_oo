@@ -25,9 +25,7 @@ func (lc *TestsController) CreateTest(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&test); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -35,7 +33,7 @@ func (lc *TestsController) CreateTest(ctx *gin.Context) {
 
 	if err := testsRepository.CreateTest(uint(chapterID), test); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -55,7 +53,7 @@ func (lc *TestsController) GetTest(ctx *gin.Context) {
 
 	if lesson, err := testsRepository.GetTest(id, authorID, userID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -70,9 +68,7 @@ func (lc *TestsController) UpdateTest(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&test); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -80,7 +76,7 @@ func (lc *TestsController) UpdateTest(ctx *gin.Context) {
 
 	if err := lessonsRepository.UpdateTest(ID, test); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -95,7 +91,7 @@ func (cc *TestsController) DeleteTest(ctx *gin.Context) {
 
 	if err := testsRepository.DeleteTest(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -110,9 +106,7 @@ func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&question); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -120,7 +114,7 @@ func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
 
 	if err := testsRepository.CreateQuestion(uint(testID), question); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -137,7 +131,7 @@ func (lc *TestsController) GetQuestion(ctx *gin.Context) {
 
 	if lesson, err := testsRepository.GetQuestion(id, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -152,9 +146,7 @@ func (lc *TestsController) UpdateQuestion(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&question); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -162,7 +154,7 @@ func (lc *TestsController) UpdateQuestion(ctx *gin.Context) {
 
 	if err := lessonsRepository.UpdateQuestion(ID, question); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -177,7 +169,7 @@ func (cc *TestsController) DeleteQuestion(ctx *gin.Context) {
 
 	if err := testsRepository.DeleteQuestion(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

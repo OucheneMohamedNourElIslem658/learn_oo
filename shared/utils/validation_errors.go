@@ -26,6 +26,7 @@ func ValidationErrorResponse(err error) gin.H {
 	errors := make(gin.H)
 	if validationErrors, ok := err.(validator.ValidationErrors); ok {
 		for _, vErr := range validationErrors {
+			errors["error"] = "bad request"
 			field := func() string {
 				var result []rune
 				for i, r := range vErr.Field() {

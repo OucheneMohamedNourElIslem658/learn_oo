@@ -25,9 +25,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateObjective(ctx *gin.Contex
 
 	if err := ctx.ShouldBind(&objective); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -35,7 +33,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateObjective(ctx *gin.Contex
 
 	if err := chaptersRepository.CreateObjective(courseID, objective); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -50,7 +48,7 @@ func (oarc *ObjectivesAndRequirementsController) DeleteObjective(ctx *gin.Contex
 
 	if err := objectivesAndRequirementsRepository.DeleteObjective(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -65,9 +63,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateRequirement(ctx *gin.Cont
 
 	if err := ctx.ShouldBind(&requirement); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -75,7 +71,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateRequirement(ctx *gin.Cont
 
 	if err := chaptersRepository.CreateRequirement(courseID, requirement); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -90,7 +86,7 @@ func (oarc *ObjectivesAndRequirementsController) DeleteRequirement(ctx *gin.Cont
 
 	if err := objectivesAndRequirementsRepository.DeleteRequirement(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

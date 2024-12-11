@@ -23,21 +23,11 @@ func NewCoursesController() *CoursesController {
 func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 	coursesRepository := cc.coursesRepository
 
-	if ctx.ContentType() != "multipart/form-data" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "content type must be multipart/form-data",
-		})
-		return
-	}
-
 	var course repositories.CreatedCourseDTO
 
 	if err := ctx.ShouldBind(&course); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		fmt.Println(message)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -45,7 +35,7 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 
 	if err := coursesRepository.CreateCourse(authorID, course); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -66,7 +56,7 @@ func (cc *CoursesController) GetCourse(ctx *gin.Context) {
 
 	if course, err := coursesRepository.GetCourse(id, authorID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -78,9 +68,8 @@ func (cc *CoursesController) GetCourses(ctx *gin.Context) {
 	var filters repositories.CourseSearchDTO
 
 	if err := ctx.ShouldBindQuery(&filters); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -88,7 +77,7 @@ func (cc *CoursesController) GetCourses(ctx *gin.Context) {
 
 	if courses, currentPage, count, maxPages, err := coursesRepository.GetCourses(filters); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -108,9 +97,7 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&course); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -119,7 +106,7 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 
 	if err := coursesRepository.UpdateCourse(ID, authorID, course); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -135,21 +122,21 @@ func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if imageHeader == nil || image == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "image not provided",
+			"error": "image not provided",
 		})
 		return
 	}
 
 	if !utils.IsImage(*imageHeader) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "the file is not an image",
+			"error": "the file is not an image",
 		})
 		return
 	}
@@ -161,7 +148,7 @@ func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
 	apiError := profilesRepository.UpdateCourseImage(uint(id), authorID, image)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
-			"message": apiError.Message,
+			"error": apiError.Message,
 		})
 		return
 	}
@@ -177,21 +164,21 @@ func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if videoHeader == nil || video == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "image not provided",
+			"error": "image not provided",
 		})
 		return
 	}
 
 	if !utils.IsVideo(*videoHeader) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "the file is not a video",
+			"error": "the file is not a video",
 		})
 		return
 	}
@@ -203,7 +190,7 @@ func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
 	apiError := profilesRepository.UpdateCourseVideo(uint(id), authorID, video)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
-			"message": apiError.Message,
+			"error": apiError.Message,
 		})
 		return
 	}
@@ -219,7 +206,7 @@ func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
 
 	if err := coursesRepository.DeleteCourse(ID, authorID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -234,7 +221,7 @@ func (cc *CoursesController) GetCategories(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -252,9 +239,7 @@ func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&category); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -262,7 +247,7 @@ func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -277,7 +262,7 @@ func (cc *CoursesController) DeleteCategory(ctx *gin.Context) {
 
 	if err := coursesRepository.DeleteCategory(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
