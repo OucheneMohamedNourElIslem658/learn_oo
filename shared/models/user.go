@@ -23,7 +23,6 @@ type User struct {
 	Courses           []Course       `gorm:"many2many:course_learners;" json:"courses,omitempty"`
 	Lessons           []Lesson       `gorm:"many2many:lesson_learners;" json:"lessons,omitempty"`
 	Tests             []Test         `gorm:"many2many:test_results;" json:"tests,omitempty"`
-	AnsweredQuestions []Question     `gorm:"many2many:question_answers" json:"question_answers,omitempty"`
 }
 
 type Author struct {

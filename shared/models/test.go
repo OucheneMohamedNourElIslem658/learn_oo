@@ -29,7 +29,6 @@ type Question struct {
 	TestID           uint           `json:"test_id"`
 	Test             *Test          `json:"test,omitempty"`
 	Options          []Option       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"options,omitempty"`
-	AnsweredLearners []User         `gorm:"many2many:question_answers;association_foreignkey:LearnerID" json:"answred_learners,omitempty"`
 }
 
 type Option struct {
@@ -41,29 +40,6 @@ type Option struct {
 	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
 	QuestionID      uint             `json:"question_id"`
 	Question        *Question        `json:"question,omitempty"`
-	QuestionAnswers []QuestionAnswer `gorm:"many2many:option_selections" json:"question_answer_selections,omitempty"`
-}
-
-type QuestionAnswer struct {
-	ID              uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
-	DeletedAt       gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	QuestionID      uint           `json:"question_id"`
-	LearnerID       uint           `json:"learner_id"`
-	Question        *Question      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"question"`
-	Learner         *User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner"`
-	SelectedOptions []Option       `gorm:"many2many:option_selections" json:"selected_options,omitempty"`
-}
-
-type OptionSelection struct {
-	CreatedAt        time.Time       `json:"created_at"`
-	UpdatedAt        time.Time       `json:"updated_at"`
-	DeletedAt        gorm.DeletedAt  `gorm:"index" json:"deleted_at"`
-	OptionID         uint            `gorm:"primaryKey" json:"question_id"`
-	QuestionAnswerID uint            `gorm:"primaryKey" json:"question_answer_id"`
-	QuestionAnswer   *QuestionAnswer `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"question_answer"`
-	Option           *Option         `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"option"`
 }
 
 type TestResult struct {
