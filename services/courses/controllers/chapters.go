@@ -38,7 +38,7 @@ func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (cc *ChaptersController) GetChapter(ctx *gin.Context) {
@@ -78,7 +78,7 @@ func (cc *ChaptersController) UpdateChapter(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *ChaptersController) DeleteChapter(ctx *gin.Context) {
@@ -93,5 +93,5 @@ func (cc *ChaptersController) DeleteChapter(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }

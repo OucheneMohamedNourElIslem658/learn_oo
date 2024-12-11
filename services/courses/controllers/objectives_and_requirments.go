@@ -38,7 +38,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateObjective(ctx *gin.Contex
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (oarc *ObjectivesAndRequirementsController) DeleteObjective(ctx *gin.Context) {
@@ -53,7 +53,7 @@ func (oarc *ObjectivesAndRequirementsController) DeleteObjective(ctx *gin.Contex
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (oarc *ObjectivesAndRequirementsController) CreateRequirement(ctx *gin.Context) {
@@ -76,7 +76,7 @@ func (oarc *ObjectivesAndRequirementsController) CreateRequirement(ctx *gin.Cont
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (oarc *ObjectivesAndRequirementsController) DeleteRequirement(ctx *gin.Context) {
@@ -91,5 +91,5 @@ func (oarc *ObjectivesAndRequirementsController) DeleteRequirement(ctx *gin.Cont
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }

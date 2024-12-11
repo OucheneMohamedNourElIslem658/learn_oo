@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -40,7 +39,7 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (cc *CoursesController) GetCourse(ctx *gin.Context) {
@@ -51,8 +50,6 @@ func (cc *CoursesController) GetCourse(ctx *gin.Context) {
 	appendWith := ctx.Query("append_with")
 
 	coursesRepository := cc.coursesRepository
-
-	fmt.Println(authorID)
 
 	if course, err := coursesRepository.GetCourse(id, authorID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
@@ -111,7 +108,7 @@ func (cc *CoursesController) UpdateCourse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
@@ -153,7 +150,7 @@ func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
@@ -195,7 +192,7 @@ func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
@@ -211,7 +208,7 @@ func (cc *CoursesController) DeleteCourse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *CoursesController) GetCategories(ctx *gin.Context) {
@@ -252,7 +249,7 @@ func (cc *CoursesController) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (cc *CoursesController) DeleteCategory(ctx *gin.Context) {
@@ -267,5 +264,5 @@ func (cc *CoursesController) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }

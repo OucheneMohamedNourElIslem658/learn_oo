@@ -29,7 +29,7 @@ func (pc *ProfilesController) GetUser(ctx *gin.Context) {
 	user, err := profilesRepository.GetUser(id, appendWith)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -43,9 +43,8 @@ func (pc *ProfilesController) UpdateUser(ctx *gin.Context) {
 		FullName string `json:"full_name"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		fmt.Println(err.Error())
 		return
 	}
@@ -54,12 +53,12 @@ func (pc *ProfilesController) UpdateUser(ctx *gin.Context) {
 	err := profilesRepository.UpdateUser(id, body.FullName)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
@@ -68,21 +67,21 @@ func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
 	if imageHeader == nil || image == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "image not provided",
+			"error": "image not provided",
 		})
 		return
 	}
 
 	if !utils.IsImage(*imageHeader) {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "the file is not an image",
+			"error": "the file is not an image",
 		})
 		return
 	}
@@ -92,12 +91,12 @@ func (pc *ProfilesController) UpdateUserImage(ctx *gin.Context) {
 	apiError := profilesRepository.UpdateUserImage(id, image)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
-			"message": apiError.Message,
+			"error": apiError.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) UpgradeToAuthor(ctx *gin.Context) {
@@ -107,12 +106,12 @@ func (pc *ProfilesController) UpgradeToAuthor(ctx *gin.Context) {
 	err := profilesRepository.UpgradeToAuthor(id)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) DowngradeFromAuthor(ctx *gin.Context) {
@@ -122,12 +121,12 @@ func (pc *ProfilesController) DowngradeFromAuthor(ctx *gin.Context) {
 	err := profilesRepository.DowngradeFromAuthor(authorID)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) UpdateAuthor(ctx *gin.Context) {
@@ -137,9 +136,8 @@ func (pc *ProfilesController) UpdateAuthor(ctx *gin.Context) {
 		Bio gin.H `json:"bio"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		fmt.Println(err.Error())
 		return
 	}
@@ -148,12 +146,12 @@ func (pc *ProfilesController) UpdateAuthor(ctx *gin.Context) {
 	err := profilesRepository.UpdateAuthor(authorID, body.Bio)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
@@ -162,7 +160,7 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -174,7 +172,7 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 		file, err := fileHeader.Open()
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
@@ -183,7 +181,7 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 
 	if len(files) == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "accomplishments can not be empty",
+			"error": "accomplishments can not be empty",
 		})
 		return
 	}
@@ -192,12 +190,12 @@ func (pc *ProfilesController) AddAuthorAccomplishments(ctx *gin.Context) {
 	apiError := profilesRepository.AddAuthorAccomplishments(authorID, files)
 	if apiError != nil {
 		ctx.JSON(apiError.StatusCode, gin.H{
-			"message": apiError.Message,
+			"error": apiError.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
@@ -208,12 +206,12 @@ func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
 	err := profilesRepository.DeleteAuthorAccomplishment(authorID, fileID)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (pc *ProfilesController) GetAuthor(ctx *gin.Context) {
@@ -224,7 +222,7 @@ func (pc *ProfilesController) GetAuthor(ctx *gin.Context) {
 	user, err := profilesRepository.GetAuthor(authorID, appendWith)
 	if err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

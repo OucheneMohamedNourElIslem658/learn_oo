@@ -39,7 +39,7 @@ func (lc *LessonsController) CreateLessonWithContent(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (lc *LessonsController) CreateLessonWithVideo(ctx *gin.Context) {
@@ -64,7 +64,7 @@ func (lc *LessonsController) CreateLessonWithVideo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (lc *LessonsController) GetLesson(ctx *gin.Context) {
@@ -107,7 +107,7 @@ func (lc *LessonsController) UpdateLesson(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (lc *LessonsController) UpdateLessonVideo(ctx *gin.Context) {
@@ -150,7 +150,7 @@ func (lc *LessonsController) UpdateLessonVideo(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *LessonsController) DeleteLesson(ctx *gin.Context) {
@@ -165,5 +165,5 @@ func (cc *LessonsController) DeleteLesson(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }

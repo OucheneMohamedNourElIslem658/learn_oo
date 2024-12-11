@@ -29,9 +29,7 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 
 	if err := ctx.ShouldBind(&session); err != nil {
 		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": message,
-		})
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -49,7 +47,7 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
@@ -71,5 +69,5 @@ func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }

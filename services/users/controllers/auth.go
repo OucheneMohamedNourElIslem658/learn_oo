@@ -43,7 +43,7 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context) {
@@ -66,7 +66,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
 		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "localhost", false, true)
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
 	}
 }
 
@@ -88,7 +88,7 @@ func (authcontroller *AuthController) SendEmailVerificationLink(ctx *gin.Context
 			"message": err.Message,
 		})
 	} else {
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
 	}
 }
 
@@ -123,7 +123,7 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 			"message": err.Message,
 		})
 	} else {
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
 	}
 }
@@ -161,7 +161,7 @@ func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 			"message": err.Message,
 		})
 	} else {
-		ctx.Status(http.StatusOK)
+		ctx.JSON(http.StatusOK, nil)
 	}
 }
 

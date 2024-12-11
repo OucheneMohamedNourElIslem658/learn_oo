@@ -38,7 +38,7 @@ func (lc *TestsController) CreateTest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (lc *TestsController) GetTest(ctx *gin.Context) {
@@ -81,7 +81,7 @@ func (lc *TestsController) UpdateTest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *TestsController) DeleteTest(ctx *gin.Context) {
@@ -96,7 +96,7 @@ func (cc *TestsController) DeleteTest(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
@@ -119,7 +119,7 @@ func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, nil)
 }
 
 func (lc *TestsController) GetQuestion(ctx *gin.Context) {
@@ -159,7 +159,7 @@ func (lc *TestsController) UpdateQuestion(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (cc *TestsController) DeleteQuestion(ctx *gin.Context) {
@@ -174,5 +174,5 @@ func (cc *TestsController) DeleteQuestion(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
