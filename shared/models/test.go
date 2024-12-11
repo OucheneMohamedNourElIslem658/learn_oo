@@ -11,11 +11,11 @@ type Test struct {
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	Questions  []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
+	Questions  []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions"`
 	MaxChances uint           `gorm:"default:1" json:"max_chances"`
 	ChapterID  uint           `json:"chapter_id"`
-	Chapter    *Chapter       `json:"chapter,omitempty"`
-	Learners   []User         `gorm:"many2many:test_results;association_foreignkey:LearnerID" json:"learners,omitempty"`
+	Chapter    *Chapter       `json:"chapter"`
+	Learners   []User         `gorm:"many2many:test_results;association_foreignkey:LearnerID" json:"learners"`
 }
 
 type Question struct {
@@ -27,8 +27,8 @@ type Question struct {
 	Duration         time.Duration  `json:"duration"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	TestID           uint           `json:"test_id"`
-	Test             *Test          `json:"test,omitempty"`
-	Options          []Option       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"options,omitempty"`
+	Test             *Test          `json:"test"`
+	Options          []Option       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"options"`
 }
 
 type Option struct {
@@ -39,7 +39,7 @@ type Option struct {
 	IsCorrect       bool             `json:"is_correct"`
 	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
 	QuestionID      uint             `json:"question_id"`
-	Question        *Question        `json:"question,omitempty"`
+	Question        *Question        `json:"question"`
 }
 
 type TestResult struct {

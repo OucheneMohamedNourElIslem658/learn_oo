@@ -13,12 +13,12 @@ type Comment struct {
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Content       string         `json:"content"`
 	LessonID      uint           `json:"lesson_id"`
-	Lesson        *Lesson        `json:"lesson,omitempty"`
+	Lesson        *Lesson        `json:"lesson"`
 	UserID        uint           `json:"user_id"`
-	User          *User          `json:"user,omitempty"`
-	RepliedTo     *uint          `json:"replied_to,omitempty"`
-	Replies       []Comment      `gorm:"foreignKey:RepliedTo;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"replies,omitempty"`
-	Notifications []Notification `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"notifications,omitempty"`
+	User          *User          `json:"user"`
+	RepliedTo     *uint          `json:"replied_to"`
+	Replies       []Comment      `gorm:"foreignKey:RepliedTo;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"replies"`
+	Notifications []Notification `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"notifications"`
 }
 
 type Notification struct {
@@ -29,5 +29,5 @@ type Notification struct {
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
 	CommentID   *uint          `json:"comment_id"`
-	Comment     *Comment       `json:"comment,omitempty"`
+	Comment     *Comment       `json:"comment"`
 }

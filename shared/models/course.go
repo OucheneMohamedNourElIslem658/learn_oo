@@ -31,22 +31,22 @@ type Course struct {
 	Title            string         `gorm:"not null" json:"title"`
 	Description      string         `json:"description"`
 	Price            float64        `json:"price"`
-	PaymentPriceID   *string        `gorm:"unique" json:"payment_price_id,omitempty"`
-	PaymentProductID *string        `gorm:"unique" json:"payment_product_id,omitempty"`
+	PaymentPriceID   *string        `gorm:"unique" json:"payment_price_id"`
+	PaymentProductID *string        `gorm:"unique" json:"payment_product_id"`
 	Language         Languages      `gorm:"default:'en'" json:"language"`
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
 	Duration         uint  `gorm:"type:bigint" json:"duration"`
 	Rate             float64        `gorm:"-:migration;->" json:"rate"`
 	IsCompleted      bool           `json:"is_completed"`
-	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements,omitempty"`
-	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives,omitempty"`
+	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements"`
+	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives"`
 	Video            *File          `gorm:"foreignKey:VideoCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
 	Image            *File          `gorm:"foreignKey:ImageCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
-	AuthorID         string        `json:"author_id,omitempty"`
-	Author           *Author        `json:"author,omitempty"`
-	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories,omitempty"`
-	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters,omitempty"`
-	Learners         []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners,omitempty"`
+	AuthorID         string        `json:"author_id"`
+	Author           *Author        `json:"author"`
+	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories"`
+	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters"`
+	Learners         []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners"`
 }
 
 type Category struct {
@@ -55,7 +55,7 @@ type Category struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Name      string         `gorm:"unique;not null" json:"name"`
-	Course    []Course       `gorm:"many2many:course_categories;" json:"courses,omitempty"`
+	Course    []Course       `gorm:"many2many:course_categories;" json:"courses"`
 }
 
 type CourseCategory struct {
@@ -78,8 +78,8 @@ type Objective struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Content   string         `json:"content"`
-	CourseID  uint           `json:"course_id,omitempty"`
-	Course    *Course        `json:"course,omitempty"`
+	CourseID  uint           `json:"course_id"`
+	Course    *Course        `json:"course"`
 }
 
 type Requirement struct {
@@ -88,8 +88,8 @@ type Requirement struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Content   string         `json:"content"`
-	CourseID  uint           `json:"course_id,omitempty"`
-	Course    *Course        `json:"course,omitempty"`
+	CourseID  uint           `json:"course_id"`
+	Course    *Course        `json:"course"`
 }
 
 type Chapter struct {
@@ -99,10 +99,10 @@ type Chapter struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
-	CourseID    uint           `json:"course_id,omitempty"`
-	Course      *Course        `json:"course,omitempty"`
-	Lessons     []Lesson       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"lessons,omitempty"`
-	Test        *Test          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"test,omitempty"`
+	CourseID    uint           `json:"course_id"`
+	Course      *Course        `json:"course"`
+	Lessons     []Lesson       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"lessons"`
+	Test        *Test          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"test"`
 }
 
 type Lesson struct {
@@ -115,9 +115,9 @@ type Lesson struct {
 	IsVideo     bool           `gorm:"-:migration;->" json:"is_video"`
 	Content     gin.H          `gorm:"json" json:"content"`
 	Video       *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
-	ChapterID   uint           `json:"chapter_id,omitempty"`
-	Chapter     *Chapter       `json:"chapter,omitempty"`
-	Learners    []User         `gorm:"many2many:lesson_learners;association_foreignkey:LearnerID" json:"learners,omitempty"`
+	ChapterID   uint           `json:"chapter_id"`
+	Chapter     *Chapter       `json:"chapter"`
+	Learners    []User         `gorm:"many2many:lesson_learners;association_foreignkey:LearnerID" json:"learners"`
 }
 
 type LessonLearner struct {

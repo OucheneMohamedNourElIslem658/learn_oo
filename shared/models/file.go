@@ -13,13 +13,13 @@ type File struct {
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
 	URL          string         `json:"url"`
 	ThumbnailURL *string        `json:"thumbnail_url"`
-	ImageKitID   *string        `json:"image_kit_id,omitempty"`
-	UserID       *string        `json:"user_id,omitempty"`
-	User         *User          `json:"user,omitempty"`
-	AuthorID     *string        `json:"author_id,omitempty"`
-	Author       *Author        `json:"author,omitempty"`
-	LessonID     *int           `json:"lesson_id,omitempty"`
-	Lesson       *Lesson        `json:"lesson,omitempty"`
-	VideoCourseID *uint          `gorm:"index" json:"video_course_id,omitempty"`
-    ImageCourseID *uint          `gorm:"index" json:"image_course_id,omitempty"`
+	ImageKitID   *string        `json:"image_kit_id"`
+	UserID       *string        `json:"user_id"`
+	User         *User          `json:"user"`
+	AuthorID     *string        `json:"author_id"`
+	Author       *Author        `json:"author"`
+	LessonID     *int           `json:"lesson_id"`
+	Lesson       *Lesson        `json:"lesson"`
+	VideoCourseID *uint          `gorm:"index" json:"video_course_id"`
+    ImageCourseID *uint          `gorm:"index" json:"image_course_id"`
 }
