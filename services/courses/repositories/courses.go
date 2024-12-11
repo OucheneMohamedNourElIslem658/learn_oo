@@ -80,10 +80,14 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		Image: &models.File{
 			URL:          imageUploadResult.Url,
 			ThumbnailURL: &imageUploadResult.ThumbnailUrl,
+			Height:       imageUploadResult.Height,
+			Width:        imageUploadResult.Width,
 		},
 		Video: &models.File{
 			URL:          videoUploadResult.Url,
 			ThumbnailURL: &videoUploadResult.ThumbnailUrl,
+			Height:       videoUploadResult.Height,
+			Width:        videoUploadResult.Width,
 		},
 	}
 
@@ -248,7 +252,7 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	}
 
 	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate, COUNT(course_learners.*) as raters_count").
-	    Where("course_learners.rate IS NOT NULL").
+		Where("course_learners.rate IS NOT NULL").
 		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
 		Group("courses.id").
 		Order("rate DESC, price DESC, created_at DESC, duration DESC")
@@ -414,6 +418,8 @@ func (cr *CoursesRepository) UpdateCourseImage(ID uint, authorID string, image m
 		ImageKitID:    &uploadData.FileId,
 		ThumbnailURL:  &uploadData.ThumbnailUrl,
 		ImageCourseID: &ID,
+		Height: uploadData.Height,
+		Width: uploadData.Width,
 	}
 	if err := database.Create(&newImage).Error; err != nil {
 		return &utils.APIError{
@@ -469,6 +475,8 @@ func (cr *CoursesRepository) UpdateCourseVideo(ID uint, authorID string, video m
 		ImageKitID:    &uploadData.FileId,
 		ThumbnailURL:  &uploadData.ThumbnailUrl,
 		VideoCourseID: &ID,
+		Height: uploadData.Height,
+		Width: uploadData.Width,
 	}
 	if err := database.Create(&newVideo).Error; err != nil {
 		return &utils.APIError{

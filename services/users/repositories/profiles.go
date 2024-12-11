@@ -140,6 +140,8 @@ func (UsersRouter *ProfilesRepository) UpdateUserImage(id string, image multipar
 		ImageKitID:   &uploadData.FileId,
 		ThumbnailURL: &uploadData.ThumbnailUrl,
 		UserID:       &id,
+		Height:       uploadData.Height,
+		Width:        uploadData.Width,
 	}
 	if err := database.Create(&newImage).Error; err != nil {
 		return &utils.APIError{
@@ -295,6 +297,8 @@ func (UsersRouter *ProfilesRepository) AddAuthorAccomplishments(authorID string,
 				ThumbnailURL: &fileUploadData.ThumbnailUrl,
 				ImageKitID:   &fileUploadData.FileId,
 				AuthorID:     &authorID,
+				Height:       fileUploadData.Height,
+				Width:        fileUploadData.Width,
 			}
 			accomplishments = append(accomplishments, file)
 		}
