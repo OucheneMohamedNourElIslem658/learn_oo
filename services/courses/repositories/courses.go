@@ -205,7 +205,11 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	)
 
 	for _, extention := range validExtentions {
-		query.Preload(extention)
+		if extention == "Author" {
+			query.Preload("Author.User")
+		} else {
+			query.Preload(extention)
+		}
 	}
 
 	if title != "" {
@@ -239,7 +243,8 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 			Where("course_categories.category_id IN (?)", categoriesIDs)
 	}
 
-	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate").
+	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate, COUNT(course_learners.*) as raters_count").
+	    Where("course_learners.rate IS NOT NULL").
 		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
 		Group("courses.id").
 		Order("rate DESC, price DESC, created_at DESC, duration DESC")

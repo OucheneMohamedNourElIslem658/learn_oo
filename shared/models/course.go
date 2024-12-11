@@ -35,14 +35,15 @@ type Course struct {
 	PaymentProductID *string        `gorm:"unique" json:"payment_product_id"`
 	Language         Languages      `gorm:"default:'en'" json:"language"`
 	Level            Level          `gorm:"default:'bigener'" json:"level"`
-	Duration         uint  `gorm:"type:bigint" json:"duration"`
+	Duration         uint           `gorm:"type:bigint" json:"duration"`
 	Rate             float64        `gorm:"-:migration;->" json:"rate"`
+	RatersCount      uint           `gorm:"-:migration;->" json:"raters_count"`
 	IsCompleted      bool           `json:"is_completed"`
 	Requirements     []Requirement  `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"requirements"`
 	Objectives       []Objective    `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"objectives"`
 	Video            *File          `gorm:"foreignKey:VideoCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
 	Image            *File          `gorm:"foreignKey:ImageCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
-	AuthorID         string        `json:"author_id"`
+	AuthorID         string         `json:"author_id"`
 	Author           *Author        `json:"author"`
 	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories"`
 	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters"`
