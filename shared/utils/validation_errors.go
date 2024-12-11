@@ -6,7 +6,6 @@ import (
 	"log"
 	"mime/multipart"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -62,12 +61,6 @@ func validatePassword(fl validator.FieldLevel) bool {
 	return len(password) >= 5
 }
 
-func validateDuration(fl validator.FieldLevel) bool {
-	durationStr := fl.Field().String()
-	duration, err := time.ParseDuration(durationStr)
-	return err == nil && duration.Minutes() > 5
-}
-
 func ValidatePrice(fl validator.FieldLevel) bool {
 	price := fl.Field().Float()
 	return price == 0 || price >= 50
@@ -95,7 +88,6 @@ func registerValidators() (err error) {
 		return errors.New("validator initialization failed")
 	} else {
 		v.RegisterValidation("password", validatePassword)
-		v.RegisterValidation("course_duration", validateDuration)
 		v.RegisterValidation("price", ValidatePrice)
 		v.RegisterValidation("question_options_list", ValidateQuestionOptionsList)
 	}

@@ -6,7 +6,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
-	"time"
 
 	gorm "gorm.io/gorm"
 
@@ -37,7 +36,7 @@ type CreatedCourseDTO struct {
 	Price       float64               `form:"price" binding:"price"`
 	Language    models.Languages      `form:"language" binding:"required,oneof='ar' 'fr' 'en'"`
 	Level       models.Level          `form:"level" binding:"required,oneof='bigener' 'medium' 'advanced'"`
-	Duration    time.Duration         `form:"duration" binding:"omitempty,min=300000000"`
+	Duration    float64               `form:"duration" binding:"omitempty,min=5"`
 	Video       *multipart.FileHeader `form:"video,omitempty" binding:"required"`
 	Image       *multipart.FileHeader `form:"image,omitempty" binding:"required"`
 }
@@ -92,7 +91,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 		Title:       course.Title,
 		Description: course.Description,
 		Price:       course.Price,
-		Duration:    course.Duration,
+		Duration:    uint(course.Duration),
 		Language:    course.Language,
 		Level:       course.Level,
 		Image: &models.File{
@@ -186,8 +185,8 @@ type CourseSearchDTO struct {
 	FreeOrPaid    string           `form:"free_or_paid" binding:"omitempty,oneof='free' 'paid'"`
 	Language      models.Languages `form:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
 	Level         models.Level     `form:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
-	MinDuration   time.Duration    `form:"min_duration" binding:"min=0"`
-	MaxDuration   time.Duration    `form:"max_duration" binding:"min=0"`
+	MinDuration   float64          `form:"min_duration" binding:"omitempty,min=5"`
+	MaxDuration   float64          `form:"max_duration" binding:"omitempty,min=5"`
 	PageSize      uint             `form:"page_size,default=10" binding:"min=1"`
 	Page          uint             `form:"page,default=1" binding:"min=1"`
 	AppendWith    string           `form:"append_with"`
@@ -245,11 +244,11 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	}
 
 	if minDuration > 0 {
-		query = query.Where("duration >= ?", minDuration.Seconds())
+		query = query.Where("duration >= ?", minDuration)
 	}
 
 	if maxDuration > 0 {
-		query = query.Where("duration <= ?", maxDuration.Seconds())
+		query = query.Where("duration <= ?", maxDuration)
 	}
 
 	if len(categoriesIDs) > 0 {
@@ -289,7 +288,7 @@ type UpdateCourseDTO struct {
 	Price         *float64         `json:"price" binding:"omitempty,price"`
 	Language      models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
 	Level         models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
-	Duration      time.Duration    `json:"duration" binding:"omitempty,min=300000000"`
+	Duration      float64          `form:"duration" binding:"omitempty,min=5"`
 	CategoriesIDs string           `json:"categories_ids"`
 }
 
@@ -328,7 +327,7 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 	}
 
 	if course.Duration > 0 {
-		existingCourse.Duration = course.Duration
+		existingCourse.Duration = uint(course.Duration)
 	}
 
 	if course.Price != nil {
@@ -419,10 +418,10 @@ func (cr *CoursesRepository) UpdateCourseImage(ID uint, authorID string, image m
 	}
 
 	newImage := models.File{
-		URL:          uploadData.Url,
-		ImageKitID:   &uploadData.FileId,
-		ThumbnailURL: &uploadData.ThumbnailUrl,
-		ImageCourseID:     &ID,
+		URL:           uploadData.Url,
+		ImageKitID:    &uploadData.FileId,
+		ThumbnailURL:  &uploadData.ThumbnailUrl,
+		ImageCourseID: &ID,
 	}
 	if err := database.Create(&newImage).Error; err != nil {
 		return &utils.APIError{
@@ -474,10 +473,10 @@ func (cr *CoursesRepository) UpdateCourseVideo(ID uint, authorID string, video m
 	}
 
 	newVideo := models.File{
-		URL:          uploadData.Url,
-		ImageKitID:   &uploadData.FileId,
-		ThumbnailURL: &uploadData.ThumbnailUrl,
-		VideoCourseID:     &ID,
+		URL:           uploadData.Url,
+		ImageKitID:    &uploadData.FileId,
+		ThumbnailURL:  &uploadData.ThumbnailUrl,
+		VideoCourseID: &ID,
 	}
 	if err := database.Create(&newVideo).Error; err != nil {
 		return &utils.APIError{
