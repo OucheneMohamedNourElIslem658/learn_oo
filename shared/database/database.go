@@ -64,8 +64,6 @@ func migrateTables() error {
 		&models.Question{},
 		&models.Option{},
 		&models.TestResult{},
-		&models.QuestionAnswer{},
-		&models.OptionSelection{},
 		&models.File{},
 		&models.Comment{},
 		&models.Notification{},
