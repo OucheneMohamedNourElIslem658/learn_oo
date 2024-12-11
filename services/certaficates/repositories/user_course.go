@@ -70,7 +70,7 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 	payment := ucr.payment
 
 	if course.Price > 0 {
-		checkout, err := payment.MakePayment(session.PaymentSuccessUrl, session.PaymentFailUrl, userID, course.AuthorID, course)
+		checkout, err := payment.MakePayment(session.PaymentSuccessUrl, session.PaymentFailUrl, userID, course)
 		if err != nil {
 			return nil, &utils.APIError{
 				StatusCode: http.StatusInternalServerError,
