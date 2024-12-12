@@ -22,7 +22,7 @@ func Init() {
 			Config: &oauth2.Config{
 				ClientID:     envs.googleClientID,
 				ClientSecret: envs.googleClientSecret,
-				RedirectURL:  "https://learn-oo-api.onrender.com/api/v1/users/auth/oauth/google/callback/",
+				RedirectURL:  "https://learn-oo-api.onrender.com/api/v1/users/auth/oauth/google/callback",
 				Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
 				Endpoint:     google.Endpoint,
 			},
