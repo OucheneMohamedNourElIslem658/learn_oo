@@ -243,9 +243,8 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
-		host := ctx.Request.Host
-		ctx.SetCookie("id_token", *idToken, 3600, "/", host, false, true)
-		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", host, false, true)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
 		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 	}
 }
