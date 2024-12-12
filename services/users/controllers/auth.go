@@ -64,8 +64,8 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 			"message": err.Message,
 		})
 	} else {
-		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
-		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "localhost", false, true)
+		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
 		ctx.JSON(http.StatusOK, nil)
 	}
 }
