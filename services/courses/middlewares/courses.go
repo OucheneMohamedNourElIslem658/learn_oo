@@ -32,14 +32,14 @@ func (cm *CoursesMiddlewares) CheckCourseExistance() gin.HandlerFunc {
 		err := database.Model(models.Course{}).Where("id = ? and author_id = ?", courseID, authorID).Count(&count).Error
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 
 		if count == 0 {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-				"message": "course not found",
+				"error": "course not found",
 			})
 			return
 		}
@@ -68,14 +68,14 @@ func (cm *CoursesMiddlewares) CheckChapterExistance() gin.HandlerFunc {
 			Error
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 
 		if count == 0 {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-				"message": "chapter not found",
+				"error": "chapter not found",
 			})
 			return
 		}
@@ -106,14 +106,14 @@ func (cm *CoursesMiddlewares) CheckTestExistance() gin.HandlerFunc {
 			Error
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 
 		if count == 0 {
 			ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-				"message": "test not found",
+				"error": "test not found",
 			})
 			return
 		}

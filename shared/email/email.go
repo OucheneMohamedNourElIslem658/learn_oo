@@ -20,7 +20,7 @@ func Init() {
 func SendEmailMessage(toEmail string, message string) error {
 	// Sending Email
 	err := smtp.SendMail(
-		"smtp.gmail.com:587",
+		"smtp.gmail.com:25",
 		auth,
 		mailerConfig.email,
 		[]string{toEmail},

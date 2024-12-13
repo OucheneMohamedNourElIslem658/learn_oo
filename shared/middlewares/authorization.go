@@ -31,14 +31,14 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 
 				if err != nil {
 					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-						"message": "invalid id token",
+						"error": "invalid id token",
 					})
 					return
 				}
 
 				if !isValid {
 					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-						"message": "id token expired",
+						"error": "id token expired",
 					})
 					return
 				}
@@ -60,7 +60,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithIDCheck() gin.HandlerFunc {
 
 		if authorID == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "id token doesn't contain id",
+				"error": "id token doesn't contain id",
 			})
 			return
 		}
@@ -75,7 +75,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithIDCheck() gin.HandlerFunc {
 
 // 		if !emailVerified {
 // 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-// 				"message": "email is not verified",
+// 				"error": "email is not verified",
 // 			})
 // 			return
 // 		}
@@ -89,7 +89,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithAuthorCheck() gin.HandlerFu
 		authorID := ctx.GetString("author_id")
 		if authorID == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "user is not author",
+				"error": "user is not author",
 			})
 			return
 		}
@@ -105,14 +105,14 @@ func (am *AuthorizationMiddlewares) AuthorizationWithEmailCheck() gin.HandlerFun
 
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
+				"error": err.Error(),
 			})
 			return
 		}
 
 		if !isValid {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"message": "token expired",
+				"error": "token expired",
 			})
 			return
 		}
