@@ -63,7 +63,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 		})
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
-		ctx.SetCookie("refresh_token", *refreshToken, 3600 * 24 * 30, "/", "", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600*24*30, "/", "", false, true)
 		ctx.JSON(http.StatusOK, nil)
 	}
 }
@@ -222,6 +222,6 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
 		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
-		ctx.Redirect(http.StatusFound, metadata.SuccessURL)
+		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
 	}
 }
