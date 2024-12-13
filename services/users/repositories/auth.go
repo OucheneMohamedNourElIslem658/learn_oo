@@ -57,21 +57,10 @@ func (ar *AuthRepository) RegisterWithEmailAndPassword(fullName, email, password
 		}
 	}
 
-	payment := ar.payment
-
-	customer, err := payment.CreateCustomer(email, fullName)
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
 	err = database.Create(&models.User{
 		FullName:          fullName,
 		Password:          hashedPassword,
 		Email:             email,
-		PaymentCustomerID: customer.ID,
 	}).Error
 	if err != nil {
 		return &utils.APIError{
@@ -417,16 +406,6 @@ func (ar *AuthRepository) OAuthCallback(provider string, code string, context co
 	err = database.Where("email = ?", user.Email).Preload("Image").Preload("AuthorProfile").First(&existingUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			payment := ar.payment
-			customer, err := payment.CreateCustomer(user.Email, user.FullName)
-			if err != nil {
-				return nil, nil, &utils.APIError{
-					StatusCode: http.StatusInternalServerError,
-					Message:    err.Error(),
-				}
-			}
-
-			user.PaymentCustomerID = customer.ID
 			err = database.Create(&user).Error
 			if err != nil {
 				return nil, nil, &utils.APIError{

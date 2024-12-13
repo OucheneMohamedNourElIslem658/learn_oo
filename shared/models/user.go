@@ -17,7 +17,6 @@ type User struct {
 	Password          string         `json:"password"`
 	FullName          string         `gorm:"not null" json:"full_name"`
 	EmailVerified     bool           `json:"email_verified"`
-	PaymentCustomerID string         `json:"payment_customer_id"`
 	Image             *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
 	AuthorProfile     *Author        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"author_profile"`
 	Courses           []Course       `gorm:"many2many:course_learners;" json:"courses"`
