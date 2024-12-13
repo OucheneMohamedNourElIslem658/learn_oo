@@ -63,7 +63,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 		})
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
-		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
+		ctx.SetCookie("refresh_token", *refreshToken, 3600 * 24 * 30, "/", "", false, true)
 		ctx.JSON(http.StatusOK, nil)
 	}
 }
@@ -125,21 +125,6 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
 	}
 }
-
-// func (authcontroller *AuthController) GetUserData(ctx *gin.Context) {
-// 	authorization := ctx.GetHeader("Authorization")
-
-// 	repository := authcontroller.authRepository
-
-// 	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
-// 		ctx.JSON(err.StatusCode, gin.H{
-// 			"error": err.Message,
-// 		})
-// 	} else {
-// 		ctx.JSON(http.StatusOK, nil)
-// 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
-// 	}
-// }
 
 func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 	var body struct {
