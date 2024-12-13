@@ -32,7 +32,7 @@ func Init() {
 			Config: &oauth2.Config{
 				ClientID:     envs.facebookClientID,
 				ClientSecret: envs.facebookClientSecret,
-				RedirectURL:  "https://learn-oo-api.onrender.com/api/v1/users/auth/oauth/facebook/callback",
+				RedirectURL:  "https://learn-oo-api.onrender.com/api/v1/users/auth/oauth/facebook/callback/",
 				Scopes:       []string{"public_profile", "email"},
 				Endpoint:     facebook.Endpoint,
 			},
