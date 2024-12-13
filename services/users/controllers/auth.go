@@ -30,7 +30,7 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
+			"error": utils.ValidationErrorResponse(err),
 		})
 		return
 	}
@@ -38,7 +38,7 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 	authRepository := authcontroller.authRepository
 	if err := authRepository.RegisterWithEmailAndPassword(body.FullName, body.Email, body.Password); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -53,7 +53,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
+			"error": utils.ValidationErrorResponse(err),
 		})
 		return
 	}
@@ -61,7 +61,7 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 	authRepository := authcontroller.authRepository
 	if idToken, refreshToken, err := authRepository.LoginWithEmailAndPassword(body.Email, body.Password); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
@@ -75,9 +75,9 @@ func (authcontroller *AuthController) SendEmailVerificationLink(ctx *gin.Context
 		Email string `json:"email" binding:"required,email"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
-			"message": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadGateway, message)
+		return
 	}
 
 	authRepository := authcontroller.authRepository
@@ -85,7 +85,7 @@ func (authcontroller *AuthController) SendEmailVerificationLink(ctx *gin.Context
 	hostURL := "http://" + ctx.Request.Host + "/api/v1/users/auth/serve-email-verification-template"
 	if err := authRepository.SendEmailVerificationLink(body.Email, hostURL); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 	} else {
 		ctx.JSON(http.StatusOK, nil)
@@ -99,13 +99,13 @@ func (authcontroller *AuthController) VerifyEmail(ctx *gin.Context) {
 
 	if err := authRepository.VerifyEmail(email); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Your email has been verified!",
+		"error": "Your email has been verified!",
 	})
 }
 
@@ -120,7 +120,7 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 
 	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 	} else {
 		ctx.JSON(http.StatusOK, nil)
@@ -135,7 +135,7 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 
 // 	if idToken, err := repository.RefreshIdToken(authorization); err != nil {
 // 		ctx.JSON(err.StatusCode, gin.H{
-// 			"message": err.Message,
+// 			"error": err.Message,
 // 		})
 // 	} else {
 // 		ctx.Status(http.StatusOK)
@@ -149,7 +149,7 @@ func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{
-			"message": utils.ValidationErrorResponse(err),
+			"error": utils.ValidationErrorResponse(err),
 		})
 	}
 
@@ -158,7 +158,7 @@ func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 	hostURL := "http://" + ctx.Request.Host + "/api/v1/users/auth/serve-reset-password-form"
 	if err := authRepository.SendPasswordResetLink(body.Email, hostURL); err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 	} else {
 		ctx.JSON(http.StatusOK, nil)
@@ -173,7 +173,7 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		fmt.Println(utils.ValidationErrorResponse(err))
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
+			"error": utils.ValidationErrorResponse(err),
 		})
 		return
 	}
@@ -185,7 +185,7 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 	newPassword := body.Password
 	if err := authRepository.ResetPassword(email, newPassword); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -203,11 +203,8 @@ func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindQuery(&query); err != nil {
-		fmt.Println(query.FailureURL)
-		fmt.Println(query.FailureURL)
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -216,7 +213,7 @@ func (authcontroller *AuthController) OAuth(ctx *gin.Context) {
 	authRepository := authcontroller.authRepository
 	if result, err := authRepository.OAuth(provider, query.SuccessURL, query.FailureURL); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 	} else {
 		oauthConfig := result["oauthConfig"].(*oauth2.Config)
