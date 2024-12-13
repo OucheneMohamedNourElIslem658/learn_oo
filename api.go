@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	certaficatesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/certaficates/routers"
@@ -24,6 +25,14 @@ func NewServer(address string) *Server {
 func (server *Server) Run() {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // Allow all origins
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true, // Set to false if no credentials like cookies are needed
+	}))
 
 	router.Use(gin.Logger())
 	// services\users\views
