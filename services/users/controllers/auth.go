@@ -29,9 +29,8 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 		Password string `json:"password" binding:"required,password"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -52,9 +51,8 @@ func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context
 		Password string `json:"password" binding:"required,password"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -105,7 +103,7 @@ func (authcontroller *AuthController) VerifyEmail(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"error": "Your email has been verified!",
+		"message": "Your email has been verified!",
 	})
 }
 
@@ -138,7 +136,7 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 // 			"error": err.Message,
 // 		})
 // 	} else {
-// 		ctx.Status(http.StatusOK)
+// 		ctx.JSON(http.StatusOK, nil)
 // 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
 // 	}
 // }
@@ -148,9 +146,8 @@ func (authcontroller *AuthController) SendPasswordResetLink(ctx *gin.Context) {
 		Email string `json:"email" binding:"required,email"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{
-			"error": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadGateway, message)
 	}
 
 	authRepository := authcontroller.authRepository
@@ -171,10 +168,8 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		fmt.Println(utils.ValidationErrorResponse(err))
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": utils.ValidationErrorResponse(err),
-		})
+		message := utils.ValidationErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, message)
 		return
 	}
 
@@ -189,7 +184,7 @@ func (authcontroller *AuthController) ResetPassword(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, nil)
 }
 
 func (authcontroller *AuthController) ServeResetPasswordForm(ctx *gin.Context) {
