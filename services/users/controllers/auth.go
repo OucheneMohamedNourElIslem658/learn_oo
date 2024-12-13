@@ -222,6 +222,6 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	} else {
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
 		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
-		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
+		ctx.Redirect(http.StatusFound, metadata.SuccessURL)
 	}
 }
