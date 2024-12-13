@@ -136,9 +136,17 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 	)
 
 	for _, extention := range validExtentions {
-		if extention == "Author" {
+		switch extention {
+		case "Chapters":
+			query.Preload(extention, func(db *gorm.DB) *gorm.DB {
+				return db.Preload("Lessons", func(db *gorm.DB) *gorm.DB {
+					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video").
+						Joins("LEFT JOIN files ON lessons.id = files.lesson_id")
+				})
+			})
+		case "Author":
 			query.Preload("Author.User")
-		} else {
+		default:
 			query.Preload(extention)
 		}
 	}
@@ -418,8 +426,8 @@ func (cr *CoursesRepository) UpdateCourseImage(ID uint, authorID string, image m
 		ImageKitID:    &uploadData.FileId,
 		ThumbnailURL:  &uploadData.ThumbnailUrl,
 		ImageCourseID: &ID,
-		Height: uploadData.Height,
-		Width: uploadData.Width,
+		Height:        uploadData.Height,
+		Width:         uploadData.Width,
 	}
 	if err := database.Create(&newImage).Error; err != nil {
 		return &utils.APIError{
@@ -475,8 +483,8 @@ func (cr *CoursesRepository) UpdateCourseVideo(ID uint, authorID string, video m
 		ImageKitID:    &uploadData.FileId,
 		ThumbnailURL:  &uploadData.ThumbnailUrl,
 		VideoCourseID: &ID,
-		Height: uploadData.Height,
-		Width: uploadData.Width,
+		Height:        uploadData.Height,
+		Width:         uploadData.Width,
 	}
 	if err := database.Create(&newVideo).Error; err != nil {
 		return &utils.APIError{

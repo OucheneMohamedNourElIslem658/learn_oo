@@ -42,7 +42,17 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, nil)
+	hostURL := "http://" + ctx.Request.Host + "/api/v1/users/auth/serve-email-verification-template"
+	if err := authRepository.SendEmailVerificationLink(body.Email, hostURL); err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"error": err.Message,
+			"message": fmt.Sprintf("user created but %v", err.Message),
+		})
+	} else {
+		ctx.JSON(http.StatusCreated, gin.H{
+			"message": "email verification has been sent",
+		})
+	}
 }
 
 func (authcontroller *AuthController) LoginWithEmailAndPassword(ctx *gin.Context) {
@@ -217,11 +227,11 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	authRepository := authcontroller.authRepository
 
 	if idToken, refreshToken, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
+		fmt.Println("failure")
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {
-		ctx.SetCookie("id_token", *idToken, 3600, "/", "", false, true)
-		ctx.SetCookie("refresh_token", *refreshToken, 3600, "/", "", false, true)
-		ctx.Redirect(http.StatusTemporaryRedirect, metadata.SuccessURL)
+		successURL := fmt.Sprintf("%v?id_token=%v&refresh_token=%v", metadata.SuccessURL, *idToken, *refreshToken)
+		ctx.Redirect(http.StatusTemporaryRedirect, successURL)
 	}
 }
