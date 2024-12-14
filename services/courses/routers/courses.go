@@ -58,7 +58,7 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	router.PUT("/:course_id/image", authorization, AuthorizationWithAuthorCheck, checkCourseExistance, coursesController.UpdateCourseImage)
 	router.PUT("/:course_id/video", authorization, AuthorizationWithAuthorCheck, checkCourseExistance, coursesController.UpdateCourseVideo)
 	router.DELETE("/:course_id", authorization, AuthorizationWithAuthorCheck, coursesController.DeleteCourse)
-	router.GET("/:course_id", authorization, authorizationWithIDCheck, coursesController.GetCourse)
+	router.GET("/:course_id", authorization, coursesController.GetCourse)
 	router.GET("/", authorization, coursesController.GetCourses)
 
 	objectivesRouter := router.Group("/:course_id/objectives")

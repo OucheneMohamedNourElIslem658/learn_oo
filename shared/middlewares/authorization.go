@@ -60,7 +60,7 @@ func (am *AuthorizationMiddlewares) AuthorizationWithIDCheck() gin.HandlerFunc {
 
 		if authorID == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "id token doesn't contain id",
+				"error": "requester is not a user",
 			})
 			return
 		}
