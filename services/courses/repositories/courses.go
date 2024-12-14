@@ -259,11 +259,13 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 			Where("course_categories.category_id IN (?)", categoriesIDs)
 	}
 
-	query.Select("courses.*, COALESCE(AVG(course_learners.rate), 0) AS rate, COUNT(course_learners.*) as raters_count").
-		Where("course_learners.rate IS NOT NULL").
+	query.Select(`courses.*, 
+		COALESCE(AVG(course_learners.rate), 0) AS rate, 
+		SUM(CASE WHEN course_learners.rate IS NOT NULL THEN 1 ELSE 0 END) AS raters_count`).
 		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
 		Group("courses.id").
 		Order("rate DESC, price DESC, created_at DESC, duration DESC")
+
 
 	var totalRecords int64
 	database.Model(&models.User{}).Count(&totalRecords)

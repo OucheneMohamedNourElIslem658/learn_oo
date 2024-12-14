@@ -44,7 +44,7 @@ type Course struct {
 	Video            *File          `gorm:"foreignKey:VideoCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video"`
 	Image            *File          `gorm:"foreignKey:ImageCourseID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
 	AuthorID         string         `json:"author_id"`
-	Author           *Author        `json:"author"`
+	Author           *Author        `gorm:"foreignKey:AuthorID" json:"author"`
 	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories"`
 	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters"`
 	Learners         []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners"`
