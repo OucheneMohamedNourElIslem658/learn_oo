@@ -307,7 +307,7 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 		if err == gorm.ErrRecordNotFound {
 			return &utils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message:    "Course not found",
+				Message:    "course not found",
 			}
 		}
 		return &utils.APIError{
@@ -338,7 +338,6 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 
 	if course.Price != nil {
 		existingCourse.Price = *course.Price
-		fmt.Println(existingCourse.Price)
 		if *course.Price >= 50 {
 			payment := cr.payment
 			product, err := payment.CreateProduct(existingCourse)

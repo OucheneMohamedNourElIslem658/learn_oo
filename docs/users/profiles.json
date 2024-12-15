@@ -53,18 +53,18 @@
                 ]
             },
             {
-                "code": "bad request",
+                "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "id token expired"
                     }
                 ]
             },
             {
-                "code": "unauthorized",
+                "code": "bad request",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -72,7 +72,7 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "user not found"
+                        "error": "user not found"
                     }
                 ]
             },
@@ -80,7 +80,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -110,18 +110,18 @@
                 "code": "ok"
             },
             {
-                "code": "bad request",
+                "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "id token expired"
                     }
                 ]
             },
             {
-                "code": "unauthorized",
+                "code": "bad request",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -129,7 +129,7 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "user not found"
+                        "error": "user not found"
                     }
                 ]
             },
@@ -137,7 +137,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -175,13 +175,13 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "multipart request error"
                     },
                     {
-                        "message": "multipart request error"
+                        "error": "the file is not an image"
                     },
                     {
-                        "message": "the file is not an image"
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -189,7 +189,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -197,7 +197,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -224,10 +224,10 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "undefined authorization"
                     },
                     {
-                        "message": "user is already an author"
+                        "error": "user is already an author"
                     }
                 ]
             },
@@ -235,7 +235,10 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "user not found"
+                        "error": "user not found"
+                    },
+                    {
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -243,7 +246,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -251,7 +254,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -278,7 +281,7 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "undefined authorization"
                     }
                 ]
             },
@@ -286,7 +289,10 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "author not found"
+                        "error": "author not found"
+                    },
+                    {
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -294,7 +300,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -302,7 +308,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -368,7 +374,7 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "undefined authorization"
                     }
                 ]
             },
@@ -376,7 +382,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -384,7 +390,7 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "author not found"
+                        "error": "author not found"
                     }
                 ]
             },
@@ -392,7 +398,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -425,7 +431,7 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -433,7 +439,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -441,7 +447,7 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "author not found"
+                        "error": "author not found"
                     }
                 ]
             },
@@ -449,7 +455,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -487,13 +493,13 @@
                 "code": "bad request",
                 "responses": [
                     {
-                        "message": "undefined authorization"
+                        "error": "invalid id token"
                     },
                     {
-                        "message": "multipart request error"
+                        "error": "multipart request error"
                     },
                     {
-                        "message": "accomplishments list can not be empty"
+                        "error": "accomplishments list can not be empty"
                     }
                 ]
             },
@@ -501,7 +507,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -509,7 +515,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -543,7 +549,7 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "message": "file not found"
+                        "error": "file not found"
                     }
                 ]
             },
@@ -551,7 +557,7 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     }
                 ]
             },
@@ -559,7 +565,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }

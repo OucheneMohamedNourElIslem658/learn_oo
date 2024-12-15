@@ -119,21 +119,16 @@ func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"error": "bad request",
+			"request": err.Error(),
 		})
 		return
 	}
 
 	if imageHeader == nil || image == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "image not provided",
-		})
-		return
-	}
-
-	if !utils.IsImage(*imageHeader) {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "the file is not an image",
+			"error": "bad request",
+			"image": "required",
 		})
 		return
 	}
@@ -161,14 +156,16 @@ func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"error": "bad request",
+			"request": err.Error(),
 		})
 		return
 	}
 
 	if videoHeader == nil || video == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "image not provided",
+			"error": "bad request",
+			"video": "required",
 		})
 		return
 	}

@@ -1,69 +1,5 @@
 [
     {
-        "path": "host/api/v1/courses",
-        "description": "create course",
-        "method": "POST",
-        "headers": [
-            {
-                "name": "Authorization",
-                "type": "string",
-                "required": true,
-                "description": "Bearer id_token"
-            }
-        ],
-        "request_body": {
-            "type": "json",
-            "body": {
-                "title": "course title",
-                "description": "course desc",
-                "price": "0 or positive float",  
-                "language": "one of en or ar or fr",
-                "level": "one of bigener or medium or advanced",
-                "duration": "in min",
-                "video": "video file",
-                "image": "image file"
-            }
-        },
-        "reponses": [
-            {
-                "code": "created"
-            },
-            {
-                "code": "bad request",
-                "responses": [
-                    {
-                        "error": "bad request",
-                        "title": "required",
-                        "description": "required",
-                        "language": "The value must be one of the following: (ar, fr, en)",
-                        "level": "The value must be one of the following: (bigener, medium, advanced)",
-                        "duration": "The value must be at least: 5"
-                    }
-                ]
-            },
-            {
-                "code": "unauthorized",
-                "responses": [
-                    {
-                        "error": "id token expired"
-                    },
-                    {
-                        "error": "invalid id token"
-                    }
-                ]
-            },
-            {
-                "code": "internal server error",
-                "responses": [
-                    {
-                        "error": "error message (contact me when you see one)"
-                    }
-                ]
-            }
-        ]
-    },
-
-    {
         "path": "host/api/v1/courses/:course_id",
         "description": "get course",
         "method": "GET",
@@ -355,9 +291,54 @@
         "query_params": [
             {
                 "name": "append_with",
-                "values": "image,author,video,categories",
+                "value": "image,author,video,categories",
                 "required": false,
                 "description": "include some infos associated to the course"
+            },
+            {
+                "name": "title",
+                "required": false,
+                "description": "wrtie part of disired title"
+            },
+            {
+                "name": "free_or_paid",
+                "required": false,
+                "description": "takes value free or paid"
+            },
+            {
+                "name": "language",
+                "required": false,
+                "description": "takes en or fr or ar"
+            },
+            {
+                "name": "min_duration",
+                "required": false,
+                "description": "num of min course duration in minutes (must be greater or equal to 5)"
+            },
+            {
+                "name": "max_duration",
+                "required": false,
+                "description": "num of max course duration in minutes (must be greater or equal to 5)"
+            },
+            {
+                "name": "level",
+                "required": false,
+                "description": "must be one of bigener or advanced or medium"
+            },
+            {
+                "name": "page_size",
+                "required": false,
+                "description": "number of courses per page (it should be at least 1 and by default its 10)"
+            },
+            {
+                "name": "page",
+                "required": false,
+                "description": "number of courses per page (it should be at least 1 and by default its 1)"
+            },
+            {
+                "name": "categories_ids",
+                "required": false,
+                "description": "takes list of ints like this: 1,5,18"
             }
         ],
         "reponses": [
@@ -456,6 +437,12 @@
                 "responses": [
                     {
                         "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation error of the field 1",
+                        "field 2": "validation error of the field 2",
+                        "...": "..."
                     }
                 ]
             },
@@ -464,6 +451,320 @@
                 "responses": [
                     {
                         "error": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id",
+        "description": "delete course",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id",
+        "description": "update course",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "title": "string",
+            "description": "string",
+            "price": "equal or greater than 0",
+            "language": "en or ar or fr",
+            "level": "advanced or bigener or medium",
+            "duration": "min 5 minutes (in minutes)",
+            "categories_ids": "1,2,18"
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses",
+        "description": "create course",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "type": "multipart/form-data",
+            "body": {
+                "title": "string",
+                "description": "string",
+                "price": "equal or greater than 0",
+                "language": "en or ar or fr",
+                "level": "advanced or bigener or medium",
+                "duration": "min 5 minutes (in minutes)",
+                "video":"video file",
+                "image":"image file"
+            },
+            "note": "all body fields are required"
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not author"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/image",
+        "description": "update course image",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "type": "multipart/form-data",
+            "body": {
+                "image": "image file"
+            }
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "image": "required",
+                        "request": "error indicated that you malformed your request"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not author"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/video",
+        "description": "update course video",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "type": "multipart/form-data",
+            "body": {
+                "video": "video file"
+            }
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "video": "required",
+                        "request": "error indicated that you malformed your request"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
                     }
                 ]
             },
