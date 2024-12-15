@@ -539,7 +539,8 @@
             "language": "en or ar or fr",
             "level": "advanced or bigener or medium",
             "duration": "min 5 minutes (in minutes)",
-            "categories_ids": "1,2,18"
+            "categories_ids": "1,2,18",
+            "is_completed": "bool"
         },
         "reponses": [
             {
@@ -617,7 +618,7 @@
         },
         "reponses": [
             {
-                "code": "ok",
+                "code": "created",
                 "responses": []
             },
             {

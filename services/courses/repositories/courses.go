@@ -295,6 +295,7 @@ type UpdateCourseDTO struct {
 	Language      models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
 	Level         models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
 	Duration      float64          `form:"duration" binding:"omitempty,min=5"`
+	IsCompleted   *bool            `form:"is_completed"`
 	CategoriesIDs string           `json:"categories_ids"`
 }
 
@@ -334,6 +335,10 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 
 	if course.Duration > 0 {
 		existingCourse.Duration = uint(course.Duration)
+	}
+
+	if course.IsCompleted != nil {
+		existingCourse.IsCompleted = *course.IsCompleted
 	}
 
 	if course.Price != nil {
