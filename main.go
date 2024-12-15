@@ -12,6 +12,7 @@ func init() {
 	email.Init()
 	oauthproviders.Init()
 	utils.InitValidators()
+	utils.GenerateExampleData()
 }
 
 func main() {

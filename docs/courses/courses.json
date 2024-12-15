@@ -337,5 +337,144 @@
                 ]
             }
         ]
+    },
+
+    {
+        "path": "host/api/v1/courses",
+        "description": "get courses",
+        "method": "GET",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": false,
+                "Why not required": "add it for author so he can get his uncompleted courses",
+                "description": "Bearer id_token."
+            }
+        ],
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "image,author,video,categories",
+                "required": false,
+                "description": "include some infos associated to the course"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": [
+                    {
+                        "count": 3,
+                        "courses": [
+                          {
+                            "id": 13,
+                            "created_at": "2024-12-14T12:21:52.485722Z",
+                            "updated_at": "2024-12-15T07:17:26.217226Z",
+                            "deleted_at": null,
+                            "title": "test",
+                            "description": "test",
+                            "price": 0,
+                            "payment_price_id": null,
+                            "payment_product_id": null,
+                            "language": "en",
+                            "level": "bigener",
+                            "duration": 15,
+                            "rate": 3.5,
+                            "raters_count": 1,
+                            "is_completed": true,
+                            "requirements": null,
+                            "objectives": null,
+                            "video": null,
+                            "image": null,
+                            "author_id": "72125ca0-94f3-42e5-ac3a-0d797ec9078b",
+                            "author": null,
+                            "categories": null,
+                            "chapters": null,
+                            "learners": null
+                          },
+                          {
+                            "id": 25,
+                            "created_at": "2024-12-15T10:25:06.684326Z",
+                            "updated_at": "2024-12-15T10:25:06.684326Z",
+                            "deleted_at": null,
+                            "title": "Introduction to Acting",
+                            "description": "A beginner's guide to the fundamentals of acting.",
+                            "price": 39.99,
+                            "payment_price_id": null,
+                            "payment_product_id": null,
+                            "language": "en",
+                            "level": "beginner",
+                            "duration": 120,
+                            "rate": 0,
+                            "raters_count": 0,
+                            "is_completed": true,
+                            "requirements": null,
+                            "objectives": null,
+                            "video": null,
+                            "image": null,
+                            "author_id": "72125ca0-94f3-42e5-ac3a-0d797ec9078b",
+                            "author": null,
+                            "categories": null,
+                            "chapters": null,
+                            "learners": null
+                          },
+                          {
+                            "id": 18,
+                            "created_at": "2024-12-15T09:51:50.68243Z",
+                            "updated_at": "2024-12-15T09:51:50.68243Z",
+                            "deleted_at": null,
+                            "title": "Introduction to Go",
+                            "description": "A beginner's guide to learning Go programming.",
+                            "price": 29.99,
+                            "payment_price_id": null,
+                            "payment_product_id": null,
+                            "language": "en",
+                            "level": "advanced",
+                            "duration": 120,
+                            "rate": 0,
+                            "raters_count": 0,
+                            "is_completed": true,
+                            "requirements": null,
+                            "objectives": null,
+                            "video": null,
+                            "image": null,
+                            "author_id": "72125ca0-94f3-42e5-ac3a-0d797ec9078b",
+                            "author": null,
+                            "categories": null,
+                            "chapters": null,
+                            "learners": null
+                          }
+                        ],
+                        "current_page": 1,
+                        "max_pages": 1
+                    }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
     }
 ]
