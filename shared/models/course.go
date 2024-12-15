@@ -47,7 +47,7 @@ type Course struct {
 	Author           *Author        `gorm:"foreignKey:AuthorID" json:"author"`
 	Categories       []Category     `gorm:"many2many:course_categories;" json:"categories"`
 	Chapters         []Chapter      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"chapters"`
-	Learners         []User         `gorm:"many2many:course_learners;association_foreignkey:LearnerID" json:"learners"`
+	Learners         []User         `gorm:"many2many:course_learners;joinForeignKey:CourseID;joinReferences:LearnerID" json:"learners"`
 }
 
 type Category struct {
@@ -144,10 +144,10 @@ type CourseLearner struct {
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	CourseID      uint           `gorm:"primaryKey" json:"course_id"`
-	LearnerID     string         `gorm:"primaryKey" json:"learner_id"`
-	Course        *Course        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"course"`
-	Learner       *User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner"`
+	CourseID       uint             `gorm:"column:course_id;primaryKey" json:"course_id"`
+    LearnerID      string           `gorm:"column:learner_id;primaryKey" json:"learner_id"`
+    Course         *Course          `gorm:"foreignKey:CourseID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"course"`
+    Learner        *User            `gorm:"foreignKey:LearnerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner"`
 	LeaningStatus LearningStatus `gorm:"default:'learning'" json:"language"`
 	Rate          *float64       `json:"rate"`
 	CheckoutID    *string        `json:"checkout_id"`

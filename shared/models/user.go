@@ -19,7 +19,7 @@ type User struct {
 	EmailVerified     bool           `json:"email_verified"`
 	Image             *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"image"`
 	AuthorProfile     *Author        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"author_profile"`
-	Courses           []Course       `gorm:"many2many:course_learners;" json:"courses"`
+	 Courses          []Course        `gorm:"many2many:course_learners;joinForeignKey:LearnerID;joinReferences:CourseID" json:"courses"`
 	Lessons           []Lesson       `gorm:"many2many:lesson_learners;" json:"lessons"`
 	Tests             []Test         `gorm:"many2many:test_results;" json:"tests"`
 }

@@ -19,7 +19,7 @@
                 "price": "0 or positive float",  
                 "language": "one of en or ar or fr",
                 "level": "one of bigener or medium or advanced",
-                "duration": "in microsecs min is 300000000",
+                "duration": "in min",
                 "video": "video file",
                 "image": "image file"
             }
@@ -32,13 +32,12 @@
                 "code": "bad request",
                 "responses": [
                     {
+                        "error": "bad request",
                         "title": "required",
                         "description": "required",
                         "language": "The value must be one of the following: (ar, fr, en)",
                         "level": "The value must be one of the following: (bigener, medium, advanced)",
-                        "duration": "The value must be at least: 300000000",
-                        "video": "required, file is not a video",
-                        "image": "required, image is not a video"
+                        "duration": "The value must be at least: 5"
                     }
                 ]
             },
@@ -46,10 +45,10 @@
                 "code": "unauthorized",
                 "responses": [
                     {
-                        "message": "id token expired"
+                        "error": "id token expired"
                     },
                     {
-                        "message": "invalid id token"
+                        "error": "invalid id token"
                     }
                 ]
             },
@@ -57,7 +56,7 @@
                 "code": "internal server error",
                 "responses": [
                     {
-                        "message": "error message (contact me when you see one)"
+                        "error": "error message (contact me when you see one)"
                     }
                 ]
             }
@@ -72,38 +71,270 @@
             {
                 "name": "Authorization",
                 "type": "string",
-                "required": true,
+                "required": false,
+                "Why not required": "add it for author so he can get his uncompleted courses",
                 "description": "Bearer id_token."
             }
         ],
         "query_params": [
             {
                 "name": "append_with",
-                "values": "image,author_profile",
+                "values": "image,author,video,requirements,objectives,categories,chapters,learners",
                 "required": false,
-                "description": "include some infos associated to the user"
+                "description": "include some infos associated to the course"
             }
         ],
         "reponses": [
             {
                 "code": "ok",
-                "responses": []
+                "responses": [
+                    {
+                        "id": 13,
+                        "created_at": "2024-12-14T12:21:52.485722Z",
+                        "updated_at": "2024-12-15T07:17:26.217226Z",
+                        "deleted_at": null,
+                        "title": "test",
+                        "description": "test",
+                        "price": 0,
+                        "payment_price_id": null,
+                        "payment_product_id": null,
+                        "language": "en",
+                        "level": "bigener",
+                        "duration": 15,
+                        "rate": 3.5,
+                        "raters_count": 0,
+                        "is_completed": true,
+                        "requirements": [
+                          {
+                            "id": 4,
+                            "created_at": "2024-12-15T07:22:20.008486Z",
+                            "updated_at": "2024-12-15T07:22:20.008486Z",
+                            "deleted_at": null,
+                            "content": "native arabian",
+                            "course_id": 13,
+                            "course": null
+                          },
+                          {
+                            "id": 5,
+                            "created_at": "2024-12-15T07:22:33.875656Z",
+                            "updated_at": "2024-12-15T07:22:33.875656Z",
+                            "deleted_at": null,
+                            "content": "know how to write letters",
+                            "course_id": 13,
+                            "course": null
+                          },
+                          {
+                            "id": 6,
+                            "created_at": "2024-12-15T07:22:41.657788Z",
+                            "updated_at": "2024-12-15T07:22:41.657788Z",
+                            "deleted_at": null,
+                            "content": "have a brain",
+                            "course_id": 13,
+                            "course": null
+                          }
+                        ],
+                        "objectives": [
+                          {
+                            "id": 4,
+                            "created_at": "2024-12-15T07:21:32.028588Z",
+                            "updated_at": "2024-12-15T07:21:32.028588Z",
+                            "deleted_at": null,
+                            "content": "Learn how to count",
+                            "course_id": 13,
+                            "course": null
+                          },
+                          {
+                            "id": 5,
+                            "created_at": "2024-12-15T07:21:44.661774Z",
+                            "updated_at": "2024-12-15T07:21:44.661774Z",
+                            "deleted_at": null,
+                            "content": "Learn how to write numbers",
+                            "course_id": 13,
+                            "course": null
+                          },
+                          {
+                            "id": 6,
+                            "created_at": "2024-12-15T07:22:05.926901Z",
+                            "updated_at": "2024-12-15T07:22:05.926901Z",
+                            "deleted_at": null,
+                            "content": "Learn how to calculate",
+                            "course_id": 13,
+                            "course": null
+                          }
+                        ],
+                        "video": {
+                          "id": 25,
+                          "created_at": "2024-12-14T12:21:52.58379Z",
+                          "updated_at": "2024-12-14T12:21:52.58379Z",
+                          "deleted_at": null,
+                          "url": "https://ik.imagekit.io/cdejmhtxd/learn_oo/authors/72125ca0-94f3-42e5-ac3a-0d797ec9078b/courses/videos/file_2iJYkIXfR",
+                          "height": 360,
+                          "width": 640,
+                          "thumbnail_url": "",
+                          "image_kit_id": null,
+                          "video_course_id": 13
+                        },
+                        "image": {
+                          "id": 26,
+                          "created_at": "2024-12-14T12:21:52.691765Z",
+                          "updated_at": "2024-12-14T12:21:52.691765Z",
+                          "deleted_at": null,
+                          "url": "https://ik.imagekit.io/cdejmhtxd/learn_oo/authors/72125ca0-94f3-42e5-ac3a-0d797ec9078b/courses/images/file_9c-sreZa7",
+                          "height": 980,
+                          "width": 1848,
+                          "thumbnail_url": "https://ik.imagekit.io/cdejmhtxd/tr:n-ik_ml_thumbnail/learn_oo/authors/72125ca0-94f3-42e5-ac3a-0d797ec9078b/courses/images/file_9c-sreZa7",
+                          "image_kit_id": null,
+                          "image_course_id": 13
+                        },
+                        "author_id": "72125ca0-94f3-42e5-ac3a-0d797ec9078b",
+                        "author": {
+                          "id": "72125ca0-94f3-42e5-ac3a-0d797ec9078b",
+                          "created_at": "2024-12-14T12:20:36.415963Z",
+                          "updated_at": "2024-12-14T12:20:36.415963Z",
+                          "deleted_at": null,
+                          "bio": null,
+                          "balance": 0,
+                          "user_id": "92d856d0-a0ee-4220-81b4-66e8adc073fc",
+                          "user": {
+                            "id": "92d856d0-a0ee-4220-81b4-66e8adc073fc",
+                            "created_at": "2024-12-11T13:11:39.167269Z",
+                            "updated_at": "2024-12-13T13:32:04.17469Z",
+                            "deleted_at": null,
+                            "email": "m_ouchene@estin.dz",
+                            "password": "$2a$10$0pImKZSJKjGFcIKcpz27zuhNXwolVaiUbfBPqZZJJxLQNCGqRQjzq",
+                            "full_name": "mohamed OUCHENE",
+                            "email_verified": true,
+                            "image": null,
+                            "author_profile": null,
+                            "courses": null,
+                            "lessons": null,
+                            "tests": null
+                          },
+                          "accomplishments": null,
+                          "courses": null
+                        },
+                        "categories": [
+                          {
+                            "id": 1,
+                            "created_at": "2024-12-15T07:16:26.991797Z",
+                            "updated_at": "2024-12-15T07:16:26.991797Z",
+                            "deleted_at": null,
+                            "name": "java script",
+                            "courses": null
+                          },
+                          {
+                            "id": 2,
+                            "created_at": "2024-12-15T07:16:34.036227Z",
+                            "updated_at": "2024-12-15T07:16:34.036227Z",
+                            "deleted_at": null,
+                            "name": "dev",
+                            "courses": null
+                          }
+                        ],
+                        "chapters": [
+                          {
+                            "id": 3,
+                            "created_at": "2024-12-15T07:20:38.797431Z",
+                            "updated_at": "2024-12-15T07:20:38.797431Z",
+                            "deleted_at": null,
+                            "title": "Learn number 1",
+                            "description": "Learn the first natural number",
+                            "course_id": 13,
+                            "course": null,
+                            "lessons": [
+                              {
+                                "id": 4,
+                                "created_at": "0001-01-01T00:00:00Z",
+                                "updated_at": "0001-01-01T00:00:00Z",
+                                "deleted_at": null,
+                                "title": "learn how to sing",
+                                "description": "hello from the other side",
+                                "is_video": false,
+                                "content": null,
+                                "video": null,
+                                "chapter_id": 3,
+                                "chapter": null,
+                                "learners": null
+                              }
+                            ],
+                            "test": null
+                          },
+                          {
+                            "id": 4,
+                            "created_at": "2024-12-15T07:20:49.194568Z",
+                            "updated_at": "2024-12-15T07:20:49.194568Z",
+                            "deleted_at": null,
+                            "title": "Learn number 2",
+                            "description": "Learn the second natural number",
+                            "course_id": 13,
+                            "course": null,
+                            "lessons": [],
+                            "test": null
+                          },
+                          {
+                            "id": 5,
+                            "created_at": "2024-12-15T07:20:57.110804Z",
+                            "updated_at": "2024-12-15T07:20:57.110804Z",
+                            "deleted_at": null,
+                            "title": "Learn number 3",
+                            "description": "Learn the third natural number",
+                            "course_id": 13,
+                            "course": null,
+                            "lessons": [],
+                            "test": null
+                          }
+                        ],
+                        "learners": [
+                          {
+                            "id": "92d856d0-a0ee-4220-81b4-66e8adc073fc",
+                            "created_at": "2024-12-11T13:11:39.167269Z",
+                            "updated_at": "2024-12-13T13:32:04.17469Z",
+                            "deleted_at": null,
+                            "email": "m_ouchene@estin.dz",
+                            "password": "$2a$10$0pImKZSJKjGFcIKcpz27zuhNXwolVaiUbfBPqZZJJxLQNCGqRQjzq",
+                            "full_name": "mohamed OUCHENE",
+                            "email_verified": true,
+                            "image": null,
+                            "author_profile": null,
+                            "courses": null,
+                            "lessons": null,
+                            "tests": null
+                          }
+                        ]
+                      }
+                ]
             },
             {
                 "code": "bad request",
-                "responses": []
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    }
+                ]
             },
             {
                 "code": "unauthorized",
-                "responses": []
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    }
+                ]
             },
             {
                 "code": "not found",
-                "responses": []
+                "responses": [
+                    {
+                        "error": "course not found"
+                    }
+                ]
             },
             {
                 "code": "internal server error",
-                "responses": []
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
             }
         ]
     }

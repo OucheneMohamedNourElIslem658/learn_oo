@@ -121,7 +121,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course *models.Course, apiError *utils.APIError) {
 	database := cr.database
 
-	query := database.Model(&models.Course{})
+	query := database.Model(&models.Course{}).Where("id = ?", ID)
 
 	validExtentions := utils.GetValidExtentions(
 		appendWith,
@@ -136,9 +136,10 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 	)
 
 	for _, extention := range validExtentions {
+		fmt.Println(extention)
 		switch extention {
 		case "Chapters":
-			query.Preload(extention, func(db *gorm.DB) *gorm.DB {
+			query = query.Preload(extention, func(db *gorm.DB) *gorm.DB {
 				return db.Preload("Lessons", func(db *gorm.DB) *gorm.DB {
 					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video").
 						Joins("LEFT JOIN files ON lessons.id = files.lesson_id")
@@ -162,7 +163,7 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 		Group("courses.id")
 
 	var existingCourse models.Course
-	err := query.Where("id = ?", ID).First(&existingCourse).Error
+	err := query.First(&existingCourse).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -265,7 +266,6 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 		Joins("LEFT JOIN course_learners ON course_learners.course_id = courses.id").
 		Group("courses.id").
 		Order("rate DESC, price DESC, created_at DESC, duration DESC")
-
 
 	var totalRecords int64
 	database.Model(&models.User{}).Count(&totalRecords)
@@ -544,7 +544,7 @@ func (cr *CoursesRepository) GetCategories() ([]models.Category, *utils.APIError
 }
 
 type CreatedCategoryDTO struct {
-	Name string `form:"name" binding:"required"`
+	Name string `json:"name" binding:"required"`
 }
 
 func (cr *CoursesRepository) CreateCategory(category CreatedCategoryDTO) (apiError *utils.APIError) {
