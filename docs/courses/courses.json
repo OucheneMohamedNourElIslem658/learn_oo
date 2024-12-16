@@ -778,5 +778,439 @@
                 ]
             }
         ]
+    },
+
+    {
+        "path": "host/api/v1/courses/categories",
+        "description": "create category",
+        "method": "POST",
+        "request_body": {
+            "name": "required"
+        },
+        "reponses": [
+            {
+                "code": "created",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/categories/:category_id",
+        "description": "delete category",
+        "method": "DELETE",
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "category not found"
+                    }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/categories",
+        "description": "get categories",
+        "method": "GET",
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": [
+                    {
+                        "categories": [
+                          {
+                            "id": 1,
+                            "created_at": "2024-12-15T07:16:26.991797Z",
+                            "updated_at": "2024-12-15T07:16:26.991797Z",
+                            "deleted_at": null,
+                            "name": "java script",
+                            "courses": null
+                          },
+                          {
+                            "id": 2,
+                            "created_at": "2024-12-15T07:16:34.036227Z",
+                            "updated_at": "2024-12-15T07:16:34.036227Z",
+                            "deleted_at": null,
+                            "name": "dev",
+                            "courses": null
+                          },
+                          {
+                            "id": 3,
+                            "created_at": "2024-12-15T09:33:11.525254Z",
+                            "updated_at": "2024-12-15T09:33:11.525254Z",
+                            "deleted_at": null,
+                            "name": "Programming",
+                            "courses": null
+                          },
+                          {
+                            "id": 4,
+                            "created_at": "2024-12-15T09:33:11.525254Z",
+                            "updated_at": "2024-12-15T09:33:11.525254Z",
+                            "deleted_at": null,
+                            "name": "Advanced",
+                            "courses": null
+                          },
+                          {
+                            "id": 5,
+                            "created_at": "2024-12-15T09:33:11.525254Z",
+                            "updated_at": "2024-12-15T09:33:11.525254Z",
+                            "deleted_at": null,
+                            "name": "Golang",
+                            "courses": null
+                          },
+                          {
+                            "id": 12,
+                            "created_at": "2024-12-15T10:25:07.677748Z",
+                            "updated_at": "2024-12-15T10:25:07.677748Z",
+                            "deleted_at": null,
+                            "name": "cooking",
+                            "courses": null
+                          },
+                          {
+                            "id": 13,
+                            "created_at": "2024-12-15T10:25:07.677748Z",
+                            "updated_at": "2024-12-15T10:25:07.677748Z",
+                            "deleted_at": null,
+                            "name": "food",
+                            "courses": null
+                          },
+                          {
+                            "id": 14,
+                            "created_at": "2024-12-15T10:25:07.677748Z",
+                            "updated_at": "2024-12-15T10:25:07.677748Z",
+                            "deleted_at": null,
+                            "name": "Acting",
+                            "courses": null
+                          },
+                          {
+                            "id": 15,
+                            "created_at": "2024-12-15T10:25:07.677748Z",
+                            "updated_at": "2024-12-15T10:25:07.677748Z",
+                            "deleted_at": null,
+                            "name": "Art",
+                            "courses": null
+                          }
+                        ],
+                        "count": 9
+                    }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    },
+                    {
+                        "error": "categoriy name already exists"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/objectives",
+        "description": "create objective",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "content": "required"
+        },
+        "reponses": [
+            {
+                "code": "created",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/objectives/:objective_id",
+        "description": "delete objective",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    },
+                    {
+                        "error": "objective not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/requirements",
+        "description": "create requirement",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "content": "required"
+        },
+        "reponses": [
+            {
+                "code": "created",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/requirements/:requirement_id",
+        "description": "delete requirement",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "course not found"
+                    },
+                    {
+                        "error": "requirement not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
     }
 ]

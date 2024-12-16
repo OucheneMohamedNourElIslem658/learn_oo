@@ -73,14 +73,12 @@ func ValidateQuestionOptionsList(fl validator.FieldLevel) bool {
 	// }
 
 	options, ok := fl.Field().Interface().([]struct {
-		Content   string `json:"content" binding:"required"`
+		Option   string `json:"option" binding:"required"`
 		IsCorrect *bool   `json:"is_correct" binding:"required"`
 	})
 	if !ok {
 		return false
 	}
-	fmt.Println("===================")
-	fmt.Println(len(options))
 	return len(options) >= 2
 }
 

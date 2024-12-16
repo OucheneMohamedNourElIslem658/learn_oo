@@ -214,12 +214,12 @@ func (cr *TestsRepository) DeleteTest(ID string) (apiError *utils.APIError) {
 }
 
 type CreatedQuestionDTO struct {
-	Content     string        `json:"content" binding:"required"`
-	Description string        `json:"description" binding:"required"`
-	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
+	Content     string `json:"content" binding:"required"`
+	Description string `json:"description" binding:"required"`
+	Duration    uint   `json:"duration" binding:"omitempty,min=10"`
 	Options     []struct {
-		Option   string `json:"option" binding:"required"`
-		IsCorrect *bool   `json:"is_correct" binding:"required"`
+		Option    string `json:"option" binding:"required"`
+		IsCorrect *bool  `json:"is_correct" binding:"required"`
 	} `json:"options" binding:"question_options_list,dive,required"`
 }
 
@@ -294,8 +294,8 @@ type UpdatedQuestionDTO struct {
 	Description string        `json:"description"`
 	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
 	Options     []struct {
-		Option   string `json:"option" binding:"required"`
-		IsCorrect *bool   `json:"is_correct" binding:"required"`
+		Option    string `json:"option" binding:"required"`
+		IsCorrect *bool  `json:"is_correct" binding:"required"`
 	} `json:"options" binding:"omitempty,question_options_list,omitempty,dive,required"`
 }
 

@@ -1,0 +1,316 @@
+[
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests",
+        "description": "create test",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "max_chances": "min=1, default=1"
+        },
+        "reponses": [
+            {
+                "code": "created",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "chapter not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id",
+        "description": "update test",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "max_chances": "min=1, default=1"
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "chapter not found"
+                    },
+                    {
+                        "error": "test not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/tests/:test_id",
+        "description": "get test",
+        "method": "GET",
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "questions,learners,chapter",
+                "required": false,
+                "description": "include some infos associated to the test"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "chapter not found"
+                    },
+                    {
+                        "error": "lesson not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/lessons/:lesson_id",
+        "description": "delete lesson",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "chapter not found"
+                    },
+                    {
+                        "error": "lesson not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/lessons/:lesson_id/video",
+        "description": "create lessons with video content",
+        "method": "POST",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "type": "multipart/form-data",
+            "body": {
+                "title": "required",
+                "description": "required",
+                "video": "video file"
+            }
+        },
+        "reponses": [
+            {
+                "code": "created",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    },
+                    {
+                        "error": "lesson is not a video"
+                    },
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "chapter not found"
+                    },
+                    {
+                        "error": "lesson not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    }
+]

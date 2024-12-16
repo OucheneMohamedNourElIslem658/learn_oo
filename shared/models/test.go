@@ -19,27 +19,27 @@ type Test struct {
 }
 
 type Question struct {
-	ID               uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt        time.Time      `json:"created_at"`
-	UpdatedAt        time.Time      `json:"updated_at"`
-	Content          string         `json:"content"`
-	Description      string         `json:"description"`
-	Duration         time.Duration  `json:"duration"`
-	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at"`
-	TestID           uint           `json:"test_id"`
-	Test             *Test          `json:"test"`
-	Options          []Option       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"options"`
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	Content     string         `json:"content"`
+	Description string         `json:"description"`
+	Duration    uint           `json:"duration"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	TestID      uint           `json:"test_id"`
+	Test        *Test          `json:"test"`
+	Options     []Option       `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"options"`
 }
 
 type Option struct {
-	ID              uint             `gorm:"primaryKey" json:"id"`
-	CreatedAt       time.Time        `json:"created_at"`
-	UpdatedAt       time.Time        `json:"updated_at"`
-	Content         string           `json:"content"`
-	IsCorrect       bool             `json:"is_correct"`
-	DeletedAt       gorm.DeletedAt   `gorm:"index" json:"deleted_at"`
-	QuestionID      uint             `json:"question_id"`
-	Question        *Question        `json:"question"`
+	ID         uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+	Content    string         `json:"content"`
+	IsCorrect  bool           `json:"is_correct"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	QuestionID uint           `json:"question_id"`
+	Question   *Question      `json:"question"`
 }
 
 type TestResult struct {
