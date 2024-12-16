@@ -24,6 +24,7 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 	courseID, _ := strconv.Atoi(courseIDString)
 
 	userID := ctx.GetString("id")
+	authorID := ctx.GetString("author_id")
 
 	var session repositories.CreatedSessionDTO
 
@@ -35,9 +36,9 @@ func (ucc *UserCourseController) StartCourse(ctx *gin.Context) {
 
 	userCourseRepository := ucc.userCourseRepository
 
-	if paymentURL, err := userCourseRepository.StartCourse(userID, uint(courseID), session); err != nil {
+	if paymentURL, err := userCourseRepository.StartCourse(userID, authorID, uint(courseID), session); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else if paymentURL != nil {
@@ -55,7 +56,7 @@ func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
 
 	if err := ctx.Bind(&checkout); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
@@ -64,7 +65,7 @@ func (ucc *UserCourseController) PayForCourse(ctx *gin.Context) {
 
 	if err := userCourseRepository.PayForCourse(checkout); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

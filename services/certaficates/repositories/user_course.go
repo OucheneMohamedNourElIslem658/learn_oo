@@ -29,7 +29,7 @@ type CreatedSessionDTO struct {
 	PaymentFailUrl    string `json:"payment_fail_url" binding:"required"`
 }
 
-func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, session CreatedSessionDTO) (paymentURL *string, apiError *utils.APIError) {
+func (ucr *UserCourseRepository) StartCourse(userID, authorID string, courseID uint, session CreatedSessionDTO) (paymentURL *string, apiError *utils.APIError) {
 	database := ucr.database
 
 	learner := false
@@ -64,6 +64,13 @@ func (ucr *UserCourseRepository) StartCourse(userID string, courseID uint, sessi
 		return nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
+		}
+	}
+
+	if course.AuthorID == authorID {
+		return nil, &utils.APIError{
+			StatusCode: http.StatusNotFound,
+			Message:    "this user is the author of this course",
 		}
 	}
 

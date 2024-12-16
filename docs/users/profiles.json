@@ -282,15 +282,15 @@
                 "responses": [
                     {
                         "error": "undefined authorization"
+                    },
+                    {
+                        "error": "user is not an author"
                     }
                 ]
             },
             {
                 "code": "not found",
                 "responses": [
-                    {
-                        "error": "author not found"
-                    },
                     {
                         "error": "invalid id token"
                     }
@@ -375,6 +375,9 @@
                 "responses": [
                     {
                         "error": "undefined authorization"
+                    },
+                    {
+                        "error": "user is not an author"
                     }
                 ]
             },
@@ -432,6 +435,9 @@
                 "responses": [
                     {
                         "error": "invalid id token"
+                    },
+                    {
+                        "error": "user is not an author"
                     }
                 ]
             },
@@ -496,6 +502,9 @@
                         "error": "invalid id token"
                     },
                     {
+                        "error": "user is not an author"
+                    },
+                    {
                         "error": "multipart request error"
                     },
                     {
@@ -558,6 +567,9 @@
                 "responses": [
                     {
                         "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
                     }
                 ]
             },
