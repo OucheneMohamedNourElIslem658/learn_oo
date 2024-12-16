@@ -227,32 +227,32 @@ type CreatedQuestionDTO struct {
 }
 
 func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionDTO) (apiError *utils.APIError) {
-	// database := cr.database
+	database := cr.database
 
-	// var options []models.Option
+	var options []models.Option
 
-	// for _, option := range question.Options {
-	// 	options = append(options, models.Option{
-	// 		Content:   option.Option,
-	// 		IsCorrect: *option.IsCorrect,
-	// 	})
-	// }
+	for _, option := range question.Options {
+		options = append(options, models.Option{
+			Content:   option.Option,
+			IsCorrect: *option.IsCorrect,
+		})
+	}
 
-	// questionToCreate := models.Question{
-	// 	TestID:      testID,
-	// 	Content:     question.Content,
-	// 	Description: question.Description,
-	// 	Duration:    question.Duration,
-	// 	Options:     options,
-	// }
+	questionToCreate := models.Question{
+		TestID:      testID,
+		Content:     question.Content,
+		Description: question.Description,
+		Duration:    question.Duration,
+		Options:     options,
+	}
 
-	// err := database.Create(&questionToCreate).Error
-	// if err != nil {
-	// 	return &utils.APIError{
-	// 		StatusCode: http.StatusInternalServerError,
-	// 		Message:    err.Error(),
-	// 	}
-	// }
+	err := database.Create(&questionToCreate).Error
+	if err != nil {
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
 
 	return nil
 }
