@@ -135,7 +135,7 @@
         "query_params": [
             {
                 "name": "append_with",
-                "values": "questions,learners,chapter",
+                "values": "questions,chapter",
                 "required": false,
                 "description": "include some infos associated to the test"
             }
@@ -143,7 +143,87 @@
         "reponses": [
             {
                 "code": "ok",
-                "responses": []
+                "responses": [
+                    {
+                        "id": 2,
+                        "questions": [
+                          {
+                            "id": 1,
+                            "content": "What is the organization that created Golang?",
+                            "description": "it is not that hard",
+                            "duration": 30,
+                            "test_id": 2,
+                            "options": [
+                              {
+                                "id": 1,
+                                "content": "google",
+                                "is_correct": true,
+                                "question_id": 1
+                              },
+                              {
+                                "id": 2,
+                                "content": "facebook",
+                                "is_correct": false,
+                                "question_id": 1
+                              },
+                              {
+                                "id": 3,
+                                "content": "twitter",
+                                "is_correct": false,
+                                "question_id": 1
+                              },
+                              {
+                                "id": 4,
+                                "content": "microsoft",
+                                "is_correct": false,
+                                "question_id": 1
+                              }
+                            ]
+                          },
+                          {
+                            "id": 2,
+                            "content": "What is the organization that created Golang?",
+                            "description": "it is not that hard",
+                            "duration": 30,
+                            "test_id": 2,
+                            "options": [
+                              {
+                                "id": 5,
+                                "content": "google",
+                                "is_correct": true,
+                                "question_id": 2
+                              },
+                              {
+                                "id": 6,
+                                "content": "google",
+                                "is_correct": false,
+                                "question_id": 2
+                              },
+                              {
+                                "id": 7,
+                                "content": "twitter",
+                                "is_correct": false,
+                                "question_id": 2
+                              },
+                              {
+                                "id": 8,
+                                "content": "microsoft",
+                                "is_correct": false,
+                                "question_id": 2
+                              }
+                            ]
+                          }
+                        ],
+                        "max_chances": 3,
+                        "chapter_id": 24,
+                        "chapter": {
+                          "id": 24,
+                          "title": "Getting Started",
+                          "description": "Introduction to acting and the world of performance.",
+                          "course_id": 25
+                        }
+                      }
+                ]
             },
             {
                 "code": "bad request",
@@ -178,8 +258,8 @@
     },
 
     {
-        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/lessons/:lesson_id",
-        "description": "delete lesson",
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id",
+        "description": "delete test",
         "method": "DELETE",
         "headers": [
             {
@@ -199,11 +279,6 @@
                 "responses": [
                     {
                         "error": "invalid id token"
-                    },
-                    {
-                        "error": "bad request",
-                        "field 1": "validation of field 1",
-                        "...": "..."
                     }
                 ]
             },
@@ -225,7 +300,7 @@
                         "error": "chapter not found"
                     },
                     {
-                        "error": "lesson not found"
+                        "error": "test not found"
                     }
                 ]
             },
@@ -241,8 +316,8 @@
     },
 
     {
-        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/lessons/:lesson_id/video",
-        "description": "create lessons with video content",
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions",
+        "description": "create question",
         "method": "POST",
         "headers": [
             {
@@ -253,12 +328,22 @@
             }
         ],
         "request_body": {
-            "type": "multipart/form-data",
-            "body": {
-                "title": "required",
-                "description": "required",
-                "video": "video file"
-            }
+            "content": "required",
+            "description": "optional",
+            "duration": "min=10, required",
+            "options": [
+                {
+                    "validation": "must at least contain two elements, without duplicates, and at least one correct option"
+                },
+                {
+                    "option": "required string", 
+                    "is_correct": "required bool" 
+                },
+                {
+                    "option": "...", 
+                    "is_correct": false 
+                }
+              ]
         },
         "reponses": [
             {
@@ -270,9 +355,6 @@
                 "responses": [
                     {
                         "error": "invalid id token"
-                    },
-                    {
-                        "error": "lesson is not a video"
                     },
                     {
                         "error": "bad request",
@@ -296,10 +378,234 @@
                 "code": "not found",
                 "responses": [
                     {
-                        "error": "chapter not found"
+                        "error": "test not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions/:question_id",
+        "description": "update question",
+        "method": "PUT",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "request_body": {
+            "content": "string",
+            "description": "string",
+            "duration": "min=10",
+            "options": [
+                {
+                    "validation": "must at least contain two elements, without duplicates, and at least one correct option, not required"
+                },
+                {
+                    "option": "required string", 
+                    "is_correct": "required bool" 
+                },
+                {
+                    "option": "...", 
+                    "is_correct": false 
+                }
+              ]
+        },
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
                     },
                     {
-                        "error": "lesson not found"
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "test not found"
+                    },
+                    {
+                        "error": "question not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/tests/:test_id",
+        "description": "get question",
+        "method": "GET",
+        "query_params": [
+            {
+                "name": "append_with",
+                "values": "test",
+                "required": false,
+                "description": "include some infos associated to the question"
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": [
+                    {
+                    "id": 2,
+                    "content": "What is the organization that created Golang?",
+                    "description": "it is not that hard",
+                    "duration": 30,
+                    "test_id": 2,
+                    "test": {
+                      "id": 2,
+                      "max_chances": 3,
+                      "chapter_id": 24
+                    },
+                    "options": [
+                      {
+                        "id": 5,
+                        "content": "google",
+                        "is_correct": true,
+                        "question_id": 2
+                      },
+                      {
+                        "id": 6,
+                        "content": "google",
+                        "is_correct": false,
+                        "question_id": 2
+                      },
+                      {
+                        "id": 7,
+                        "content": "twitter",
+                        "is_correct": false,
+                        "question_id": 2
+                      },
+                      {
+                        "id": 8,
+                        "content": "microsoft",
+                        "is_correct": false,
+                        "question_id": 2
+                      }
+                    ]
+                  }
+                ]
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "bad request",
+                        "field 1": "validation of field 1",
+                        "...": "..."
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "test not found"
+                    },
+                    {
+                        "error": "question not found"
+                    }
+                ]
+            },
+            {
+                "code": "internal server error",
+                "responses": [
+                    {
+                        "error": "error message (contact me when you see one)"
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "path": "host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions/:question_id",
+        "description": "delete question",
+        "method": "DELETE",
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer id_token."
+            }
+        ],
+        "reponses": [
+            {
+                "code": "ok",
+                "responses": []
+            },
+            {
+                "code": "bad request",
+                "responses": [
+                    {
+                        "error": "invalid id token"
+                    }
+                ]
+            },
+            {
+                "code": "unauthorized",
+                "responses": [
+                    {
+                        "error": "id token expired"
+                    },
+                    {
+                        "error": "user is not an author"
+                    }
+                ]
+            },
+            {
+                "code": "not found",
+                "responses": [
+                    {
+                        "error": "test not found"
+                    },
+                    {
+                        "error": "question not found"
                     }
                 ]
             },

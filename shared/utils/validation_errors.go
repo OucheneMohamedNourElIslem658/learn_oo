@@ -19,7 +19,7 @@ var ErrorMessages = map[string]string{
 	"password":              "its lenght must be greater than 5",
 	"couse_duration":        "must be more than 5 min",
 	"price":                 "must be 0 or greater than 50",
-	"question_options_list": "must at least contain two elements",
+	"question_options_list": "must at least contain two elements, without duplicates, and at least one correct option",
 }
 
 func ValidationErrorResponse(err error) gin.H {
@@ -68,18 +68,30 @@ func ValidatePrice(fl validator.FieldLevel) bool {
 }
 
 func ValidateQuestionOptionsList(fl validator.FieldLevel) bool {
-	// if fl.Field().IsNil() || fl.Field().Len() == 0 {
-	// 	return true
-	// }
-
 	options, ok := fl.Field().Interface().([]struct {
-		Option   string `json:"option" binding:"required"`
-		IsCorrect *bool   `json:"is_correct" binding:"required"`
+		Option    string `json:"option" binding:"required"`
+		IsCorrect *bool  `json:"is_correct" binding:"required"`
 	})
+	
 	if !ok {
 		return false
 	}
-	return len(options) >= 2
+
+	isDuplicated := false
+	containCorrectAnswer := false
+	seenOptions := make(map[string]bool)
+
+	for _, option := range options {
+		if *option.IsCorrect {
+			containCorrectAnswer = true
+		}
+		if seenOptions[option.Option] {
+			isDuplicated = true
+		}
+		seenOptions[option.Option] = true
+	}
+
+	return len(options) >= 2 && containCorrectAnswer && !isDuplicated
 }
 
 func registerValidators() (err error) {

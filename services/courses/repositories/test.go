@@ -100,11 +100,14 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 	validExtensions := utils.GetValidExtentions(
 		appendWith,
 		"questions",
-		"learners",
 		"chapter",
 	)
 
 	for _, extension := range validExtensions {
+		if extension == "Questions" {
+			query.Preload("Questions.Options")
+			continue
+		}
 		query.Preload(extension)
 	}
 
@@ -215,8 +218,8 @@ func (cr *TestsRepository) DeleteTest(ID string) (apiError *utils.APIError) {
 
 type CreatedQuestionDTO struct {
 	Content     string `json:"content" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Duration    uint   `json:"duration" binding:"omitempty,min=10"`
+	Description string `json:"description"`
+	Duration    uint   `json:"duration" binding:"required,min=10"`
 	Options     []struct {
 		Option    string `json:"option" binding:"required"`
 		IsCorrect *bool  `json:"is_correct" binding:"required"`
@@ -224,32 +227,32 @@ type CreatedQuestionDTO struct {
 }
 
 func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionDTO) (apiError *utils.APIError) {
-	database := cr.database
+	// database := cr.database
 
-	var options []models.Option
+	// var options []models.Option
 
-	for _, option := range question.Options {
-		options = append(options, models.Option{
-			Content:   option.Option,
-			IsCorrect: *option.IsCorrect,
-		})
-	}
+	// for _, option := range question.Options {
+	// 	options = append(options, models.Option{
+	// 		Content:   option.Option,
+	// 		IsCorrect: *option.IsCorrect,
+	// 	})
+	// }
 
-	questionToCreate := models.Question{
-		TestID:      testID,
-		Content:     question.Content,
-		Description: question.Description,
-		Duration:    question.Duration,
-		Options:     options,
-	}
+	// questionToCreate := models.Question{
+	// 	TestID:      testID,
+	// 	Content:     question.Content,
+	// 	Description: question.Description,
+	// 	Duration:    question.Duration,
+	// 	Options:     options,
+	// }
 
-	err := database.Create(&questionToCreate).Error
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
+	// err := database.Create(&questionToCreate).Error
+	// if err != nil {
+	// 	return &utils.APIError{
+	// 		StatusCode: http.StatusInternalServerError,
+	// 		Message:    err.Error(),
+	// 	}
+	// }
 
 	return nil
 }
@@ -262,7 +265,6 @@ func (cr *TestsRepository) GetQuestion(ID string, appendWith string) (question *
 	validExtensions := utils.GetValidExtentions(
 		appendWith,
 		"test",
-		"answered_learners",
 	)
 
 	for _, extension := range validExtensions {
@@ -292,7 +294,7 @@ func (cr *TestsRepository) GetQuestion(ID string, appendWith string) (question *
 type UpdatedQuestionDTO struct {
 	Content     string        `json:"content"`
 	Description string        `json:"description"`
-	Duration    time.Duration `json:"duration" binding:"omitempty,min=10000000"`
+	Duration    time.Duration `json:"duration" binding:"omitempty,min=10"`
 	Options     []struct {
 		Option    string `json:"option" binding:"required"`
 		IsCorrect *bool  `json:"is_correct" binding:"required"`
