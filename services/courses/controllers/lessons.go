@@ -71,7 +71,7 @@ func (lc *LessonsController) GetLesson(ctx *gin.Context) {
 	id := ctx.Param("lesson_id")
 
 	authorID := ctx.GetString("author_id")
-	userID := ctx.GetString("user_id")
+	userID := ctx.GetString("id")
 
 	appendWith := ctx.Query("append_with")
 
