@@ -7,15 +7,16 @@ import (
 )
 
 type Test struct {
-	ID         uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt  time.Time      `json:"-"`
-	UpdatedAt  time.Time      `json:"-"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
-	Questions  []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
-	MaxChances uint           `gorm:"default:1" json:"max_chances"`
-	ChapterID  uint           `json:"chapter_id"`
-	Chapter    *Chapter       `json:"chapter,omitempty"`
-	Learners   []User         `gorm:"many2many:test_results;association_foreignkey:LearnerID" json:"learners,omitempty"`
+	ID             uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt      time.Time      `json:"-"`
+	UpdatedAt      time.Time      `json:"-"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
+	QuestionsCount *uint           `gorm:"-:migration;->" json:"questions_count,omitempty"`
+	Questions      []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
+	MaxChances     uint           `gorm:"default:1" json:"max_chances"`
+	ChapterID      uint           `json:"chapter_id"`
+	Chapter        *Chapter       `json:"chapter,omitempty"`
+	Learners       []User         `gorm:"many2many:test_results;association_foreignkey:LearnerID" json:"learners,omitempty"`
 }
 
 type Question struct {

@@ -114,6 +114,7 @@ type Lesson struct {
 	Title       string         `gorm:"not null" json:"title"`
 	Description string         `json:"description"`
 	IsVideo     bool           `gorm:"-:migration;->" json:"is_video"`
+	Learned     *bool          `gorm:"-:migration;->" json:"learned,omitempty"`
 	Content     gin.H          `gorm:"json" json:"content"`
 	Video       *File          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"video,omitempty"`
 	ChapterID   uint           `json:"chapter_id"`

@@ -118,7 +118,7 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	return nil
 }
 
-func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course *models.Course, apiError *utils.APIError) {
+func (cr *CoursesRepository) GetCourse(ID, userID, authorID, appendWith string) (course *models.Course, apiError *utils.APIError) {
 	database := cr.database
 
 	query := database.Model(&models.Course{}).Where("id = ?", ID)
@@ -140,9 +140,16 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 		switch extention {
 		case "Chapters":
 			query = query.Preload(extention, func(db *gorm.DB) *gorm.DB {
-				return db.Preload("Test").Preload("Lessons", func(db *gorm.DB) *gorm.DB {
-					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video").
-						Joins("LEFT JOIN files ON lessons.id = files.lesson_id")
+				return db.Preload("Test", func(db *gorm.DB) *gorm.DB {
+					return db.Select("tests.*, COUNT(questions.id) AS questions_count").
+					Joins("LEFT JOIN questions ON questions.test_id = tests.id").
+					Group("tests.id") // Grouping by Test to count questions correctly
+				}).Preload("Lessons", func(db *gorm.DB) *gorm.DB {
+					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, " +
+						"CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video, " +
+						"CASE WHEN lesson_learners.lesson_id IS NOT NULL AND lesson_learners.learned = TRUE THEN TRUE ELSE FALSE END AS learned").
+						Joins("LEFT JOIN files ON lessons.id = files.lesson_id").
+						Joins("LEFT JOIN lesson_learners ON lesson_learners.lesson_id = lessons.id AND lesson_learners.learner_id = ?", userID) // Assuming `userID` is available
 				})
 			})
 		case "Author":

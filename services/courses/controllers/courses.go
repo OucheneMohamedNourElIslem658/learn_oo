@@ -45,13 +45,14 @@ func (cc *CoursesController) CreateCourse(ctx *gin.Context) {
 func (cc *CoursesController) GetCourse(ctx *gin.Context) {
 	id := ctx.Param("course_id")
 
+	userID := ctx.GetString("id")
 	authorID := ctx.GetString("author_id")
 
 	appendWith := ctx.Query("append_with")
 
 	coursesRepository := cc.coursesRepository
 
-	if course, err := coursesRepository.GetCourse(id, authorID, appendWith); err != nil {
+	if course, err := coursesRepository.GetCourse(id, userID, authorID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"error": err.Message,
 		})
@@ -119,7 +120,7 @@ func (cc *CoursesController) UpdateCourseImage(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "bad request",
+			"error":   "bad request",
 			"request": err.Error(),
 		})
 		return
@@ -156,7 +157,7 @@ func (cc *CoursesController) UpdateCourseVideo(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "bad request",
+			"error":   "bad request",
 			"request": err.Error(),
 		})
 		return
