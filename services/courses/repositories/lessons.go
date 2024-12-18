@@ -252,6 +252,8 @@ func (ar *LessonsRepository) GetLesson(ID, authorID, userID, appendWith string) 
 		}
 	}
 
+	existingLesson.IsVideo = existingLesson.Video != nil
+
 	return &existingLesson, nil
 }
 
