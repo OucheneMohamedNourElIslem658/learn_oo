@@ -140,7 +140,7 @@ func (cr *CoursesRepository) GetCourse(ID, authorID, appendWith string) (course 
 		switch extention {
 		case "Chapters":
 			query = query.Preload(extention, func(db *gorm.DB) *gorm.DB {
-				return db.Preload("Lessons", func(db *gorm.DB) *gorm.DB {
+				return db.Preload("Test").Preload("Lessons", func(db *gorm.DB) *gorm.DB {
 					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video").
 						Joins("LEFT JOIN files ON lessons.id = files.lesson_id")
 				})
