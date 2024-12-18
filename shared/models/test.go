@@ -32,7 +32,7 @@ type Question struct {
 }
 
 type Option struct {
-	ID         uint           `gorm:"primaryKey" json:"id"`
+	ID         uint           `gorm:"primaryKey" json:"-"`
 	CreatedAt  time.Time      `json:"-"`
 	UpdatedAt  time.Time      `json:"-"`
 	Content    string         `json:"content"`
