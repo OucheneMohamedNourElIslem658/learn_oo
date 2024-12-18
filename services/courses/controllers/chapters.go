@@ -33,7 +33,7 @@ func (cc *ChaptersController) CreateChapter(ctx *gin.Context) {
 
 	if err := chaptersRepository.CreateChapter(courseID, chapter); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -50,7 +50,7 @@ func (cc *ChaptersController) GetChapter(ctx *gin.Context) {
 
 	if chapter, err := chaptersRepository.GetChapter(id, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	} else {
@@ -73,7 +73,7 @@ func (cc *ChaptersController) UpdateChapter(ctx *gin.Context) {
 
 	if err := chaptersRepository.UpdateChapter(ID, chapter); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}
@@ -88,7 +88,7 @@ func (cc *ChaptersController) DeleteChapter(ctx *gin.Context) {
 
 	if err := chaptersRepository.DeleteChapter(ID); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
-			"message": err.Message,
+			"error": err.Message,
 		})
 		return
 	}

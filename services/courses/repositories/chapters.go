@@ -119,7 +119,7 @@ func (cr *ChaptersRepository) GetChapter(ID, appendWith string) (chapter *models
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
 				StatusCode: http.StatusNotFound,
-				Message:    "course not found",
+				Message:    "chapter not found",
 			}
 		}
 		return nil, &utils.APIError{
