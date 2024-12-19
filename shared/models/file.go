@@ -1,15 +1,11 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/gorm"
 )
 
 type File struct {
 	ID            uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt     time.Time      `json:"-"`
-	UpdatedAt     time.Time      `json:"-"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 	URL           string         `json:"url"`
 	Height        int            `json:"height"`

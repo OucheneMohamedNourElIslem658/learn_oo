@@ -52,16 +52,12 @@ type Course struct {
 
 type Category struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time      `json:"-"`
-	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Name      string         `gorm:"unique;not null" json:"name"`
 	Course    []Course       `gorm:"many2many:course_categories;" json:"courses,omitempty"`
 }
 
 type CourseCategory struct {
-	CreatedAt  time.Time      `json:"-"`
-	UpdatedAt  time.Time      `json:"-"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 	CourseID   uint           `gorm:"primaryKey" json:"course_id"`
 	CategoryID uint           `gorm:"primaryKey" json:"category_id"`
@@ -75,8 +71,6 @@ func (CourseCategory) TableName() string {
 
 type Objective struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time      `json:"-"`
-	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Content   string         `json:"content"`
 	CourseID  uint           `json:"course_id"`
@@ -85,8 +79,6 @@ type Objective struct {
 
 type Requirement struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time      `json:"-"`
-	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	Content   string         `json:"content"`
 	CourseID  uint           `json:"course_id"`
@@ -130,7 +122,7 @@ type LessonLearner struct {
 	LearnerID uint           `gorm:"primaryKey" json:"learner_id"`
 	Lesson    *Lesson        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"lesson,omitempty"`
 	Learner   *User          `gorm:"foreignKey:LearnerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner,omitempty"`
-	Learned   bool           `json:"language"`
+	Learned   bool           `json:"learned"`
 }
 
 type LearningStatus string

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	// "os"
 	// "time"
@@ -44,7 +43,7 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Database connected succesfully!")
+	log.Println("Database connected succesfully!")
 }
 
 func migrateTables() error {

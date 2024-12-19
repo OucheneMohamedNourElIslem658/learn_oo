@@ -10,9 +10,8 @@ type Test struct {
 	ID             uint           `gorm:"primaryKey" json:"id"`
 	CreatedAt      time.Time      `json:"-"`
 	UpdatedAt      time.Time      `json:"-"`
-	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
-	QuestionsCount *uint          `gorm:"-:migration;->" json:"questions_count,omitempty"`
-	HasSucceed     *bool          `gorm:"-:migration;->" json:"has_succeed,omitempty"`
+	QuestionsCount *uint           `gorm:"-:migration;->" json:"questions_count,omitempty"`
+    HasSucceed *bool           `gorm:"-:migration;->" json:"has_succeed,omitempty"`
 	Questions      []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
 	MaxChances     uint           `gorm:"default:1" json:"max_chances"`
 	ChapterID      uint           `json:"chapter_id"`
@@ -35,8 +34,6 @@ type Question struct {
 
 type Option struct {
 	ID         uint           `gorm:"primaryKey" json:"-"`
-	CreatedAt  time.Time      `json:"-"`
-	UpdatedAt  time.Time      `json:"-"`
 	Content    string         `json:"content"`
 	IsCorrect  bool           `json:"is_correct"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
@@ -47,7 +44,6 @@ type Option struct {
 type TestResult struct {
 	CreatedAt     time.Time      `json:"-"`
 	UpdatedAt     time.Time      `json:"-"`
-	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 	TestID        uint           `gorm:"primaryKey" json:"test_id"`
 	LearnerID     uint           `gorm:"primaryKey" json:"learner_id"`
 	Test          *Test          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"test,omitempty"`

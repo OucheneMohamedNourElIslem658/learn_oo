@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -61,7 +61,7 @@ func (server *Server) Run() {
 	userCoursesRouter := certaficatesRouters.NewUserCourseRouter(subRoute)
 	userCoursesRouter.RegisterRoutes()
 
-	fmt.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
+	log.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
 	if err := router.Run(server.address); err != nil {
 		panic(err)
 	}

@@ -239,7 +239,7 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	}
 
 	if title != "" {
-		query = query.Where("title LIKE ?", "%"+title+"%")
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
 	}
 
 	if freePaid == "free" {

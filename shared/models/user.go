@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -10,9 +8,6 @@ import (
 
 type User struct {
 	ID                string         `gorm:"primaryKey" json:"id"`
-	CreatedAt         time.Time      `json:"-"`
-	UpdatedAt         time.Time      `json:"-"`
-	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`
 	Email             string         `gorm:"unique;not null" json:"email"`
 	Password          string         `json:"password"`
 	FullName          string         `gorm:"not null" json:"full_name"`
@@ -26,8 +21,6 @@ type User struct {
 
 type Author struct {
 	ID              string         `gorm:"primaryKey" json:"id"`
-	CreatedAt       time.Time      `json:"-"`
-	UpdatedAt       time.Time      `json:"-"`
 	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
 	Bio             gin.H          `gorm:"json" json:"bio"`
 	Balance         float64        `gorm:"balance" json:"balance"`
