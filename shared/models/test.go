@@ -11,7 +11,8 @@ type Test struct {
 	CreatedAt      time.Time      `json:"-"`
 	UpdatedAt      time.Time      `json:"-"`
 	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
-	QuestionsCount *uint           `gorm:"-:migration;->" json:"questions_count,omitempty"`
+	QuestionsCount *uint          `gorm:"-:migration;->" json:"questions_count,omitempty"`
+	HasSucceed     *bool          `gorm:"-:migration;->" json:"has_succeed,omitempty"`
 	Questions      []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
 	MaxChances     uint           `gorm:"default:1" json:"max_chances"`
 	ChapterID      uint           `json:"chapter_id"`

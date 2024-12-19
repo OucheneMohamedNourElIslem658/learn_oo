@@ -141,12 +141,14 @@ func (cr *CoursesRepository) GetCourse(ID, userID, authorID, appendWith string) 
 		case "Chapters":
 			query = query.Preload(extention, func(db *gorm.DB) *gorm.DB {
 				return db.Preload("Test", func(db *gorm.DB) *gorm.DB {
-					return db.Select("tests.*, COUNT(questions.id) AS questions_count").
-					Joins("LEFT JOIN questions ON questions.test_id = tests.id").
-					Group("tests.id") // Grouping by Test to count questions correctly
+					return db.Select("tests.*, COUNT(questions.id) AS questions_count, "+
+						"CASE WHEN test_results.test_id IS NOT NULL AND test_results.has_succeed = TRUE THEN TRUE ELSE FALSE END AS has_succeed").
+						Joins("LEFT JOIN test_results ON test_results.test_id = tests.id AND test_results.learner_id = ?", userID).
+						Joins("LEFT JOIN questions ON questions.test_id = tests.id").
+						Group("tests.id, test_results.test_id, test_results.has_succeed")
 				}).Preload("Lessons", func(db *gorm.DB) *gorm.DB {
-					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, " +
-						"CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video, " +
+					return db.Select("lessons.id, lessons.title, lessons.description, lessons.chapter_id, "+
+						"CASE WHEN files.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_video, "+
 						"CASE WHEN lesson_learners.lesson_id IS NOT NULL AND lesson_learners.learned = TRUE THEN TRUE ELSE FALSE END AS learned").
 						Joins("LEFT JOIN files ON lessons.id = files.lesson_id").
 						Joins("LEFT JOIN lesson_learners ON lesson_learners.lesson_id = lessons.id AND lesson_learners.learner_id = ?", userID) // Assuming `userID` is available
@@ -188,16 +190,16 @@ func (cr *CoursesRepository) GetCourse(ID, userID, authorID, appendWith string) 
 }
 
 type CourseSearchDTO struct {
-	Title         string           `form:"title"`
-	FreeOrPaid    string           `form:"free_or_paid" binding:"omitempty,oneof='free' 'paid'"`
-	Language      models.Languages `form:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
-	Level         models.Level     `form:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
-	MinDuration   float64          `form:"min_duration" binding:"omitempty,min=5"`
-	MaxDuration   float64          `form:"max_duration" binding:"omitempty,min=5"`
-	PageSize      uint             `form:"page_size,default=10" binding:"min=1"`
-	Page          uint             `form:"page,default=1" binding:"min=1"`
-	AppendWith    string           `form:"append_with"`
-	CategoriesIDs string           `form:"categories_ids"`
+	Title           string           `form:"title"`
+	FreeOrPaid      string           `form:"free_or_paid" binding:"omitempty,oneof='free' 'paid'"`
+	Language        models.Languages `form:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
+	Level           models.Level     `form:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
+	MinDuration     float64          `form:"min_duration" binding:"omitempty,min=5"`
+	MaxDuration     float64          `form:"max_duration" binding:"omitempty,min=5"`
+	PageSize        uint             `form:"page_size,default=10" binding:"min=1"`
+	Page            uint             `form:"page,default=1" binding:"min=1"`
+	AppendWith      string           `form:"append_with"`
+	CategoriesNames string           `form:"categories_names"`
 }
 
 func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []models.Course, currentPage, count, maxPages *uint, apiError *utils.APIError) {
@@ -215,9 +217,9 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 	pageSize := filters.PageSize
 	page := filters.Page
 
-	var categoriesIDs []string
-	if len(filters.CategoriesIDs) > 0 {
-		categoriesIDs = strings.Split(filters.CategoriesIDs, ",")
+	var categoriesNames []string
+	if len(filters.CategoriesNames) > 0 {
+		categoriesNames = strings.Split(filters.CategoriesNames, ",")
 	}
 
 	validExtentions := utils.GetValidExtentions(
@@ -262,9 +264,10 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 		query = query.Where("duration <= ?", maxDuration)
 	}
 
-	if len(categoriesIDs) > 0 {
+	if len(categoriesNames) > 0 {
 		query = query.Joins("JOIN course_categories ON course_categories.course_id = courses.id").
-			Where("course_categories.category_id IN (?)", categoriesIDs)
+			Joins("JOIN categories ON course_categories.category_id = categories.id").
+			Where("categories.name IN (?)", categoriesNames)
 	}
 
 	query.Select(`courses.*, 
@@ -296,14 +299,14 @@ func (cr *CoursesRepository) GetCourses(filters CourseSearchDTO) (courses []mode
 }
 
 type UpdateCourseDTO struct {
-	Title         string           `json:"title"`
-	Description   string           `json:"description"`
-	Price         *float64         `json:"price" binding:"omitempty,price"`
-	Language      models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
-	Level         models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
-	Duration      float64          `form:"duration" binding:"omitempty,min=5"`
-	IsCompleted   *bool            `form:"is_completed"`
-	CategoriesIDs string           `json:"categories_ids"`
+	Title           string           `json:"title"`
+	Description     string           `json:"description"`
+	Price           *float64         `json:"price" binding:"omitempty,price"`
+	Language        models.Languages `json:"language" binding:"omitempty,oneof='ar' 'fr' 'en'"`
+	Level           models.Level     `json:"level" binding:"omitempty,oneof='bigener' 'medium' 'advanced'"`
+	Duration        float64          `form:"duration" binding:"omitempty,min=5"`
+	IsCompleted     *bool            `form:"is_completed"`
+	CategoriesNames []string         `json:"categories_names"`
 }
 
 func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCourseDTO) (apiError *utils.APIError) {
@@ -364,10 +367,10 @@ func (cr *CoursesRepository) UpdateCourse(ID, authorID string, course UpdateCour
 		}
 	}
 
-	if course.CategoriesIDs != "" {
-		categoryIDs := strings.Split(course.CategoriesIDs, ",")
+	if len(course.CategoriesNames) != 0 {
+		categoriesNames := course.CategoriesNames
 		var categories []models.Category
-		err = database.Where("id IN (?)", categoryIDs).Find(&categories).Error
+		err = database.Where("name IN (?)", categoriesNames).Find(&categories).Error
 		if err != nil {
 			return &utils.APIError{
 				StatusCode: http.StatusInternalServerError,

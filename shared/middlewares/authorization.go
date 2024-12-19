@@ -30,15 +30,15 @@ func (am *AuthorizationMiddlewares) Authorization() gin.HandlerFunc {
 				claims, isValid, err := utils.VerifyIDToken(idToken)
 
 				if err != nil {
-					ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-						"error": "invalid id token",
+					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+						"error": "id token expired",
 					})
 					return
 				}
 
 				if !isValid {
-					ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-						"error": "id token expired",
+					ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+						"error": "invalid id token",
 					})
 					return
 				}
