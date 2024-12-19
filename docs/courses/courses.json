@@ -336,9 +336,9 @@
                 "description": "number of courses per page (it should be at least 1 and by default its 1)"
             },
             {
-                "name": "categories_ids",
+                "name": "categories_names",
                 "required": false,
-                "description": "takes list of ints like this: 1,5,18"
+                "description": "takes list of strings like this: Golang,dev,Acting"
             }
         ],
         "reponses": [
@@ -539,7 +539,7 @@
             "language": "en or ar or fr",
             "level": "advanced or bigener or medium",
             "duration": "min 5 minutes (in minutes)",
-            "categories_ids": "1,2,18",
+            "categories_names": ["Golang", "dev", "Acting"],
             "is_completed": "bool"
         },
         "reponses": [
