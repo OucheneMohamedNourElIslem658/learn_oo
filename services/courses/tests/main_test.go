@@ -12,9 +12,9 @@ func TestCreateCourseEndpoint(t *testing.T) {
 	fmt.Println("Testing course creation :")
 	client := resty.New()
 
-	baseURL := "http://localhost:8000/api/v1"
+	baseURL := "https://learn-oo-api.onrender.com/api/v1"
 
-	idToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiJkYzhiMDBkNi00MmFlLTQyMjMtOGMzYS1hZmZkZDYxYTJiYzYiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNzM0MDMxMjExLCJpZCI6IjkyZDg1NmQwLWEwZWUtNDIyMC04MWI0LTY2ZThhZGMwNzNmYyJ9.0Chluw2JVMO0EFM_fgZtgIVI_N1UdMLqKkQzApks9wA"
+	idToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiI3MjEyNWNhMC05NGYzLTQyZTUtYWMzYS0wZDc5N2VjOTA3OGIiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNzM0NzE2OTI0LCJpZCI6IjkyZDg1NmQwLWEwZWUtNDIyMC04MWI0LTY2ZThhZGMwNzNmYyJ9.sukWWEPCfjjN8U5T-9qqU-zXBf8uknJ1XA647Ekwxns"
 
 	t.Run("create-course-success", func(t *testing.T) {
 		resp, err := client.R().
