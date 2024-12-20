@@ -35,6 +35,7 @@ func (server *Server) Run() {
 
 	router.Use(gin.Logger())
 	// services\users\views
+	router.MaxMultipartMemory = 10 << 20
 	router.LoadHTMLGlob("services/users/views/*")
 
 	v1 := router.Group("/api/v1")

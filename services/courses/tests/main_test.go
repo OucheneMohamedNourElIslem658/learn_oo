@@ -14,7 +14,7 @@ func TestCreateCourseEndpoint(t *testing.T) {
 
 	baseURL := "https://learn-oo-api.onrender.com/api/v1"
 
-	idToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiI3MjEyNWNhMC05NGYzLTQyZTUtYWMzYS0wZDc5N2VjOTA3OGIiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNzM0NzE2OTI0LCJpZCI6IjkyZDg1NmQwLWEwZWUtNDIyMC04MWI0LTY2ZThhZGMwNzNmYyJ9.sukWWEPCfjjN8U5T-9qqU-zXBf8uknJ1XA647Ekwxns"
+	idToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiI3MjEyNWNhMC05NGYzLTQyZTUtYWMzYS0wZDc5N2VjOTA3OGIiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNzM0NzIxNDI5LCJpZCI6IjkyZDg1NmQwLWEwZWUtNDIyMC04MWI0LTY2ZThhZGMwNzNmYyJ9.cYkOAhyYW5w9DSGHr5yxtpk06eePIpsoZs9pc2llTFk"
 
 	t.Run("create-course-success", func(t *testing.T) {
 		resp, err := client.R().
