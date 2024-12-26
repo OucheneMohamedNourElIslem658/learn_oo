@@ -214,8 +214,24 @@ func (pc *ProfilesController) DeleteAuthorAccomplishment(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-func (pc *ProfilesController) GetAuthor(ctx *gin.Context) {
+func (pc *ProfilesController) GetAuthorPorfile(ctx *gin.Context) {
 	authorID := ctx.GetString("author_id")
+	appendWith := ctx.Query("append_with")
+
+	profilesRepository := pc.profilesRepository
+	user, err := profilesRepository.GetAuthor(authorID, appendWith)
+	if err != nil {
+		ctx.JSON(err.StatusCode, gin.H{
+			"error": err.Message,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
+func (pc *ProfilesController) GetAuthor(ctx *gin.Context) {
+	authorID := ctx.Param("author_id")
 	appendWith := ctx.Query("append_with")
 
 	profilesRepository := pc.profilesRepository

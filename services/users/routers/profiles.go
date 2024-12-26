@@ -38,9 +38,10 @@ func (pr *ProfilesRouter) RegisterRoutes() {
 	authorsRouter := router.Group("/authors")
 	authorsRouter.PUT("/upgrade", authorization, authorizationWithIDCheck, usersController.UpgradeToAuthor)
 	authorsRouter.DELETE("/downgrade", authorization, authorizationWithAuthorCheck, usersController.DowngradeFromAuthor)
+	authorsRouter.GET("/:author_id", usersController.GetAuthor)
 
 	authorProfileRouter := authorsRouter.Group("/profile")
-	authorProfileRouter.GET("/", authorization, authorizationWithAuthorCheck, usersController.GetAuthor)
+	authorProfileRouter.GET("/", authorization, authorizationWithAuthorCheck, usersController.GetAuthorPorfile)
 	authorProfileRouter.PUT("/", authorization, authorizationWithAuthorCheck, usersController.UpdateAuthor)
 
 	authorAccomplishments := authorProfileRouter.Group("/accomplishments")
