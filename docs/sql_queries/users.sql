@@ -1,4 +1,4 @@
--- Create user with email and password:
+-- Create user with email and password (password is hashed with bcrypt):
 
 INSERT INTO "users" ("id","email","password","full_name","email_verified") VALUES ('7308f1cf-2ede-476d-869a-7be31d03afbf','ouchene@estin.dz','$2a$10$FX1XpMqd/GgJ6RWbugxINu.RR/Zfk2b7sZG1UIwnHM7MOGdsoCdla','ouchene mohamed',false)
 
