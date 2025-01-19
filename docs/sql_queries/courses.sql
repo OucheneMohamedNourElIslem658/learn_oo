@@ -1,4 +1,4 @@
--- Create course
+-- Create course:
 
 -- 1 create the course descriptive componetents:
 INSERT INTO "files" ("deleted_at","url","height","width","thumbnail_url","image_kit_id","user_id","author_id","lesson_id","video_course_id","image_course_id") VALUES (NULL,'https://ik.imagekit.io/cdejmhtxd/learn_oo/authors/72125ca0-94f3-42e5-ac3a-0d797ec9078b/courses/videos/file_xlkchxPX1',360,640,'',NULL,NULL,NULL,NULL,37,NULL) ON CONFLICT ("id") DO UPDATE SET "video_course_id"="excluded"."video_course_id" RETURNING "id"
@@ -26,7 +26,13 @@ INSERT INTO "lessons" ("created_at","updated_at","deleted_at","title","descripti
 
 -- 3.3 create test for the chapter:
 
+INSERT INTO "tests" ("created_at","updated_at","max_chances","chapter_id") VALUES ('2025-01-19 14:33:38.688','2025-01-19 14:33:38.688',1,27) RETURNING "id" 
 
+-- 3.3.1 create the test questions one by one:
+
+INSERT INTO "options" ("content","is_correct","deleted_at","question_id") VALUES ('me',false,NULL,3),('him',true,NULL,3) ON CONFLICT ("id") DO UPDATE SET "question_id"="excluded"."question_id" RETURNING "id"
+
+INSERT INTO "questions" ("created_at","updated_at","content","description","duration","deleted_at","test_id") VALUES ('2025-01-19 14:39:14.142','2025-01-19 14:39:14.142','who is your father ?','',30,NULL,3) RETURNING "id"
 
 
 -- --------------------------------------------------------------------------------------------------------------------------------
