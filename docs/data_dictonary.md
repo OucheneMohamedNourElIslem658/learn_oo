@@ -220,3 +220,90 @@
 - `idx_files_deleted_at` on `files(deleted_at)`
 - `idx_comments_deleted_at` on `comments(deleted_at)`
 - `idx_notifications_deleted_at` on `notifications(deleted_at)`
+
+## Relations
+
+### User - Author
+**Relation Name:** user_author  
+**Description:** One-to-One relationship between Users and Authors.  
+
+### Author - Course
+**Relation Name:** author_course  
+**Description:** One-to-Many relationship between Authors and Courses.  
+
+### Course - Chapter
+**Relation Name:** course_chapter  
+**Description:** One-to-Many relationship between Courses and Chapters.  
+
+### Chapter - Lesson
+**Relation Name:** chapter_lesson  
+**Description:** One-to-Many relationship between Chapters and Lessons.  
+
+### Chapter - Test
+**Relation Name:** chapter_test  
+**Description:** One-to-One relationship between Chapters and Tests.  
+
+### Test - Question
+**Relation Name:** test_question  
+**Description:** One-to-Many relationship between Tests and Questions.  
+
+### Question - Option
+**Relation Name:** question_option  
+**Description:** One-to-Many relationship between Questions and Options.  
+
+### Question - Question Answer
+**Relation Name:** question_question_answer  
+**Description:** One-to-Many relationship between Questions and Question Answers.  
+
+### Question Answer - Option Selection
+**Relation Name:** question_answer_option_selection  
+**Description:** One-to-Many relationship between Question Answers and Option Selections.  
+
+### Course - Objective
+**Relation Name:** course_objective  
+**Description:** One-to-Many relationship between Courses and Objectives.  
+
+### Course - Requirement
+**Relation Name:** course_requirement  
+**Description:** One-to-Many relationship between Courses and Requirements.  
+
+### Course - File (Image)
+**Relation Name:** course_image  
+**Description:** One-to-One relationship between Courses and Files.  
+
+### Course - File (Video)
+**Relation Name:** course_video
+**Description:** One-to-One relationship between Courses and Files.  
+
+### Course - Category
+**Relation Name:** course_category  
+**Description:** Many-to-Many relationship between Courses and Categories.  
+**Attributes:**
+- `course_id` (bigint): PRIMARY KEY, FOREIGN KEY REFERENCES courses(id)
+- `category_id` (bigint): PRIMARY KEY, FOREIGN KEY REFERENCES categories(id)
+
+### Course - Learner
+**Relation Name:** course_learner  
+**Description:** Many-to-Many relationship between Courses and Learners.  
+**Attributes:**
+- `course_id` (bigint): PRIMARY KEY, FOREIGN KEY REFERENCES courses(id)
+- `learner_id` (text): PRIMARY KEY, FOREIGN KEY REFERENCES users(id)
+
+### Lesson - Learner
+**Relation Name:** lesson_learner  
+**Description:** Many-to-Many relationship between Lessons and Learners.  
+**Attributes:**
+- `lesson_id` (bigint): PRIMARY KEY, FOREIGN KEY REFERENCES lessons(id)
+- `learner_id` (varchar(64)): PRIMARY KEY, FOREIGN KEY REFERENCES users(id)
+
+### Test - Learner
+**Relation Name:** test_learner  
+**Description:** Many-to-Many relationship between Tests and Learners.  
+**Attributes:**
+- `test_id` (bigint): PRIMARY KEY, FOREIGN KEY REFERENCES tests(id)
+- `learner_id` (varchar(64)): PRIMARY KEY, FOREIGN KEY REFERENCES users(id)
+- `has_succeed` (boolean)
+- `current_chance` (bigint)
+- `created_at` (timestamptz)
+- `updated_at` (timestamptz)
+- `deleted_at` (timestamptz)
