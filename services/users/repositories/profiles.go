@@ -40,6 +40,13 @@ func (UsersRouter *ProfilesRepository) GetUser(id, appendWith string) (user *mod
 		"courses",
 	)
 	for _, extention := range validExtentions {
+		if extention == "Courses" {
+			query.Preload("Courses")
+			query.Preload("Courses.Image")
+			query.Preload("Courses.Author")
+			query.Preload("Courses.Author.User")
+			query.Preload("Courses.Author")
+		}
 		query.Preload(extention)
 	}
 
