@@ -335,9 +335,9 @@
 ### Additional Rules
 - **User Email Verification:** Users must verify their email before accessing certain features.
 - **Course Completion:** A course is marked as completed if all chapters and tests are completed by the learner.
-- **Content Uniqueness:** Titles and descriptions for courses, lessons, and chapters should be unique to avoid duplication.
+- **Course Content:** A course can eather be a rich text or a video.
 - **Cascade Deletion:** Deleting a user will cascade delete related authors, courses, chapters, lessons, tests, and results.
-- **Soft Deletion:** Records are not permanently deleted but marked with a `deleted_at` timestamp for potential recovery.
+- **Soft Deletion:** Some Times Records are not permanently deleted but marked with a `deleted_at` timestamp for potential recovery, like when an author want to downgrade from author his content will not be deleted permanently.
 
 ### Hooks Used
 - **Before Save Hooks:** Used to enforce business rules before saving records to the database.
