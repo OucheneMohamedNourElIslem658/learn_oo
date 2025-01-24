@@ -90,8 +90,6 @@ func VerifyIDTokenFromEmail(idToken string) (email *string, isValid bool, err er
 		return secretKey, nil
 	})
 
-	fmt.Println(jwtIdToken.Valid)
-
 	if err != nil {
 		return nil, false, err
 	}

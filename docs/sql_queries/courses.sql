@@ -8,6 +8,7 @@ INSERT INTO "files" ("deleted_at","url","height","width","thumbnail_url","image_
 INSERT INTO "courses" ("created_at","updated_at","deleted_at","title","description","price","payment_price_id","payment_product_id","language","level","duration","is_completed","author_id") VALUES ('2025-01-16 20:59:47.027','2025-01-16 20:59:47.027',NULL,'course_title_example','course_description_example',2000,'01jhrb6d9902zr4dad4a1anfhw','01jhrb6bve7jktcrck6d064msh','en','advanced',5,false,'72125ca0-94f3-42e5-ac3a-0d797ec9078b') RETURNING "id"
 
 -- 2 create the course chapters:
+
 SELECT count(*) FROM "courses" WHERE (id = '37' and author_id = '72125ca0-94f3-42e5-ac3a-0d797ec9078b') AND "courses"."deleted_at" IS NULL
 
 INSERT INTO "chapters" ("created_at","updated_at","deleted_at","title","description","course_id") VALUES ('2025-01-16 21:09:05.61','2025-01-16 21:09:05.61',NULL,'chapter_title','chapter_description_example',37) RETURNING "id"

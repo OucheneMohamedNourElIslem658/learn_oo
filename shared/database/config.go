@@ -20,8 +20,10 @@ var envs = initAPI()
 
 func initAPI() config {
 	if err := godotenv.Load();err != nil {
+		fmt.Println("here 1")
 		log.Fatalf("Error loading .env file")
 	}
+	fmt.Println(os.Getenv("DB_USER"))
 	return config{
 		User:     os.Getenv("DB_USER"),
 		Password: os.Getenv("DB_PASSWORD"),
