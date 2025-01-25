@@ -2,6 +2,88 @@
 
 This document provides detailed information and code snippets for the `tests` package. The package includes tests for course creation, user authentication, and user authorization.
 
+## cURL Commands
+
+For non-Go developers, here are the equivalent cURL commands for each test case.
+
+### TestCreateCourseEndpoint
+
+1. **create-course-success**:
+
+```sh
+curl -X POST "https://learn-oo-api.onrender.com/api/v1/courses/" \
+-H "Authorization: Bearer <idToken>" \
+-F "title=Counting" \
+-F "description=Learn How To Count" \
+-F "price=2000" \
+-F "language=en" \
+-F "level=bigener" \
+-F "duration=5" \
+-F "video=@./assets/123.mp4" \
+-F "image=@./assets/123.jpg"
+```
+
+2. **create-course-bad-request**:
+
+```sh
+curl -X POST "https://learn-oo-api.onrender.com/api/v1/courses/" \
+-H "Authorization: Bearer <idToken>" \
+-H "Content-Type: application/json" \
+-F "title=" \
+-F "description=Learn How To Count" \
+-F "price=5000" \
+-F "language=sp" \
+-F "level=beg" \
+-F "duration=2" \
+-F "image=@./assets/123.txt"
+```
+
+### TestUserAuthentification
+
+1. **user-creation-success**:
+
+```sh
+curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/register-with-email-and-password" \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "test<randomInt>@gmail.com",
+    "password": "123456",
+    "full_name": "test"
+}'
+```
+
+2. **user-creation-bad-request**:
+
+```sh
+curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/register-with-email-and-password" \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "m_ouchene@estin.dz",
+    "password": "",
+    "full_name": "test"
+}'
+```
+
+3. **user-login-success**:
+
+```sh
+curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/login-with-email-and-password" \
+-H "Content-Type: application/json" \
+-d '{
+    "email": "m_ouchene@estin.dz",
+    "password": "123456"
+}'
+```
+
+### TestUsersAuthorization
+
+1. **Authorization Middleware**:
+
+```sh
+curl -X GET "http://localhost:8080/" \
+-H "Authorization: Bearer <randomIDToken>"
+```
+
 ## Package Imports
 
 ```go
@@ -212,85 +294,4 @@ func TestUsersAuthorization(t *testing.T) {
 
     assert.Equal(t, 200, w.Code)
 }
-```
-## cURL Commands
-
-For non-Go developers, here are the equivalent cURL commands for each test case.
-
-### TestCreateCourseEndpoint
-
-1. **create-course-success**:
-
-```sh
-curl -X POST "https://learn-oo-api.onrender.com/api/v1/courses/" \
--H "Authorization: Bearer <idToken>" \
--F "title=Counting" \
--F "description=Learn How To Count" \
--F "price=2000" \
--F "language=en" \
--F "level=bigener" \
--F "duration=5" \
--F "video=@./assets/123.mp4" \
--F "image=@./assets/123.jpg"
-```
-
-2. **create-course-bad-request**:
-
-```sh
-curl -X POST "https://learn-oo-api.onrender.com/api/v1/courses/" \
--H "Authorization: Bearer <idToken>" \
--H "Content-Type: application/json" \
--F "title=" \
--F "description=Learn How To Count" \
--F "price=5000" \
--F "language=sp" \
--F "level=beg" \
--F "duration=2" \
--F "image=@./assets/123.txt"
-```
-
-### TestUserAuthentification
-
-1. **user-creation-success**:
-
-```sh
-curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/register-with-email-and-password" \
--H "Content-Type: application/json" \
--d '{
-    "email": "test<randomInt>@gmail.com",
-    "password": "123456",
-    "full_name": "test"
-}'
-```
-
-2. **user-creation-bad-request**:
-
-```sh
-curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/register-with-email-and-password" \
--H "Content-Type: application/json" \
--d '{
-    "email": "m_ouchene@estin.dz",
-    "password": "",
-    "full_name": "test"
-}'
-```
-
-3. **user-login-success**:
-
-```sh
-curl -X POST "https://learn-oo-api.onrender.com/api/v1/users/auth/login-with-email-and-password" \
--H "Content-Type: application/json" \
--d '{
-    "email": "m_ouchene@estin.dz",
-    "password": "123456"
-}'
-```
-
-### TestUsersAuthorization
-
-1. **Authorization Middleware**:
-
-```sh
-curl -X GET "http://localhost:8080/" \
--H "Authorization: Bearer <randomIDToken>"
 ```
