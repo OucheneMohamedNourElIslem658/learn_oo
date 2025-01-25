@@ -41,17 +41,16 @@ func (UsersRouter *ProfilesRepository) GetUser(id, appendWith string) (user *mod
 	)
 	for _, extention := range validExtentions {
 		if extention == "Courses" {
-			query.Preload("Courses")
-			query.Preload("Courses.Author")
-			query.Preload("Courses.Image")
-			query.Preload("Courses.Video")
-			continue
+			fmt.Println(extention)
+			query = query.Debug().Preload("Courses.Author.User").Preload("Image").Preload("Video")
+		} else {
+			query = query.Preload(extention)
 		}
-		query.Preload(extention)
 	}
 
 	var existingUser models.User
 	err := query.Where("id = ?", id).First(&existingUser).Error
+	fmt.Println(existingUser.Courses[0].Author)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{

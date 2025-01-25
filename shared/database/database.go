@@ -2,12 +2,12 @@ package database
 
 import (
 	"log"
-	"os"
-	"time"
+	// "os"
+	// "time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	// "gorm.io/gorm/logger"
 	// "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 )
 
@@ -16,15 +16,15 @@ var Instance *gorm.DB
 func Init() {
 	dsn := envs.getDatabaseDSN()
 
-	sqlLogger := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
-			SlowThreshold:             time.Second,
-			LogLevel:                  logger.Info,
-			IgnoreRecordNotFoundError: true,
-			Colorful:                  true,
-		},
-	)
+	// sqlLogger := logger.New(
+	// 	log.New(os.Stdout, "\r\n", log.LstdFlags),
+	// 	logger.Config{
+	// 		SlowThreshold:             time.Second,
+	// 		LogLevel:                  logger.Info,
+	// 		IgnoreRecordNotFoundError: true,
+	// 		Colorful:                  true,
+	// 	},
+	// )
 
 	var err error
 	Instance, err = gorm.Open(postgres.New(
@@ -33,7 +33,7 @@ func Init() {
 			PreferSimpleProtocol: true,
 		},
 	), &gorm.Config{
-		Logger: sqlLogger,
+		// Logger: sqlLogger,
 	})
 	if err != nil {
 		log.Fatal(err.Error())
