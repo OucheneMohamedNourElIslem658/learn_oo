@@ -375,6 +375,9 @@ func (UsersRouter *ProfilesRepository) GetAuthor(authorID string, appendWith str
 			query.Preload("User.Image")
 			continue
 		}
+		if extention == "Courses" {
+			query.Preload("Courses.Image").Preload("Courses.Video")
+		}
 		query.Preload(extention)
 	}
 
