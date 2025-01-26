@@ -50,7 +50,6 @@ func (UsersRouter *ProfilesRepository) GetUser(id, appendWith string) (user *mod
 
 	var existingUser models.User
 	err := query.Where("id = ?", id).First(&existingUser).Error
-	fmt.Println(existingUser.Courses[0].Author)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
