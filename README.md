@@ -35,10 +35,10 @@ The server should now be running on `http://localhost:8080`.
 
 ### Contributors
 
-- Person 1: [GitHub Profile](https://github.com/seffihfadi)
+- Seffih Fadi: [GitHub Profile](https://github.com/seffihfadi)
 
-- Person 2: [GitHub Profile](https://github.com/bkrfethi)
-- Person 3: [GitHub Profile](https://github.com/alaasao)
+- Fethi Boukourou: [GitHub Profile](https://github.com/bkrfethi)
+- Alaa Eddine Saouchi: [GitHub Profile](https://github.com/alaasao)
 
 You can find the web app ui code in this repository link [here](https://github.com/seffihfadi/learnoo).
 
