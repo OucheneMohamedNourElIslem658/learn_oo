@@ -18,31 +18,8 @@ func NewTestsController() *TestsController {
 	}
 }
 
-func (lc *TestsController) CreateTest(ctx *gin.Context) {
-	testsRepository := lc.testsRepository
-
-	var test repositories.CreatedTestDTO
-
-	if err := ctx.ShouldBind(&test); err != nil {
-		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, message)
-		return
-	}
-
-	chapterID := ctx.GetInt("chapter_id")
-
-	if err := testsRepository.CreateTest(uint(chapterID), test); err != nil {
-		ctx.JSON(err.StatusCode, gin.H{
-			"error": err.Message,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, nil)
-}
-
 func (lc *TestsController) GetTest(ctx *gin.Context) {
-	id := ctx.Param("test_id")
+	chapterID := ctx.Param("chapter_id")
 
 	authorID := ctx.GetString("author_id")
 	userID := ctx.GetString("user_id")
@@ -51,7 +28,7 @@ func (lc *TestsController) GetTest(ctx *gin.Context) {
 
 	testsRepository := lc.testsRepository
 
-	if lesson, err := testsRepository.GetTest(id, authorID, userID, appendWith); err != nil {
+	if lesson, err := testsRepository.GetTest(chapterID, authorID, userID, appendWith); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"error": err.Message,
 		})
@@ -59,44 +36,6 @@ func (lc *TestsController) GetTest(ctx *gin.Context) {
 	} else {
 		ctx.JSON(http.StatusOK, lesson)
 	}
-}
-
-func (lc *TestsController) UpdateTest(ctx *gin.Context) {
-	lessonsRepository := lc.testsRepository
-
-	var test repositories.UpdateTestDTO
-
-	if err := ctx.ShouldBind(&test); err != nil {
-		message := utils.ValidationErrorResponse(err)
-		ctx.JSON(http.StatusBadRequest, message)
-		return
-	}
-
-	ID := ctx.Param("test_id")
-
-	if err := lessonsRepository.UpdateTest(ID, test); err != nil {
-		ctx.JSON(err.StatusCode, gin.H{
-			"error": err.Message,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, nil)
-}
-
-func (cc *TestsController) DeleteTest(ctx *gin.Context) {
-	ID := ctx.Param("test_id")
-
-	testsRepository := cc.testsRepository
-
-	if err := testsRepository.DeleteTest(ID); err != nil {
-		ctx.JSON(err.StatusCode, gin.H{
-			"error": err.Message,
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusOK, nil)
 }
 
 func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
@@ -110,9 +49,9 @@ func (lc *TestsController) CreateQuestion(ctx *gin.Context) {
 		return
 	}
 
-	testID := ctx.GetInt("test_id")
+	chapterID := ctx.GetInt("chapter_id")
 
-	if err := testsRepository.CreateQuestion(uint(testID), question); err != nil {
+	if err := testsRepository.CreateQuestion(uint(chapterID), question); err != nil {
 		ctx.JSON(err.StatusCode, gin.H{
 			"error": err.Message,
 		})

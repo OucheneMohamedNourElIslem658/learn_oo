@@ -28,7 +28,7 @@ type CreatedTestDTO struct {
 	MaxChances *int `json:"max_chances" binding:"omitempty,min=1"`
 }
 
-func (cr *TestsRepository) CreateTest(chapterID uint, test CreatedTestDTO) (apiError *utils.APIError) {
+func (cr *TestsRepository) createTest(chapterID uint, test CreatedTestDTO) (createdTest *models.Test, apiError *utils.APIError) {
 	database := cr.database
 
 	maxChances := func() int {
@@ -46,53 +46,16 @@ func (cr *TestsRepository) CreateTest(chapterID uint, test CreatedTestDTO) (apiE
 
 	err := database.Create(&testToCreate).Error
 	if err != nil {
-		return &utils.APIError{
+		return nil, &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 		}
 	}
 
-	return nil
+	return &testToCreate, nil
 }
 
-type UpdateTestDTO struct {
-	MaxChances *int `json:"max_chances" binding:"omitempty,min=1"`
-}
-
-func (cr *TestsRepository) UpdateTest(ID string, test UpdateTestDTO) (apiError *utils.APIError) {
-	database := cr.database
-
-	var existingTest models.Test
-	err := database.Where("id = ?", ID).First(&existingTest).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return &utils.APIError{
-				StatusCode: http.StatusNotFound,
-				Message:    "test not found",
-			}
-		}
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	if test.MaxChances != nil {
-		existingTest.MaxChances = uint(*test.MaxChances)
-	}
-
-	err = database.Save(&existingTest).Error
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	return nil
-}
-
-func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith string) (test *models.Test, apiError *utils.APIError) {
+func (cr *TestsRepository) GetTest(chapterID, authorID, userID string, appendWith string) (test *models.Test, apiError *utils.APIError) {
 	database := cr.database
 
 	// Build the query with preloads
@@ -111,9 +74,11 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 		query.Preload(extension)
 	}
 
+	query.Preload("Chapter")
+
 	var existingTest models.Test
 
-	err := query.Where("id = ?", ID).First(&existingTest).Error
+	err := query.Where("chapter_id = ?", chapterID).First(&existingTest).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, &utils.APIError{
@@ -131,7 +96,7 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 	isAuthor := false
 	err = database.Model(&models.Course{}).
 		Select("count(*) > 0").
-		Where("author_id = ? AND id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", authorID, ID).
+		Where("author_id = ? AND id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", authorID, existingTest.ID).
 		Scan(&isAuthor).Error
 
 	if err != nil && err != gorm.ErrRecordNotFound {
@@ -146,7 +111,7 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 		learner := false
 		err = database.Model(&models.CourseLearner{}).
 			Select("count(*) > 0").
-			Where("learner_id = ? AND course_id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", userID, ID).
+			Where("learner_id = ? AND course_id = (SELECT chapters.course_id FROM tests JOIN chapters ON chapters.id = tests.chapter_id WHERE tests.id = ?)", userID, existingTest.ID).
 			Scan(&learner).Error
 
 		if err != nil && err != gorm.ErrRecordNotFound {
@@ -172,7 +137,7 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 					WHERE l.chapter_id = (SELECT chapter_id FROM tests WHERE id = ?)
 					AND (ll.learned = false OR ll.learned IS NULL)
 				) AS all_learned
-			`, userID, ID).Scan(&allLessonsLearned).Error
+			`, userID, existingTest.ID).Scan(&allLessonsLearned).Error
 
 			if err != nil {
 				return nil, &utils.APIError{
@@ -193,29 +158,6 @@ func (cr *TestsRepository) GetTest(ID, authorID, userID string, appendWith strin
 	return &existingTest, nil
 }
 
-func (cr *TestsRepository) DeleteTest(ID string) (apiError *utils.APIError) {
-	database := cr.database
-
-	deleteResult := database.Where("id = ?", ID).Unscoped().Delete(models.Test{})
-
-	if deleteResult.RowsAffected == 0 {
-		return &utils.APIError{
-			StatusCode: http.StatusNotFound,
-			Message:    "test not found",
-		}
-	}
-
-	err := deleteResult.Error
-	if err != nil {
-		return &utils.APIError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-		}
-	}
-
-	return nil
-}
-
 type CreatedQuestionDTO struct {
 	Content     string `json:"content" binding:"required"`
 	Description string `json:"description"`
@@ -226,8 +168,41 @@ type CreatedQuestionDTO struct {
 	} `json:"options" binding:"question_options_list,dive,required"`
 }
 
-func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionDTO) (apiError *utils.APIError) {
+func (cr *TestsRepository) CreateQuestion(chapterID uint, question CreatedQuestionDTO) (apiError *utils.APIError) {
 	database := cr.database
+
+	var chapter models.Chapter
+	err := database.Where("id = ?", chapterID).Preload("Test").First(&chapter).Error
+
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &utils.APIError{
+				StatusCode: http.StatusNotFound,
+				Message:    "chapter not found",
+			}
+		}
+		return &utils.APIError{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+		}
+	}
+
+	var testID uint
+
+	if chapter.Test == nil {
+		maxChances := 200
+		test, err := cr.createTest(chapter.ID, CreatedTestDTO{
+			MaxChances: &maxChances,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		testID = test.ID
+	} else {
+		testID = chapter.Test.ID
+	}
 
 	var options []models.Option
 
@@ -246,7 +221,7 @@ func (cr *TestsRepository) CreateQuestion(testID uint, question CreatedQuestionD
 		Options:     options,
 	}
 
-	err := database.Create(&questionToCreate).Error
+	err = database.Create(&questionToCreate).Error
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

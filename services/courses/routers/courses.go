@@ -51,7 +51,6 @@ func (cr *CoursesRouter) RegisterRoutes() {
 
 	checkCourseExistance := coursesMiddlewares.CheckCourseExistance()
 	checkChapterExistance := coursesMiddlewares.CheckChapterExistance()
-	checkTestExistance := coursesMiddlewares.CheckTestExistance()
 
 	router.POST("/", authorization, AuthorizationWithAuthorCheck, coursesController.CreateCourse)
 	router.PUT("/:course_id", authorization, AuthorizationWithAuthorCheck, coursesController.UpdateCourse)
@@ -79,6 +78,7 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	chaptersRouter.PUT("/:chapter_id", authorization, AuthorizationWithAuthorCheck, checkCourseExistance, chaptersController.UpdateChapter)
 	chaptersRouter.DELETE("/:chapter_id", authorization, AuthorizationWithAuthorCheck, checkCourseExistance, chaptersController.DeleteChapter)
 	chaptersRouter.GET("/:chapter_id", chaptersController.GetChapter)
+	chaptersRouter.GET("/:chapter_id/test", authorization, authorizationWithIDCheck, testsController.GetTest)
 
 	lessonsRouter := chaptersRouter.Group("/:chapter_id/lessons")
 	lessonsRouter.POST("/create-with-content", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.CreateLessonWithContent)
@@ -88,15 +88,9 @@ func (cr *CoursesRouter) RegisterRoutes() {
 	lessonsRouter.DELETE("/:lesson_id", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, lessonsController.DeleteLesson)
 	lessonsRouter.GET("/:lesson_id", authorization, authorizationWithIDCheck, lessonsController.GetLesson)
 
-	testsRouter := chaptersRouter.Group("/:chapter_id/tests")
-	testsRouter.POST("/", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.CreateTest)
-	testsRouter.PUT("/:test_id", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.UpdateTest)
-	testsRouter.DELETE("/:test_id", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.DeleteTest)
-	testsRouter.GET("/:test_id", authorization, authorizationWithIDCheck, testsController.GetTest)
-
-	questionsRouter := testsRouter.Group("/:test_id/questions")
-	questionsRouter.POST("/", authorization, AuthorizationWithAuthorCheck, checkTestExistance, testsController.CreateQuestion)
-	questionsRouter.PUT("/:question_id", authorization, AuthorizationWithAuthorCheck, checkTestExistance, testsController.UpdateQuestion)
-	questionsRouter.DELETE("/:question_id", authorization, AuthorizationWithAuthorCheck, checkTestExistance, testsController.DeleteQuestion)
+	questionsRouter := chaptersRouter.Group("/:chapter_id/questions")
+	questionsRouter.POST("/", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.CreateQuestion)
+	questionsRouter.PUT("/:question_id", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.UpdateQuestion)
+	questionsRouter.DELETE("/:question_id", authorization, AuthorizationWithAuthorCheck, checkChapterExistance, testsController.DeleteQuestion)
 	questionsRouter.GET("/:question_id", authorization, authorizationWithIDCheck, testsController.GetQuestion)
 }
