@@ -32,13 +32,33 @@ go run main.go
 
 The server should now be running on `http://localhost:8080`.
 
+### Prerequisites
+
+Ensure you have the following installed on your machine:
+- [Docker](https://www.docker.com/get-started)
+
+### Running the Server Using Docker
+
+You can run the application using Docker. Follow these steps:
+
+1. Pull the Docker image:
+    ```sh
+    docker pull fethi279/learn_oo:latest
+    ```
+
+2. Run the container:
+    ```sh
+    docker run -d -p 8080:8000 fethi279/learn_oo:latest
+    ```
+
+The server should now be running on `http://localhost:8080`.
 
 ### Contributors
 
 - Seffih Fadi: [GitHub Profile](https://github.com/seffihfadi)
 
 - Fethi Boukourou: [GitHub Profile](https://github.com/bkrfethi)
-- Alaa Eddine Souchi: [GitHub Profile](https://github.com/alaasao)
+- Alaa Eddine Saouchi: [GitHub Profile](https://github.com/alaasao)
 
 You can find the web app ui code in this repository link [here](https://github.com/seffihfadi/learnoo).
 
