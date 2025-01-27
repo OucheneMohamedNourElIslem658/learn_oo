@@ -1,0 +1,193 @@
+{
+    "basePath": "/api/v1",
+    "routes": [
+      {
+        "path": "/comments/:lesson_id",
+        "method": "POST",
+        "description": "Create a new comment for a lesson",
+        "parameters": [
+          {
+            "name": "lesson_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the lesson"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateCommentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Comment created successfully",
+            "schema": {
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      },
+      {
+        "path": "/comments/:id",
+        "method": "GET",
+        "description": "Retrieve a comment by its ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the comment"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment details",
+            "schema": {
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "404": {
+            "description": "Comment not found"
+          }
+        }
+      },
+      {
+        "path": "/comments/lesson/:lesson_id",
+        "method": "GET",
+        "description": "Retrieve all comments for a lesson",
+        "parameters": [
+          {
+            "name": "lesson_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the lesson"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments for the lesson",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Comment"
+              }
+            }
+          }
+        }
+      },
+      {
+        "path": "/comments/user",
+        "method": "GET",
+        "description": "Retrieve comments by the authenticated user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of comments by the user",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Comment"
+              }
+            }
+          }
+        }
+      },
+      {
+        "path": "/comments/:id",
+        "method": "DELETE",
+        "description": "Delete a comment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the comment to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully"
+          },
+          "400": {
+            "description": "Invalid comment ID"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      {
+        "path": "/notifications/all_notification",
+        "method": "GET",
+        "description": "Retrieve all notifications for the authenticated user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of notifications",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "definitions": {
+      "CreateCommentRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The content of the comment"
+          }
+        },
+        "required": ["content"]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "lesson_id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }

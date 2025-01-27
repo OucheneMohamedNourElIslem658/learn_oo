@@ -15,7 +15,7 @@
             "payment_success_url": "required",
             "payment_fail_url": "required"
         },
-        "reponses": [
+        "responses": [
             {
                 "code": "accepted",
                 "description": "this is only if course is paid",
@@ -75,6 +75,130 @@
                         "error": "error message (contact me when you see one)"
                     }
                 ]
+            }
+        ]
+    },
+    {
+        "method": "GET",
+        "path": "/check-course-completion/:courseID",
+        "description": "Checks if the authenticated user has completed all tests in a course.",
+        "authRequired": true,
+        "parameters": [
+            {
+                "name": "courseID",
+                "in": "path",
+                "description": "The ID of the course to check for completion.",
+                "required": true,
+                "type": "integer"
+            }
+        ],
+        "response": {
+            "statusCode": 200,
+            "description": "Returns whether the user has completed all tests in the course.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "course": {
+                            "id": 1,
+                            "name": "Go Programming"
+                        },
+                        "user": {
+                            "id": 1,
+                            "name": "John Doe"
+                        },
+                        "testResults": [
+                            {
+                                "test_id": 1,
+                                "has_succeed": true
+                            },
+                            {
+                                "test_id": 2,
+                                "has_succeed": true
+                            }
+                        ],
+                        "date": "2024-12-31T00:00:00Z"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "method": "POST",
+        "path": "/mark-lessons-learned/:chapterID",
+        "description": "Marks all lessons within a specified chapter as learned for a given user.",
+        "authRequired": true,
+        "parameters": [
+            {
+                "name": "chapterID",
+                "in": "path",
+                "description": "The ID of the chapter whose lessons are to be marked as learned.",
+                "required": true,
+                "type": "integer"
+            }
+        ],
+        "headers": [
+            {
+                "name": "Authorization",
+                "type": "string",
+                "required": true,
+                "description": "Bearer token for user authentication."
+            }
+        ],
+        "response": {
+            "statusCode": 200,
+            "description": "Returns a success message upon marking lessons as learned.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "message": "Lessons marked as learned"
+                    }
+                }
+            }
+        },
+        "errorResponses": [
+            {
+                "statusCode": 401,
+                "description": "User not authenticated",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "User not authenticated"
+                        }
+                    }
+                }
+            },
+            {
+                "statusCode": 400,
+                "description": "Invalid request parameters or user ID type",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Invalid user ID type"
+                        }
+                    }
+                }
+            },
+            {
+                "statusCode": 400,
+                "description": "Invalid chapter ID",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Invalid chapter ID"
+                        }
+                    }
+                }
+            },
+            {
+                "statusCode": 500,
+                "description": "Internal server error",
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "error": "Internal server error message"
+                        }
+                    }
+                }
             }
         ]
     }
