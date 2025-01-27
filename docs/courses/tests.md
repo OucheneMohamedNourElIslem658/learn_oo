@@ -1,112 +1,7 @@
 # API Endpoints Documentation
 
-## Create Test
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests`  
-**Method:** `POST`  
-**Description:** Create a new test.
-
-### Headers
-- **Authorization** (string, required): Bearer id_token.
-
-### Request Body
-- **max_chances** (integer, min=1, default=1)
-
-### Responses
-- **201 Created**
-- **400 Bad Request**
-    ```json
-    {
-        "error": "invalid id token"
-    }
-    ```
-    ```json
-    {
-        "error": "bad request",
-        "field 1": "validation of field 1",
-        "...": "..."
-    }
-    ```
-- **401 Unauthorized**
-    ```json
-    {
-        "error": "id token expired"
-    }
-    ```
-    ```json
-    {
-        "error": "user is not an author"
-    }
-    ```
-- **404 Not Found**
-    ```json
-    {
-        "error": "chapter not found"
-    }
-    ```
-- **500 Internal Server Error**
-    ```json
-    {
-        "error": "error message (contact me when you see one)"
-    }
-    ```
-
-## Update Test
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id`  
-**Method:** `PUT`  
-**Description:** Update test details.
-
-### Headers
-- **Authorization** (string, required): Bearer id_token.
-
-### Request Body
-- **max_chances** (integer, min=1, default=1)
-
-### Responses
-- **200 OK**
-- **400 Bad Request**
-    ```json
-    {
-        "error": "invalid id token"
-    }
-    ```
-    ```json
-    {
-        "error": "bad request",
-        "field 1": "validation of field 1",
-        "...": "..."
-    }
-    ```
-- **401 Unauthorized**
-    ```json
-    {
-        "error": "id token expired"
-    }
-    ```
-    ```json
-    {
-        "error": "user is not an author"
-    }
-    ```
-- **404 Not Found**
-    ```json
-    {
-        "error": "chapter not found"
-    }
-    ```
-    ```json
-    {
-        "error": "test not found"
-    }
-    ```
-- **500 Internal Server Error**
-    ```json
-    {
-        "error": "error message (contact me when you see one)"
-    }
-    ```
-
 ## Get Test
-**Path:** `host/api/v1/courses/:course_id/tests/:test_id`  
+**Path:** `host/api/v1/courses/:course_id/test`  
 **Method:** `GET`  
 **Description:** Get test details.
 
@@ -222,53 +117,9 @@
     }
     ```
 
-## Delete Test
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id`  
-**Method:** `DELETE`  
-**Description:** Delete a test.
-
-### Headers
-- **Authorization** (string, required): Bearer id_token.
-
-### Responses
-- **200 OK**
-- **400 Bad Request**
-    ```json
-    {
-        "error": "invalid id token"
-    }
-    ```
-- **401 Unauthorized**
-    ```json
-    {
-        "error": "id token expired"
-    }
-    ```
-    ```json
-    {
-        "error": "user is not an author"
-    }
-    ```
-- **404 Not Found**
-    ```json
-    {
-        "error": "chapter not found"
-    }
-    ```
-    ```json
-    {
-        "error": "test not found"
-    }
-    ```
-- **500 Internal Server Error**
-    ```json
-    {
-        "error": "error message (contact me when you see one)"
-    }
-    ```
 
 ## Create Question
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions`  
+**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/questions`  
 **Method:** `POST`  
 **Description:** Create a new question.
 
@@ -323,7 +174,7 @@
     ```
 
 ## Update Question
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions/:question_id`  
+**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/questions/:question_id`  
 **Method:** `PUT`  
 **Description:** Update question details.
 
@@ -383,7 +234,7 @@
     ```
 
 ## Get Question
-**Path:** `host/api/v1/courses/:course_id/tests/:test_id`  
+**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/questions/:question_id`  
 **Method:** `GET`  
 **Description:** Get question details.
 
@@ -459,7 +310,7 @@
     ```
 
 ## Delete Question
-**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/tests/:test_id/questions/:question_id`  
+**Path:** `host/api/v1/courses/:course_id/chapters/:chapter_id/questions/:question_id`  
 **Method:** `DELETE`  
 **Description:** Delete a question.
 
