@@ -17,7 +17,7 @@ func CreateIdToken(id string, authorID *string, emailVerified bool) (string, err
 			"id":             id,
 			"email_verified": emailVerified,
 			"author_id":      authorID,
-			"exp":            time.Now().Add(time.Hour).Unix(),
+			"exp":            time.Now().Add(time.Hour * 24 * 2).Unix(),
 		},
 	)
 
