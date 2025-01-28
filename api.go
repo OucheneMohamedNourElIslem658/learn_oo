@@ -10,6 +10,7 @@ import (
 	certaficatesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/certaficates/routers"
 	coursesRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/courses/routers"
 	usersRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/routers"
+	commentsRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/comments/routers" 
 )
 
 type Server struct {
@@ -61,6 +62,10 @@ func (server *Server) Run() {
 	subRoute = v1.Group("/user-courses")
 	userCoursesRouter := certaficatesRouters.NewUserCourseRouter(subRoute)
 	userCoursesRouter.RegisterRoutes()
+
+	subRoute = v1.Group("/comments")
+	commentsRouter := commentsRouters.NewCommentsRouter(subRoute)
+	commentsRouter.RegisterRoutes()
 
 	log.Printf("Listening and serving at %v\n", "http://"+server.address+"/api/v1/")
 	if err := router.Run(server.address); err != nil {
