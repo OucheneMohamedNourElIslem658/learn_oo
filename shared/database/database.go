@@ -2,14 +2,14 @@ package database
 
 import (
 	"log"
-	// "os"
-	// "time"
+	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	// "gorm.io/gorm/logger"
+	"gorm.io/gorm/logger"
 
-	// "github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 )
 
 var Instance *gorm.DB
@@ -17,15 +17,15 @@ var Instance *gorm.DB
 func Init() {
 	dsn := envs.getDatabaseDSN()
 
-	// sqlLogger := logger.New(
-	// 	log.New(os.Stdout, "\r\n", log.LstdFlags),
-	// 	logger.Config{
-	// 		SlowThreshold: time.Second,
-	// 		LogLevel:      logger.Info,
-	// 		IgnoreRecordNotFoundError: true,
-	// 		Colorful:      true,
-	// 	},
-	// )
+	sqlLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+			IgnoreRecordNotFoundError: true,
+			Colorful:      true,
+		},
+	)
 
 	var err error
 	Instance, err = gorm.Open(postgres.New(
@@ -33,7 +33,9 @@ func Init() {
 			DSN: dsn,
 			PreferSimpleProtocol: true,
 		},
-	), &gorm.Config{})
+	), &gorm.Config{
+		Logger: sqlLogger, // Use the sqlLogger here
+	})
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -43,32 +45,32 @@ func Init() {
 		log.Fatal(err)
 	}
 
-	log.Println("Database connected succesfully!")
+	log.Println("Database connected successfully!")
 }
 
 func migrateTables() error {
-	// err := Instance.AutoMigrate(
-	// 	&models.User{},
-	// 	&models.Author{},
-	// 	&models.Course{},
-	// 	&models.Objective{},
-	// 	&models.Requirement{},
-	// 	&models.Category{},
-	// 	&models.CourseCategory{},
-	// 	&models.Chapter{},
-	// 	&models.Lesson{},
-	// 	&models.LessonLearner{},
-	// 	&models.CourseLearner{},
-	// 	&models.Test{},
-	// 	&models.Question{},
-	// 	&models.Option{},
-	// 	&models.TestResult{},
-	// 	&models.File{},
-	// 	&models.Comment{},
-	// 	&models.Notification{},
-	// )
-	// if err != nil {
-	// 	return err
-	// }
+	err := Instance.AutoMigrate(
+		&models.User{},
+		&models.Author{},
+		&models.Course{},
+		&models.Objective{},
+		&models.Requirement{},
+		&models.Category{},
+		&models.CourseCategory{},
+		&models.Chapter{},
+		&models.Lesson{},
+		&models.LessonLearner{},
+		&models.CourseLearner{},
+		&models.Test{},
+		&models.Question{},
+		&models.Option{},
+		&models.TestResult{},
+		&models.File{},
+		&models.Comment{},
+		&models.Notification{},
+	)
+	if err != nil {
+		return err
+	}
 	return nil
 }
