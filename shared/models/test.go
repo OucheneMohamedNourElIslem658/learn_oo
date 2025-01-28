@@ -11,7 +11,7 @@ type Test struct {
 	CreatedAt      time.Time      `json:"-"`
 	UpdatedAt      time.Time      `json:"-"`
 	QuestionsCount *uint           `gorm:"-:migration;->" json:"questions_count,omitempty"`
-    HasSucceed *bool           `gorm:"-:migration;->" json:"has_succeed,omitempty"`
+    HasSucceed      *bool           `gorm:"-:migration;->" json:"has_succeed,omitempty"`
 	Questions      []Question     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"questions,omitempty"`
 	MaxChances     uint           `gorm:"default:1" json:"max_chances"`
 	ChapterID      uint           `json:"chapter_id"`
@@ -45,7 +45,7 @@ type TestResult struct {
 	CreatedAt     time.Time      `json:"-"`
 	UpdatedAt     time.Time      `json:"-"`
 	TestID        uint           `gorm:"primaryKey" json:"test_id"`
-	LearnerID     uint           `gorm:"primaryKey" json:"learner_id"`
+	LearnerID     string           `gorm:"primaryKey" json:"learner_id"`
 	Test          *Test          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"test,omitempty"`
 	Learner       *User          `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner,omitempty"`
 	HasSucceed    bool           `json:"has_succeed"`

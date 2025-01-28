@@ -1,9 +1,10 @@
 package repositories
 
 import (
-	"strconv"
 	"errors"
 	"net/http"
+	// "strconv"
+
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/models"
 	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/utils"
 	"gorm.io/gorm"
@@ -15,11 +16,11 @@ type UserProgressRepository struct {
 
 func NewUserProgressRepository(database *gorm.DB) *UserProgressRepository {
 	return &UserProgressRepository{
-		Database: database, 
+		Database: database,
 	}
 }
 
-func (r *UserProgressRepository) HasUserSucceededAllTests(courseID, userID uint) (bool, *utils.APIError) {
+func (r *UserProgressRepository) HasUserSucceededAllTests(courseID uint, userID string) (bool, *utils.APIError) {
 	var count int64
 	err := r.Database.Model(&models.TestResult{}).
 		Joins("JOIN tests ON test_results.test_id = tests.id").
@@ -42,12 +43,12 @@ func (r *UserProgressRepository) HasUserSucceededAllTests(courseID, userID uint)
 	return count == totalTests, nil
 }
 
-func (r *UserProgressRepository) MarkLessonsAsLearned(userID uint, chapterID uint) *utils.APIError {
+func (r *UserProgressRepository) MarkLessonsAsLearned(userID string, chapterID uint) *utils.APIError {
 	var test models.Test
 	if err := r.Database.Preload("Learners").Where("chapter_id = ?", chapterID).First(&test).Error; err != nil {
 		return &utils.APIError{
 			Message:    "Failed to retrieve test for the given chapter",
-			StatusCode: 400,
+			StatusCode: http.StatusBadRequest,
 		}
 	}
 
@@ -55,14 +56,14 @@ func (r *UserProgressRepository) MarkLessonsAsLearned(userID uint, chapterID uin
 	if err := r.Database.Where("test_id = ? AND learner_id = ?", test.ID, userID).First(&testResult).Error; err != nil {
 		return &utils.APIError{
 			Message:    "Failed to retrieve test result for the user",
-			StatusCode: 400,
+			StatusCode: http.StatusBadRequest,
 		}
 	}
 
 	if !testResult.HasSucceed {
 		return &utils.APIError{
 			Message:    "User did not succeed in the test",
-			StatusCode: 400,
+			StatusCode: http.StatusBadRequest,
 		}
 	}
 
@@ -70,7 +71,7 @@ func (r *UserProgressRepository) MarkLessonsAsLearned(userID uint, chapterID uin
 	if err := r.Database.Where("chapter_id = ?", chapterID).Find(&lessons).Error; err != nil {
 		return &utils.APIError{
 			Message:    "Failed to retrieve lessons for the given chapter",
-			StatusCode: 400,
+			StatusCode: http.StatusBadRequest,
 		}
 	}
 
@@ -79,7 +80,7 @@ func (r *UserProgressRepository) MarkLessonsAsLearned(userID uint, chapterID uin
 		if err := r.Database.Where("lesson_id = ? AND learner_id = ?", lesson.ID, userID).FirstOrCreate(&lessonLearner).Error; err != nil {
 			return &utils.APIError{
 				Message:    "Failed to find or create LessonLearner record",
-				StatusCode: 400,
+				StatusCode: http.StatusBadRequest,
 			}
 		}
 
@@ -87,7 +88,7 @@ func (r *UserProgressRepository) MarkLessonsAsLearned(userID uint, chapterID uin
 		if err := r.Database.Save(&lessonLearner).Error; err != nil {
 			return &utils.APIError{
 				Message:    "Failed to mark lesson as learned",
-				StatusCode: 400,
+				StatusCode: http.StatusBadRequest,
 			}
 		}
 	}
@@ -109,7 +110,7 @@ func (r *UserProgressRepository) GetTestWithQuestionsAndOptions(testID uint) (*m
 	return &test, nil
 }
 
-func (r *UserProgressRepository) GetTestResult(learnerID, testID uint) (*models.TestResult, error) {
+func (r *UserProgressRepository) GetTestResult(learnerID string, testID uint) (*models.TestResult, error) {
 	var result models.TestResult
 	err := r.Database.Where("learner_id = ? AND test_id = ?", learnerID, testID).
 		First(&result).Error
@@ -127,7 +128,7 @@ func (r *UserProgressRepository) UpdateTestResult(result *models.TestResult) err
 	return r.Database.Save(result).Error
 }
 
-func (r *UserProgressRepository) GetCurrentAttempts(learnerID, testID uint) (uint, error) {
+func (r *UserProgressRepository) GetCurrentAttempts(learnerID string, testID uint) (uint, error) {
 	var result models.TestResult
 	err := r.Database.Where("learner_id = ? AND test_id = ?", learnerID, testID).
 		First(&result).Error
@@ -182,19 +183,13 @@ func (r *UserProgressRepository) CheckUserCourseAccess(userID string, courseID u
 func (r *UserProgressRepository) HandleTestAttempt(userID string, testID uint) (uint, error) {
 	var testResult models.TestResult
 
-	// Convert userID from string to uint
-	learnerID, err := strconv.ParseUint(userID, 10, 64)
-	if err != nil {
-		return 0, errors.New("invalid user ID")
-	}
-
 	// Check if the test result already exists
-	err = r.Database.Where("learner_id = ? AND test_id = ?", uint(learnerID), testID).First(&testResult).Error
+	err := r.Database.Where("learner_id = ? AND test_id = ?", userID, testID).First(&testResult).Error
 
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		// No test result found, this is the first attempt, create a new test result
 		testResult = models.TestResult{
-			LearnerID:     uint(learnerID), // Use the converted uint value
+			LearnerID:     userID,
 			TestID:        testID,
 			CurrentChance: 1, // First attempt
 		}

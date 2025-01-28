@@ -119,7 +119,7 @@ type LessonLearner struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	LessonID  uint           `gorm:"primaryKey" json:"course_id"`
-	LearnerID uint           `gorm:"primaryKey" json:"learner_id"`
+	LearnerID string           `gorm:"primaryKey" json:"learner_id"`
 	Lesson    *Lesson        `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"lesson,omitempty"`
 	Learner   *User          `gorm:"foreignKey:LearnerID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"learner,omitempty"`
 	Learned   bool           `json:"learned"`

@@ -2,7 +2,7 @@
     "basePath": "/api/v1",
     "routes": [
       {
-        "path": "/comments/:lesson_id",
+        "path": "/comments/comments/:lesson_id",
         "method": "POST",
         "description": "Create a new comment for a lesson",
         "parameters": [
@@ -60,7 +60,7 @@
         }
       },
       {
-        "path": "/comments/lesson/:lesson_id",
+        "path": "comments/comments/lesson/:lesson_id",
         "method": "GET",
         "description": "Retrieve all comments for a lesson",
         "parameters": [
@@ -85,7 +85,7 @@
         }
       },
       {
-        "path": "/comments/user",
+        "path": "comments/comments/user",
         "method": "GET",
         "description": "Retrieve comments by the authenticated user",
         "parameters": [],

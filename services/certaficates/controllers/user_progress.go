@@ -33,79 +33,59 @@ func NewUserProgressController() *UserProgressController {
 }
 
 func (c *UserProgressController) CheckCourseCompletion(ctx *gin.Context) {
-	courseID := ctx.Param("courseID")
-	userID, exists := ctx.Get("id") // Retrieve user ID from the context
+    courseIDStr := ctx.Param("courseID")
+    userID := ctx.GetString("id")
 
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in context"})
-		return
-	}
+    // Convert courseID to uint
+    courseIDUint, err := strconv.ParseUint(courseIDStr, 10, 64)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid courseID"})
+        return
+    }
 
-	// Convert string parameters to uint
-	courseIDUint, err := strconv.ParseUint(courseID, 10, 32)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid course ID"})
-		return
-	}
-	userIDUint := userID.(uint)
+    success, apiErr := c.userProgressRepo.HasUserSucceededAllTests(uint(courseIDUint), userID)
+    if apiErr != nil {
+        ctx.JSON(apiErr.StatusCode, gin.H{"error": apiErr.Message})
+        return
+    }
 
-	success, apiErr := c.userProgressRepo.HasUserSucceededAllTests(uint(courseIDUint), userIDUint)
-	if apiErr != nil {
-		ctx.JSON(apiErr.StatusCode, gin.H{"error": apiErr.Message})
-		return
-	}
+    if success {
+        // Fetch the user, course, and test results for the certificate
+        var user models.User
+        var course models.Course
+        var testResults []models.TestResult
 
-	if success {
-		// Fetch the user, course, and test results for the certificate
-		var user models.User
-		var course models.Course
-		var testResults []models.TestResult
+        if err := c.userProgressRepo.Database.First(&user, userID).Error; err != nil {
+            ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        if err := c.userProgressRepo.Database.First(&course, courseIDUint).Error; err != nil {
+            ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+        if err := c.userProgressRepo.Database.Where("learner_id = ? AND has_succeed = true", userID).Find(&testResults).Error; err != nil {
+            ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
 
-		if err := c.userProgressRepo.Database.First(&user, userIDUint).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		if err := c.userProgressRepo.Database.First(&course, courseIDUint).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		if err := c.userProgressRepo.Database.Where("learner_id = ? AND has_succeed = true", userIDUint).Find(&testResults).Error; err != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		certificateData := gin.H{
-			"course":      course,
-			"user":        user,
-			"testResults": testResults,
-			"date":        time.Now(),
-		}
-		ctx.JSON(http.StatusOK, certificateData)
-	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "User has not succeeded all tests"})
-	}
+        certificateData := gin.H{
+            "course":      course,
+            "user":        user,
+            "testResults": testResults,
+            "date":        time.Now(),
+        }
+        ctx.JSON(http.StatusOK, certificateData)
+    } else {
+        ctx.JSON(http.StatusOK, gin.H{"message": "User has not succeeded all tests"})
+    }
 }
 
 
 
 
-
-
 func (ctrl *UserProgressController) MarkLessonsAsLearned(ctx *gin.Context) {
-	userID, exists := ctx.Get("id")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return
-	}
-
-	// Convert userID to uint
-	userIDUint, ok := userID.(uint)
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID type"})
-		return
-	}
-
-	// Extract chapter ID from request parameters and convert it to uint
+	userID := ctx.GetString("id")
+	
 	chapterIDStr := ctx.Param("chapterID")
 	chapterID, err := strconv.ParseUint(chapterIDStr, 10, 32)
 	if err != nil {
@@ -114,7 +94,7 @@ func (ctrl *UserProgressController) MarkLessonsAsLearned(ctx *gin.Context) {
 	}
 
 	// Call the repository to mark the lessons as learned
-	apiErr := ctrl.userProgressRepo.MarkLessonsAsLearned(userIDUint, uint(chapterID))
+	apiErr := ctrl.userProgressRepo.MarkLessonsAsLearned(userID, uint(chapterID))
 	if apiErr != nil {
 		ctx.JSON(apiErr.StatusCode, gin.H{"error": apiErr.Message})
 		return
@@ -133,21 +113,8 @@ func (upc *UserProgressController) GetTestByChapter(c *gin.Context) {
     }
 
     // Get user ID from context
-    userIDInterface, exists := c.Get("id")
-    if !exists {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-        return
-    }
+    userID:= c.GetString("id")
     
-    // Convert user ID to uint 
-    userID, ok := userIDInterface.(uint)
-    if !ok {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
-        return
-    }
-
-    // Convert userID to string (if repository expects string)
-    userIDStr := strconv.FormatUint(uint64(userID), 10)
 
     // Check if chapter exists and get associated course
     chapter, err := upc.userProgressRepo.GetChapterWithCourse(uint(chapterID))
@@ -157,7 +124,7 @@ func (upc *UserProgressController) GetTestByChapter(c *gin.Context) {
     }
 
     // Check course access FIRST before fetching test
-    hasAccess, err := upc.userProgressRepo.CheckUserCourseAccess(userIDStr, chapter.CourseID)
+    hasAccess, err := upc.userProgressRepo.CheckUserCourseAccess(userID, chapter.CourseID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to verify course access"})
         return
@@ -175,7 +142,7 @@ func (upc *UserProgressController) GetTestByChapter(c *gin.Context) {
     }
 
     // Handle test attempt
-    currentChance, err := upc.userProgressRepo.HandleTestAttempt(userIDStr, test.ID)
+    currentChance, err := upc.userProgressRepo.HandleTestAttempt(userID, test.ID)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to handle test attempt"})
         return
@@ -205,16 +172,8 @@ func (upc *UserProgressController) SubmitTestAnswers(c *gin.Context) {
 	}
 
 	// Get user ID from context
-	userIDInterface, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return
-	}
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
-		return
-	}
+	userID:= c.GetString("id")
+	
 
 	// Parse request body
 	var userAnswers []struct {
@@ -328,20 +287,11 @@ func (upc *UserProgressController) SubmitTestAnswers(c *gin.Context) {
 
 
 func (upc *UserProgressController) GetTestResult(c *gin.Context) {
-	// Get user ID from context
-	userIDInterface, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
-		return
-	}
 
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
-		return
-	}
 
-	// Get test ID from URL params
+
+	userID:= c.GetString("id")
+	
 	testID, err := strconv.ParseUint(c.Param("test_id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid test ID"})
