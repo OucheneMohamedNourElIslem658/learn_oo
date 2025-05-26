@@ -41,7 +41,6 @@ func (UsersRouter *ProfilesRepository) GetUser(id, appendWith string) (user *mod
 	)
 	for _, extention := range validExtentions {
 		if extention == "Courses" {
-			fmt.Println(extention)
 			query = query.Debug().Preload("Courses.Author.User").Preload("Courses.Image").Preload("Courses.Video")
 		} else {
 			query = query.Preload(extention)
@@ -139,7 +138,6 @@ func (UsersRouter *ProfilesRepository) UpdateUserImage(id string, image multipar
 		}
 	}
 
-	fmt.Println(uploadData.Url)
 	newImage := models.File{
 		URL:          uploadData.Url,
 		ImageKitID:   &uploadData.FileId,

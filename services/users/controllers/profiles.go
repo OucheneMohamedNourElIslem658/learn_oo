@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"mime/multipart"
 	"net/http"
 
@@ -45,7 +44,6 @@ func (pc *ProfilesController) UpdateUser(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		message := utils.ValidationErrorResponse(err)
 		ctx.JSON(http.StatusBadRequest, message)
-		fmt.Println(err.Error())
 		return
 	}
 
@@ -138,7 +136,6 @@ func (pc *ProfilesController) UpdateAuthor(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		message := utils.ValidationErrorResponse(err)
 		ctx.JSON(http.StatusBadRequest, message)
-		fmt.Println(err.Error())
 		return
 	}
 

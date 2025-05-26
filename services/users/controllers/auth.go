@@ -227,7 +227,6 @@ func (authcontroller *AuthController) OAuthCallback(ctx *gin.Context) {
 	authRepository := authcontroller.authRepository
 
 	if idToken, refreshToken, err := authRepository.OAuthCallback(provider, code, ctx.Request.Context()); err != nil {
-		fmt.Println("failure")
 		failureURL := fmt.Sprintf("%v?message=%v", metadata.FailureURL, err.Message)
 		ctx.Redirect(http.StatusTemporaryRedirect, failureURL)
 	} else {

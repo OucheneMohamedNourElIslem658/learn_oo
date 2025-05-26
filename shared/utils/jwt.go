@@ -2,7 +2,6 @@ package utils
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -108,7 +107,6 @@ func VerifyIDTokenFromEmail(idToken string) (email *string, isValid bool, err er
 }
 
 func CreateRefreshToken(id string) (string, error) {
-	fmt.Println(id)
 	jwtIdToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{

@@ -61,7 +61,6 @@ func (cr *CoursesRepository) CreateCourse(authorID string, course CreatedCourseD
 	}
 
 	videoUploadResult, err := filestorage.UploadFile(video, fmt.Sprintf("/learn_oo/authors/%v/courses/videos", authorID))
-	fmt.Println(videoUploadResult.Url)
 	if err != nil {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,
@@ -136,7 +135,6 @@ func (cr *CoursesRepository) GetCourse(ID, userID, authorID, appendWith string) 
 	)
 
 	for _, extention := range validExtentions {
-		fmt.Println(extention)
 		switch extention {
 		case "Chapters":
 			query = query.Preload(extention, func(db *gorm.DB) *gorm.DB {

@@ -16,7 +16,6 @@ import (
 )
 
 func TestCreateCourseEndpoint(t *testing.T) {
-	fmt.Println("Testing course creation :")
 	client := resty.New()
 
 	baseURL := "https://learn-oo-api.onrender.com/api/v1"
@@ -80,7 +79,6 @@ func TestCreateCourseEndpoint(t *testing.T) {
 }
 
 func TestUserAuthentification(t *testing.T) {
-	fmt.Println("Testing user authentification :")
 	client := resty.New()
 
 	baseURL := "https://learn-oo-api.onrender.com/api/v1"
@@ -89,7 +87,6 @@ func TestUserAuthentification(t *testing.T) {
 		randomEmail := func() string {
 			rand.Seed(time.Now().UnixNano())
 			randomInt := rand.Int()
-			fmt.Println("Random Integer:", randomInt)
 			return fmt.Sprintf("test%v@gmail.com", randomInt)
 		}()
 
@@ -100,8 +97,6 @@ func TestUserAuthentification(t *testing.T) {
 				"password":  "123456",
 				"full_name": "test",
 			}).Post(baseURL + "/users/auth/register-with-email-and-password")
-
-		fmt.Println(resp.String())
 
 		assert.NoError(t, err)
 		assert.Equal(t, 201, resp.StatusCode())
@@ -153,8 +148,6 @@ func TestUsersAuthorization(t *testing.T) {
 		return token
 	}()
 
-	fmt.Println(randomIDToken)
-
 	router := gin.New()
 	router.GET("/",
 		authorization,
@@ -170,8 +163,6 @@ func TestUsersAuthorization(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", randomIDToken))
 	router.ServeHTTP(w, req)
-
-	fmt.Println(w.Body.String())
 
 	assert.Equal(t, 200, w.Code)
 }
