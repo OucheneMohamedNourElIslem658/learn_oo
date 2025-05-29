@@ -4,8 +4,14 @@ package auth;
 
 option go_package = ".";
 
+import "google/protobuf/empty.proto";
+
 service AuthService {
   rpc RegisterWithEmailAndPassword(RegisterRequest) returns (RegisterResponse);
+  rpc LoginWithEmailAndPassword(LoginRequest) returns (LoginResponse);
+  rpc SendEmailVerificationLink(EmailLinkRequest) returns (google.protobuf.Empty);
+  rpc SendPasswordResetLink(EmailLinkRequest) returns (google.protobuf.Empty);
+  rpc GetProfile(google.protobuf.Empty) returns (Profile);
 }
 
 message RegisterRequest {
@@ -16,4 +22,25 @@ message RegisterRequest {
 
 message RegisterResponse {
   string message = 1;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string id_token = 1;
+  string refresh_token = 2;
+}
+
+message EmailLinkRequest {
+  string email = 1;
+}
+
+message Profile {
+  string id = 1;
+  string full_name = 2;
+  string email = 3;
+  bool email_verified = 4;
 }

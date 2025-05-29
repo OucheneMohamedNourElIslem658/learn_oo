@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,6 +21,10 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	AuthService_RegisterWithEmailAndPassword_FullMethodName = "/auth.AuthService/RegisterWithEmailAndPassword"
+	AuthService_LoginWithEmailAndPassword_FullMethodName    = "/auth.AuthService/LoginWithEmailAndPassword"
+	AuthService_SendEmailVerificationLink_FullMethodName    = "/auth.AuthService/SendEmailVerificationLink"
+	AuthService_SendPasswordResetLink_FullMethodName        = "/auth.AuthService/SendPasswordResetLink"
+	AuthService_GetProfile_FullMethodName                   = "/auth.AuthService/GetProfile"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -27,6 +32,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	RegisterWithEmailAndPassword(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	LoginWithEmailAndPassword(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	SendEmailVerificationLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendPasswordResetLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Profile, error)
 }
 
 type authServiceClient struct {
@@ -47,11 +56,55 @@ func (c *authServiceClient) RegisterWithEmailAndPassword(ctx context.Context, in
 	return out, nil
 }
 
+func (c *authServiceClient) LoginWithEmailAndPassword(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, AuthService_LoginWithEmailAndPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SendEmailVerificationLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AuthService_SendEmailVerificationLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SendPasswordResetLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AuthService_SendPasswordResetLink_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Profile, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Profile)
+	err := c.cc.Invoke(ctx, AuthService_GetProfile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 type AuthServiceServer interface {
 	RegisterWithEmailAndPassword(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	LoginWithEmailAndPassword(context.Context, *LoginRequest) (*LoginResponse, error)
+	SendEmailVerificationLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
+	SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
+	GetProfile(context.Context, *emptypb.Empty) (*Profile, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -64,6 +117,18 @@ type UnimplementedAuthServiceServer struct{}
 
 func (UnimplementedAuthServiceServer) RegisterWithEmailAndPassword(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterWithEmailAndPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) LoginWithEmailAndPassword(context.Context, *LoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithEmailAndPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) SendEmailVerificationLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmailVerificationLink not implemented")
+}
+func (UnimplementedAuthServiceServer) SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendPasswordResetLink not implemented")
+}
+func (UnimplementedAuthServiceServer) GetProfile(context.Context, *emptypb.Empty) (*Profile, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -104,6 +169,78 @@ func _AuthService_RegisterWithEmailAndPassword_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_LoginWithEmailAndPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LoginWithEmailAndPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LoginWithEmailAndPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LoginWithEmailAndPassword(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SendEmailVerificationLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendEmailVerificationLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SendEmailVerificationLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendEmailVerificationLink(ctx, req.(*EmailLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SendPasswordResetLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailLinkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendPasswordResetLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SendPasswordResetLink_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendPasswordResetLink(ctx, req.(*EmailLinkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetProfile(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +251,22 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterWithEmailAndPassword",
 			Handler:    _AuthService_RegisterWithEmailAndPassword_Handler,
+		},
+		{
+			MethodName: "LoginWithEmailAndPassword",
+			Handler:    _AuthService_LoginWithEmailAndPassword_Handler,
+		},
+		{
+			MethodName: "SendEmailVerificationLink",
+			Handler:    _AuthService_SendEmailVerificationLink_Handler,
+		},
+		{
+			MethodName: "SendPasswordResetLink",
+			Handler:    _AuthService_SendPasswordResetLink_Handler,
+		},
+		{
+			MethodName: "GetProfile",
+			Handler:    _AuthService_GetProfile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
