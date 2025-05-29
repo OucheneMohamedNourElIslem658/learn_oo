@@ -1,6 +1,6 @@
 package utils
 
 type APIError struct {
-	Message    any
+	Message    string
 	StatusCode int
 }

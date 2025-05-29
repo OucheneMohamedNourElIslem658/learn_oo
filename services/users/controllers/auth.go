@@ -131,8 +131,8 @@ func (authcontroller *AuthController) RefreshIdToken(ctx *gin.Context) {
 			"error": err.Message,
 		})
 	} else {
-		ctx.JSON(http.StatusOK, nil)
 		ctx.SetCookie("id_token", *idToken, 3600, "/", "localhost", false, true)
+		ctx.JSON(http.StatusOK, nil)
 	}
 }
 

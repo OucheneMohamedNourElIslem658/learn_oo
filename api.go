@@ -37,14 +37,21 @@ func (server *Server) Run() {
 	router.Use(gin.Logger())
 	// services\users\views
 	router.MaxMultipartMemory = 10 << 20
-	router.LoadHTMLGlob("services/users/views/*")
+	router.Static("/static", "./views/static")
+	router.LoadHTMLGlob("views/*.html")
+	
+
+	// Home route
+	router.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "home.html", nil)
+	})
 
 	v1 := router.Group("/api/v1")
 
 	v1.GET("/", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "Welcome To Learn_oo API V1")
+		ctx.HTML(http.StatusOK, "api.html", nil)
 	})
-
+	
 	usersRouter := v1.Group("/users")
 
 	subRoute := usersRouter.Group("/auth")
