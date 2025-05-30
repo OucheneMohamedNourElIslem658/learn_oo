@@ -24,7 +24,6 @@ const (
 	AuthService_LoginWithEmailAndPassword_FullMethodName    = "/auth.AuthService/LoginWithEmailAndPassword"
 	AuthService_SendEmailVerificationLink_FullMethodName    = "/auth.AuthService/SendEmailVerificationLink"
 	AuthService_SendPasswordResetLink_FullMethodName        = "/auth.AuthService/SendPasswordResetLink"
-	AuthService_GetProfile_FullMethodName                   = "/auth.AuthService/GetProfile"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -35,7 +34,6 @@ type AuthServiceClient interface {
 	LoginWithEmailAndPassword(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	SendEmailVerificationLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SendPasswordResetLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Profile, error)
 }
 
 type authServiceClient struct {
@@ -86,16 +84,6 @@ func (c *authServiceClient) SendPasswordResetLink(ctx context.Context, in *Email
 	return out, nil
 }
 
-func (c *authServiceClient) GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Profile, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Profile)
-	err := c.cc.Invoke(ctx, AuthService_GetProfile_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -104,7 +92,6 @@ type AuthServiceServer interface {
 	LoginWithEmailAndPassword(context.Context, *LoginRequest) (*LoginResponse, error)
 	SendEmailVerificationLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
 	SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
-	GetProfile(context.Context, *emptypb.Empty) (*Profile, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -126,9 +113,6 @@ func (UnimplementedAuthServiceServer) SendEmailVerificationLink(context.Context,
 }
 func (UnimplementedAuthServiceServer) SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPasswordResetLink not implemented")
-}
-func (UnimplementedAuthServiceServer) GetProfile(context.Context, *emptypb.Empty) (*Profile, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -223,24 +207,6 @@ func _AuthService_SendPasswordResetLink_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GetProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).GetProfile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AuthService_GetProfile_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetProfile(ctx, req.(*emptypb.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -263,10 +229,6 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendPasswordResetLink",
 			Handler:    _AuthService_SendPasswordResetLink_Handler,
-		},
-		{
-			MethodName: "GetProfile",
-			Handler:    _AuthService_GetProfile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

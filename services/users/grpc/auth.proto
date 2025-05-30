@@ -11,7 +11,6 @@ service AuthService {
   rpc LoginWithEmailAndPassword(LoginRequest) returns (LoginResponse);
   rpc SendEmailVerificationLink(EmailLinkRequest) returns (google.protobuf.Empty);
   rpc SendPasswordResetLink(EmailLinkRequest) returns (google.protobuf.Empty);
-  rpc GetProfile(google.protobuf.Empty) returns (Profile);
 }
 
 message RegisterRequest {
@@ -36,11 +35,4 @@ message LoginResponse {
 
 message EmailLinkRequest {
   string email = 1;
-}
-
-message Profile {
-  string id = 1;
-  string full_name = 2;
-  string email = 3;
-  bool email_verified = 4;
 }

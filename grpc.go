@@ -4,8 +4,9 @@ import (
 	"log"
 	"net"
 
-	"google.golang.org/grpc"
 	authpb "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/grpc"
+	"github.com/OucheneMohamedNourElIslem658/learn_oo/shared/middlewares"
+	"google.golang.org/grpc"
 
 	usersRouters "github.com/OucheneMohamedNourElIslem658/learn_oo/services/users/routers"
 )
@@ -26,10 +27,15 @@ func (server *GRPCServer) Run() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	authService := usersRouters.NewAuthServiceServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(middlewares.AuthorizationUnaryInterceptor()),
+	)
 
+	authService := usersRouters.NewAuthServiceServer()
 	authpb.RegisterAuthServiceServer(grpcServer, authService)
+
+	profilesService := usersRouters.NewProfilesServiceServer()
+	authpb.RegisterProfilesServiceServer(grpcServer, profilesService)
 
 	log.Printf("Listening and serving (grpc) at %v\n", "tcp:"+server.address)
 	if err := grpcServer.Serve(lis); err != nil {

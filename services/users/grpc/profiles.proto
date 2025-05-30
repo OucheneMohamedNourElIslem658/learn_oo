@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = ".";
+
+import "google/protobuf/empty.proto";
+
+service ProfilesService {
+  rpc GetProfile(google.protobuf.Empty) returns (Profile);
+}
+
+message Profile {
+  string id = 1;
+  string full_name = 2;
+  string email = 3;
+  bool email_verified = 4;
+  optional File image = 5;
+  optional Author author_profile = 6;
+  repeated Course courses = 7;
+}
+
+message Author {
+  string id = 1;
+  string bio = 2;
+  int32 balance = 3;
+}
+
+message Course {
+  uint64 id = 1;
+  string title = 2;
+  string description = 3;
+  double price = 4;
+  string payment_price_id = 5;
+  string payment_product_id = 6;
+  string language = 7;
+  string level = 8;
+  uint64 duration = 9;
+  double rate = 10;
+  uint64 raters_count = 11;
+  bool is_completed = 12;
+  File video = 15;
+  File image = 16;
+  string author_id = 17;
+  Author author = 18;
+}
+
+message File {
+  uint64 id = 1;
+  string url = 2;
+  int32 height = 4;
+  int32 width = 5;
+  optional string thumbnail_url = 6;
+}
