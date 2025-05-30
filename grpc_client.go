@@ -25,9 +25,9 @@ func runTestGRPC() {
 	ctx := context.Background()
 	// defer cancel()
 
-	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiJob29vb29vIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImV4cCI6MTc0ODc3NTc2OCwiaWQiOiIzNzhmMjAxNC01MzMxLTQyZWMtYWY1MC01YmQ4OWNiMDM3NjcifQ.QjhLDZTH9bRpQmqsFz491iLnAj9Hw283HY-vbjtBMWk")
+	ctx = metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JfaWQiOiJmOWU3ZjBhNy1jYTZjLTQ3ZDEtYTE5Ni01YjY3MzRmYTNlYjkiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZXhwIjoxNzQ4Nzg1Mzk2LCJpZCI6IjM3OGYyMDE0LTUzMzEtNDJlYy1hZjUwLTViZDg5Y2IwMzc2NyJ9.BsnM9Fwng7zW0PwHP5D1TUkDeY3BXwxWckWorMbbUf0")
 
-	resp, err := client.GetProfile(ctx, nil)
+	resp, err := client.UpgradeToAuthor(ctx, nil)
 
 	if err != nil {
 		log.Fatalf("gRPC call failed: %v", err)

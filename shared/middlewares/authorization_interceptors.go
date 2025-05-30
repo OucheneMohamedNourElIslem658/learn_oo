@@ -47,7 +47,7 @@ func AuthorizationUnaryInterceptor() grpc.UnaryServerInterceptor {
 				}
 				ctx = context.WithValue(ctx, "id", claims.ID)
 				if claims.AuthorID != nil {
-					ctx = context.WithValue(ctx, ContextKeyAuthorID, *claims.AuthorID)
+					ctx = context.WithValue(ctx, "author_id", *claims.AuthorID)
 				}
 			}
 		}

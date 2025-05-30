@@ -274,6 +274,50 @@ func (x *EmailLinkRequest) GetEmail() string {
 	return ""
 }
 
+type RefreshIDTokenReponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IdToken       string                 `protobuf:"bytes,1,opt,name=id_token,json=idToken,proto3" json:"id_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RefreshIDTokenReponse) Reset() {
+	*x = RefreshIDTokenReponse{}
+	mi := &file_auth_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RefreshIDTokenReponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RefreshIDTokenReponse) ProtoMessage() {}
+
+func (x *RefreshIDTokenReponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RefreshIDTokenReponse.ProtoReflect.Descriptor instead.
+func (*RefreshIDTokenReponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *RefreshIDTokenReponse) GetIdToken() string {
+	if x != nil {
+		return x.IdToken
+	}
+	return ""
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -293,12 +337,15 @@ const file_auth_proto_rawDesc = "" +
 	"\bid_token\x18\x01 \x01(\tR\aidToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"(\n" +
 	"\x10EmailLinkRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email2\xb8\x02\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\"2\n" +
+	"\x15RefreshIDTokenReponse\x12\x19\n" +
+	"\bid_token\x18\x01 \x01(\tR\aidToken2\xff\x02\n" +
 	"\vAuthService\x12M\n" +
 	"\x1cRegisterWithEmailAndPassword\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x12D\n" +
 	"\x19LoginWithEmailAndPassword\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x12K\n" +
 	"\x19SendEmailVerificationLink\x12\x16.auth.EmailLinkRequest\x1a\x16.google.protobuf.Empty\x12G\n" +
-	"\x15SendPasswordResetLink\x12\x16.auth.EmailLinkRequest\x1a\x16.google.protobuf.EmptyB\x03Z\x01.b\x06proto3"
+	"\x15SendPasswordResetLink\x12\x16.auth.EmailLinkRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
+	"\x0eRefreshIDToken\x12\x16.google.protobuf.Empty\x1a\x1b.auth.RefreshIDTokenReponseB\x03Z\x01.b\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -312,26 +359,29 @@ func file_auth_proto_rawDescGZIP() []byte {
 	return file_auth_proto_rawDescData
 }
 
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: auth.RegisterRequest
-	(*RegisterResponse)(nil), // 1: auth.RegisterResponse
-	(*LoginRequest)(nil),     // 2: auth.LoginRequest
-	(*LoginResponse)(nil),    // 3: auth.LoginResponse
-	(*EmailLinkRequest)(nil), // 4: auth.EmailLinkRequest
-	(*emptypb.Empty)(nil),    // 5: google.protobuf.Empty
+	(*RegisterRequest)(nil),       // 0: auth.RegisterRequest
+	(*RegisterResponse)(nil),      // 1: auth.RegisterResponse
+	(*LoginRequest)(nil),          // 2: auth.LoginRequest
+	(*LoginResponse)(nil),         // 3: auth.LoginResponse
+	(*EmailLinkRequest)(nil),      // 4: auth.EmailLinkRequest
+	(*RefreshIDTokenReponse)(nil), // 5: auth.RefreshIDTokenReponse
+	(*emptypb.Empty)(nil),         // 6: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
 	0, // 0: auth.AuthService.RegisterWithEmailAndPassword:input_type -> auth.RegisterRequest
 	2, // 1: auth.AuthService.LoginWithEmailAndPassword:input_type -> auth.LoginRequest
 	4, // 2: auth.AuthService.SendEmailVerificationLink:input_type -> auth.EmailLinkRequest
 	4, // 3: auth.AuthService.SendPasswordResetLink:input_type -> auth.EmailLinkRequest
-	1, // 4: auth.AuthService.RegisterWithEmailAndPassword:output_type -> auth.RegisterResponse
-	3, // 5: auth.AuthService.LoginWithEmailAndPassword:output_type -> auth.LoginResponse
-	5, // 6: auth.AuthService.SendEmailVerificationLink:output_type -> google.protobuf.Empty
-	5, // 7: auth.AuthService.SendPasswordResetLink:output_type -> google.protobuf.Empty
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	6, // 4: auth.AuthService.RefreshIDToken:input_type -> google.protobuf.Empty
+	1, // 5: auth.AuthService.RegisterWithEmailAndPassword:output_type -> auth.RegisterResponse
+	3, // 6: auth.AuthService.LoginWithEmailAndPassword:output_type -> auth.LoginResponse
+	6, // 7: auth.AuthService.SendEmailVerificationLink:output_type -> google.protobuf.Empty
+	6, // 8: auth.AuthService.SendPasswordResetLink:output_type -> google.protobuf.Empty
+	5, // 9: auth.AuthService.RefreshIDToken:output_type -> auth.RefreshIDTokenReponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -348,7 +398,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

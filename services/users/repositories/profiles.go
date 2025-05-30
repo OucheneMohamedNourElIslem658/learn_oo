@@ -182,7 +182,7 @@ func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *uti
 	}
 
 	var author models.Author
-	err = database.Unscoped().Where("user_id = ?", user.ID).First(&author).Error
+	err = database.Where("user_id = ?", user.ID).Unscoped().First(&author).Error
 	if err == nil {
 		err = database.Model(models.Author{}).Where("id = ?", author.ID).Unscoped().Update("deleted_at", nil).Error
 		if err != nil {
@@ -205,6 +205,8 @@ func (UsersRouter *ProfilesRepository) UpgradeToAuthor(id string) (apiError *uti
 				Message:    err.Error(),
 			}
 		}
+
+		return nil
 	} else if err != gorm.ErrRecordNotFound {
 		return &utils.APIError{
 			StatusCode: http.StatusInternalServerError,

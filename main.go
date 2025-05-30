@@ -16,8 +16,8 @@ func init() {
 
 func main() {
 	// go func() {
-		// server := NewServer("0.0.0.0:8000")
-		// server.Run()
+	// 	server := NewServer("0.0.0.0:8000")
+	// 	server.Run()
 	// }()
 
 	// gPRCServer := NewGRPCServer(":50051")

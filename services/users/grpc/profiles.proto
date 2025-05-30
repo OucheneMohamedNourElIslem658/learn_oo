@@ -8,6 +8,11 @@ import "google/protobuf/empty.proto";
 
 service ProfilesService {
   rpc GetProfile(google.protobuf.Empty) returns (Profile);
+  rpc UpgradeToAuthor(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc DowngradeToUser(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc GetAuthor(GetAuthorRequest) returns (Author);
+  rpc AddAccomplishment(AddAccomplishmentRequest) returns (google.protobuf.Empty);
+  rpc DeleteAccomplishment(DeleteAccomplishmentRequest) returns (google.protobuf.Empty);
 }
 
 message Profile {
@@ -24,6 +29,8 @@ message Author {
   string id = 1;
   string bio = 2;
   int32 balance = 3;
+  Profile user_profile = 4;
+  repeated File accomplishments = 5;
 }
 
 message Course {
@@ -51,4 +58,18 @@ message File {
   int32 height = 4;
   int32 width = 5;
   optional string thumbnail_url = 6;
+}
+
+message GetAuthorRequest {
+  string id = 1;
+}
+
+message AddAccomplishmentRequest {
+  bytes file_content = 1;
+  string file_name = 2;
+  string content_type = 3;
+}
+
+message DeleteAccomplishmentRequest {
+  string id = 1;
 }

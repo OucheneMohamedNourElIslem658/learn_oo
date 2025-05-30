@@ -20,7 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProfilesService_GetProfile_FullMethodName = "/auth.ProfilesService/GetProfile"
+	ProfilesService_GetProfile_FullMethodName           = "/auth.ProfilesService/GetProfile"
+	ProfilesService_UpgradeToAuthor_FullMethodName      = "/auth.ProfilesService/UpgradeToAuthor"
+	ProfilesService_DowngradeToUser_FullMethodName      = "/auth.ProfilesService/DowngradeToUser"
+	ProfilesService_GetAuthor_FullMethodName            = "/auth.ProfilesService/GetAuthor"
+	ProfilesService_AddAccomplishment_FullMethodName    = "/auth.ProfilesService/AddAccomplishment"
+	ProfilesService_DeleteAccomplishment_FullMethodName = "/auth.ProfilesService/DeleteAccomplishment"
 )
 
 // ProfilesServiceClient is the client API for ProfilesService service.
@@ -28,6 +33,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProfilesServiceClient interface {
 	GetProfile(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*Profile, error)
+	UpgradeToAuthor(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DowngradeToUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetAuthor(ctx context.Context, in *GetAuthorRequest, opts ...grpc.CallOption) (*Author, error)
+	AddAccomplishment(ctx context.Context, in *AddAccomplishmentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteAccomplishment(ctx context.Context, in *DeleteAccomplishmentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type profilesServiceClient struct {
@@ -48,11 +58,66 @@ func (c *profilesServiceClient) GetProfile(ctx context.Context, in *emptypb.Empt
 	return out, nil
 }
 
+func (c *profilesServiceClient) UpgradeToAuthor(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ProfilesService_UpgradeToAuthor_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profilesServiceClient) DowngradeToUser(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ProfilesService_DowngradeToUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profilesServiceClient) GetAuthor(ctx context.Context, in *GetAuthorRequest, opts ...grpc.CallOption) (*Author, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Author)
+	err := c.cc.Invoke(ctx, ProfilesService_GetAuthor_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profilesServiceClient) AddAccomplishment(ctx context.Context, in *AddAccomplishmentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ProfilesService_AddAccomplishment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profilesServiceClient) DeleteAccomplishment(ctx context.Context, in *DeleteAccomplishmentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, ProfilesService_DeleteAccomplishment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfilesServiceServer is the server API for ProfilesService service.
 // All implementations must embed UnimplementedProfilesServiceServer
 // for forward compatibility.
 type ProfilesServiceServer interface {
 	GetProfile(context.Context, *emptypb.Empty) (*Profile, error)
+	UpgradeToAuthor(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	DowngradeToUser(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	GetAuthor(context.Context, *GetAuthorRequest) (*Author, error)
+	AddAccomplishment(context.Context, *AddAccomplishmentRequest) (*emptypb.Empty, error)
+	DeleteAccomplishment(context.Context, *DeleteAccomplishmentRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedProfilesServiceServer()
 }
 
@@ -65,6 +130,21 @@ type UnimplementedProfilesServiceServer struct{}
 
 func (UnimplementedProfilesServiceServer) GetProfile(context.Context, *emptypb.Empty) (*Profile, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (UnimplementedProfilesServiceServer) UpgradeToAuthor(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpgradeToAuthor not implemented")
+}
+func (UnimplementedProfilesServiceServer) DowngradeToUser(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DowngradeToUser not implemented")
+}
+func (UnimplementedProfilesServiceServer) GetAuthor(context.Context, *GetAuthorRequest) (*Author, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuthor not implemented")
+}
+func (UnimplementedProfilesServiceServer) AddAccomplishment(context.Context, *AddAccomplishmentRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAccomplishment not implemented")
+}
+func (UnimplementedProfilesServiceServer) DeleteAccomplishment(context.Context, *DeleteAccomplishmentRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAccomplishment not implemented")
 }
 func (UnimplementedProfilesServiceServer) mustEmbedUnimplementedProfilesServiceServer() {}
 func (UnimplementedProfilesServiceServer) testEmbeddedByValue()                         {}
@@ -105,6 +185,96 @@ func _ProfilesService_GetProfile_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfilesService_UpgradeToAuthor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).UpgradeToAuthor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_UpgradeToAuthor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).UpgradeToAuthor(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfilesService_DowngradeToUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).DowngradeToUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_DowngradeToUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).DowngradeToUser(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfilesService_GetAuthor_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuthorRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).GetAuthor(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_GetAuthor_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).GetAuthor(ctx, req.(*GetAuthorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfilesService_AddAccomplishment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddAccomplishmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).AddAccomplishment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_AddAccomplishment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).AddAccomplishment(ctx, req.(*AddAccomplishmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfilesService_DeleteAccomplishment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAccomplishmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).DeleteAccomplishment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_DeleteAccomplishment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).DeleteAccomplishment(ctx, req.(*DeleteAccomplishmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfilesService_ServiceDesc is the grpc.ServiceDesc for ProfilesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,6 +285,26 @@ var ProfilesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetProfile",
 			Handler:    _ProfilesService_GetProfile_Handler,
+		},
+		{
+			MethodName: "UpgradeToAuthor",
+			Handler:    _ProfilesService_UpgradeToAuthor_Handler,
+		},
+		{
+			MethodName: "DowngradeToUser",
+			Handler:    _ProfilesService_DowngradeToUser_Handler,
+		},
+		{
+			MethodName: "GetAuthor",
+			Handler:    _ProfilesService_GetAuthor_Handler,
+		},
+		{
+			MethodName: "AddAccomplishment",
+			Handler:    _ProfilesService_AddAccomplishment_Handler,
+		},
+		{
+			MethodName: "DeleteAccomplishment",
+			Handler:    _ProfilesService_DeleteAccomplishment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

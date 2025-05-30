@@ -24,6 +24,7 @@ const (
 	AuthService_LoginWithEmailAndPassword_FullMethodName    = "/auth.AuthService/LoginWithEmailAndPassword"
 	AuthService_SendEmailVerificationLink_FullMethodName    = "/auth.AuthService/SendEmailVerificationLink"
 	AuthService_SendPasswordResetLink_FullMethodName        = "/auth.AuthService/SendPasswordResetLink"
+	AuthService_RefreshIDToken_FullMethodName               = "/auth.AuthService/RefreshIDToken"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -34,6 +35,7 @@ type AuthServiceClient interface {
 	LoginWithEmailAndPassword(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	SendEmailVerificationLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SendPasswordResetLink(ctx context.Context, in *EmailLinkRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RefreshIDToken(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RefreshIDTokenReponse, error)
 }
 
 type authServiceClient struct {
@@ -84,6 +86,16 @@ func (c *authServiceClient) SendPasswordResetLink(ctx context.Context, in *Email
 	return out, nil
 }
 
+func (c *authServiceClient) RefreshIDToken(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*RefreshIDTokenReponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefreshIDTokenReponse)
+	err := c.cc.Invoke(ctx, AuthService_RefreshIDToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -92,6 +104,7 @@ type AuthServiceServer interface {
 	LoginWithEmailAndPassword(context.Context, *LoginRequest) (*LoginResponse, error)
 	SendEmailVerificationLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
 	SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error)
+	RefreshIDToken(context.Context, *emptypb.Empty) (*RefreshIDTokenReponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -113,6 +126,9 @@ func (UnimplementedAuthServiceServer) SendEmailVerificationLink(context.Context,
 }
 func (UnimplementedAuthServiceServer) SendPasswordResetLink(context.Context, *EmailLinkRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPasswordResetLink not implemented")
+}
+func (UnimplementedAuthServiceServer) RefreshIDToken(context.Context, *emptypb.Empty) (*RefreshIDTokenReponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefreshIDToken not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -207,6 +223,24 @@ func _AuthService_SendPasswordResetLink_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_RefreshIDToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RefreshIDToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RefreshIDToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RefreshIDToken(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +263,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendPasswordResetLink",
 			Handler:    _AuthService_SendPasswordResetLink_Handler,
+		},
+		{
+			MethodName: "RefreshIDToken",
+			Handler:    _AuthService_RefreshIDToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

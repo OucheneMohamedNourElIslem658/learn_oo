@@ -11,6 +11,7 @@ service AuthService {
   rpc LoginWithEmailAndPassword(LoginRequest) returns (LoginResponse);
   rpc SendEmailVerificationLink(EmailLinkRequest) returns (google.protobuf.Empty);
   rpc SendPasswordResetLink(EmailLinkRequest) returns (google.protobuf.Empty);
+  rpc RefreshIDToken(google.protobuf.Empty) returns (RefreshIDTokenReponse);
 }
 
 message RegisterRequest {
@@ -35,4 +36,8 @@ message LoginResponse {
 
 message EmailLinkRequest {
   string email = 1;
+}
+
+message RefreshIDTokenReponse {
+  string id_token = 1;
 }

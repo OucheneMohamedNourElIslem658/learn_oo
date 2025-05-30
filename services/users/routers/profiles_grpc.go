@@ -124,3 +124,71 @@ func (s *ProfilesServiceServer) GetProfile(ctx context.Context, req *emptypb.Emp
 		}(),
 	}, nil
 }
+
+func (s *ProfilesServiceServer) UpgradeToAuthor(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
+	id, ok := ctx.Value("id").(string)
+	if !ok || id == "" {
+		return nil, errors.New("requester is not a user")
+	}
+
+	apiErr := s.usersRepo.UpgradeToAuthor(id)
+	if apiErr != nil {
+		return nil, errors.New(apiErr.Message)
+	}
+
+	return nil, nil
+}
+
+func (s *ProfilesServiceServer) DowngradeToUser(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
+	id, ok := ctx.Value("author_id").(string)
+	if !ok || id == "" {
+		return nil, errors.New("requester is not an author")
+	}
+
+	apiErr := s.usersRepo.DowngradeFromAuthor(id)
+	if apiErr != nil {
+		return nil, errors.New(apiErr.Message)
+	}
+
+	return nil, nil
+}
+
+func (s *ProfilesServiceServer) GetAuthor(ctx context.Context, req *authpb.GetAuthorRequest) (*authpb.Author, error) {
+	author, apiErr := s.usersRepo.GetAuthor(req.Id, "accomplishments,user")
+	if apiErr != nil {
+		return nil, errors.New(apiErr.Message)
+	}
+
+	bio, err := json.Marshal(author.Bio)
+	if err != nil {
+		return nil, errors.New("error marshaling bio")
+	}
+
+	user := author.User
+
+	accomplishments := []*authpb.File{};
+	for _, a := range author.Accomplishments {
+		accomplishments = append(accomplishments, &authpb.File{
+			Url: a.URL,
+			Id:           uint64(a.ID),
+			Height:       int32(a.Height),
+			Width:        int32(a.Width),
+			ThumbnailUrl: a.ThumbnailURL,
+		})
+	}
+
+	response := &authpb.Author{
+		Id: author.ID,
+		Bio: string(bio),
+		Balance: int32(author.Balance),
+		UserProfile: &authpb.Profile{
+			Id: author.UserID,
+			Email: user.Email,
+			FullName: user.FullName,
+			EmailVerified: user.EmailVerified,
+		},
+		Accomplishments: accomplishments,
+	}
+
+	return response, nil
+}

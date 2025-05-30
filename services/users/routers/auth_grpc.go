@@ -74,6 +74,26 @@ func (s *AuthServiceServer) SendPasswordResetLink(ctx context.Context, req *auth
 	return &emptypb.Empty{}, nil
 }
 
+func (s *AuthServiceServer) RefreshIDToken(ctx context.Context, req *emptypb.Empty) (*authpb.RefreshIDTokenReponse, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, errors.New("metadata not found in context")
+	}
+
+	if tokens := md["authorization"]; len(tokens) > 0 {
+		idToken, apiErr := s.authRepo.RefreshIdToken(md["authorization"][0])
+		if apiErr != nil {
+			return nil, errors.New(apiErr.Message)
+		}
+
+		return &authpb.RefreshIDTokenReponse{
+			IdToken: *idToken,
+		}, nil
+	}
+
+	return nil, errors.New("invalid authorization")
+}
+
 func getDomainLink(ctx context.Context) string {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
