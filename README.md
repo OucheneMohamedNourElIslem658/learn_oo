@@ -31,6 +31,7 @@ go run main.go
 ```
 
 The server should now be running on `http://localhost:8080`.
+The gRPC server will be available on `tcp:50051`.
 
 ### Prerequisites
 
