@@ -238,3 +238,74 @@
         "message": "error message (contact me when you see one)"
     }
     ```
+
+## gRPC Service Documentation
+
+### Service: `AuthService`
+
+#### RegisterWithEmailAndPassword
+- **rpc:** `RegisterWithEmailAndPassword(RegisterRequest) returns (RegisterResponse)`
+- **Description:** Register a user with email and password.
+
+##### RegisterRequest
+| Field      | Type   | Required | Description                              |
+|------------|--------|----------|------------------------------------------|
+| full_name  | string | Yes      | Full name of the user (non-empty)        |
+| email      | string | Yes      | User email (e.g., `m_ouchene@estin.dz`)  |
+| password   | string | Yes      | Password (length > 4)                    |
+
+##### RegisterResponse
+| Field   | Type   | Description                |
+|---------|--------|---------------------------|
+| message | string | Registration status message|
+
+---
+
+#### LoginWithEmailAndPassword
+- **rpc:** `LoginWithEmailAndPassword(LoginRequest) returns (LoginResponse)`
+- **Description:** Login a user with email and password.
+
+##### LoginRequest
+| Field    | Type   | Required | Description                              |
+|----------|--------|----------|------------------------------------------|
+| email    | string | Yes      | User email (e.g., `m_ouchene@estin.dz`)  |
+| password | string | Yes      | Password (length > 4)                    |
+
+##### LoginResponse
+| Field         | Type   | Description                                 |
+|---------------|--------|---------------------------------------------|
+| id_token      | string | ID token for user authorization             |
+| refresh_token | string | Token to refresh the ID token               |
+
+---
+
+#### SendEmailVerificationLink
+- **rpc:** `SendEmailVerificationLink(EmailLinkRequest) returns (google.protobuf.Empty)`
+- **Description:** Send an email verification link to the user.
+
+##### EmailLinkRequest
+| Field | Type   | Required | Description                              |
+|-------|--------|----------|------------------------------------------|
+| email | string | Yes      | User email (e.g., `m_ouchene@estin.dz`)  |
+
+---
+
+#### SendPasswordResetLink
+- **rpc:** `SendPasswordResetLink(EmailLinkRequest) returns (google.protobuf.Empty)`
+- **Description:** Send a password reset link to the user.
+
+##### EmailLinkRequest
+| Field | Type   | Required | Description                              |
+|-------|--------|----------|------------------------------------------|
+| email | string | Yes      | User email (e.g., `m_ouchene@estin.dz`)  |
+
+---
+
+#### RefreshIDToken
+- **rpc:** `RefreshIDToken(google.protobuf.Empty) returns (RefreshIDTokenReponse)`
+- **Description:** Refresh the user's ID token.
+
+##### RefreshIDTokenReponse
+| Field    | Type   | Description                      |
+|----------|--------|----------------------------------|
+| id_token | string | New ID token for authorization   |

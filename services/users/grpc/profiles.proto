@@ -11,8 +11,6 @@ service ProfilesService {
   rpc UpgradeToAuthor(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc DowngradeToUser(google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc GetAuthor(GetAuthorRequest) returns (Author);
-  rpc AddAccomplishment(AddAccomplishmentRequest) returns (google.protobuf.Empty);
-  rpc DeleteAccomplishment(DeleteAccomplishmentRequest) returns (google.protobuf.Empty);
 }
 
 message Profile {
@@ -61,15 +59,5 @@ message File {
 }
 
 message GetAuthorRequest {
-  string id = 1;
-}
-
-message AddAccomplishmentRequest {
-  bytes file_content = 1;
-  string file_name = 2;
-  string content_type = 3;
-}
-
-message DeleteAccomplishmentRequest {
   string id = 1;
 }

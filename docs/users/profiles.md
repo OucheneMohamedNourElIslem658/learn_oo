@@ -432,3 +432,94 @@
         "error": "error message (contact me when you see one)"
     }
     ```
+
+## gRPC Service Documentation
+
+### Service: `ProfilesService`
+
+#### RPC Methods
+
+- **GetProfile**
+    - **Request:** `google.protobuf.Empty`
+    - **Response:** [`Profile`](#profile)
+    - **Description:** Retrieves the current user's profile.
+
+- **UpgradeToAuthor**
+    - **Request:** `google.protobuf.Empty`
+    - **Response:** `google.protobuf.Empty`
+    - **Description:** Upgrades the current user to an author.
+
+- **DowngradeToUser**
+    - **Request:** `google.protobuf.Empty`
+    - **Response:** `google.protobuf.Empty`
+    - **Description:** Downgrades the current author to a regular user.
+
+- **GetAuthor**
+    - **Request:** [`GetAuthorRequest`](#getauthorrequest)
+    - **Response:** [`Author`](#author)
+    - **Description:** Retrieves an author profile by ID.
+
+---
+
+### Messages
+
+#### Profile
+
+| Field           | Type      | Description                                      |
+|-----------------|-----------|--------------------------------------------------|
+| id              | string    | Unique identifier for the user                   |
+| full_name       | string    | Full name of the user                            |
+| email           | string    | Email address                                    |
+| email_verified  | bool      | Whether the email is verified                    |
+| image           | File      | (optional) Profile image                         |
+| author_profile  | Author    | (optional) Author profile if user is an author   |
+| courses         | Course[]  | List of courses associated with the user         |
+
+#### Author
+
+| Field           | Type      | Description                                      |
+|-----------------|-----------|--------------------------------------------------|
+| id              | string    | Unique identifier for the author                 |
+| bio             | string    | Author's biography                              |
+| balance         | int32     | Author's balance                                |
+| user_profile    | Profile   | Linked user profile                             |
+| accomplishments | File[]    | List of accomplishment files                    |
+
+#### Course
+
+| Field             | Type      | Description                                    |
+|-------------------|-----------|------------------------------------------------|
+| id                | uint64    | Course ID                                      |
+| title             | string    | Course title                                   |
+| description       | string    | Course description                             |
+| price             | double    | Course price                                   |
+| payment_price_id  | string    | Payment price ID                               |
+| payment_product_id| string    | Payment product ID                             |
+| language          | string    | Course language                                |
+| level             | string    | Course level                                   |
+| duration          | uint64    | Duration (in minutes or seconds)               |
+| rate              | double    | Average rating                                 |
+| raters_count      | uint64    | Number of raters                               |
+| is_completed      | bool      | Completion status                              |
+| video             | File      | Course video file                              |
+| image             | File      | Course image file                              |
+| author_id         | string    | Author ID                                      |
+| author            | Author    | Author details                                 |
+
+#### File
+
+| Field         | Type      | Description                                      |
+|---------------|-----------|--------------------------------------------------|
+| id            | uint64    | File ID                                          |
+| url           | string    | File URL                                         |
+| height        | int32     | Image height (if applicable)                     |
+| width         | int32     | Image width (if applicable)                      |
+| thumbnail_url | string    | (optional) Thumbnail URL                         |
+
+#### GetAuthorRequest
+
+| Field | Type   | Description                |
+|-------|--------|----------------------------|
+| id    | string | Author ID to retrieve      |
+
+---
