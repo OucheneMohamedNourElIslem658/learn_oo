@@ -24,9 +24,9 @@ const (
 
 type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	FullName      string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	FullName      *string                `protobuf:"bytes,1,req,name=full_name,json=fullName" json:"full_name,omitempty"`
+	Email         *string                `protobuf:"bytes,2,req,name=email" json:"email,omitempty"`
+	Password      *string                `protobuf:"bytes,3,req,name=password" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -62,29 +62,29 @@ func (*RegisterRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *RegisterRequest) GetFullName() string {
-	if x != nil {
-		return x.FullName
+	if x != nil && x.FullName != nil {
+		return *x.FullName
 	}
 	return ""
 }
 
 func (x *RegisterRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
+	if x != nil && x.Email != nil {
+		return *x.Email
 	}
 	return ""
 }
 
 func (x *RegisterRequest) GetPassword() string {
-	if x != nil {
-		return x.Password
+	if x != nil && x.Password != nil {
+		return *x.Password
 	}
 	return ""
 }
 
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Message       *string                `protobuf:"bytes,1,req,name=message" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -120,16 +120,16 @@ func (*RegisterResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *RegisterResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
+	if x != nil && x.Message != nil {
+		return *x.Message
 	}
 	return ""
 }
 
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Email         *string                `protobuf:"bytes,1,req,name=email" json:"email,omitempty"`
+	Password      *string                `protobuf:"bytes,2,req,name=password" json:"password,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -165,23 +165,23 @@ func (*LoginRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *LoginRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
+	if x != nil && x.Email != nil {
+		return *x.Email
 	}
 	return ""
 }
 
 func (x *LoginRequest) GetPassword() string {
-	if x != nil {
-		return x.Password
+	if x != nil && x.Password != nil {
+		return *x.Password
 	}
 	return ""
 }
 
 type LoginResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	IdToken       string                 `protobuf:"bytes,1,opt,name=id_token,json=idToken,proto3" json:"id_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	IdToken       *string                `protobuf:"bytes,1,req,name=id_token,json=idToken" json:"id_token,omitempty"`
+	RefreshToken  *string                `protobuf:"bytes,2,req,name=refresh_token,json=refreshToken" json:"refresh_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -217,22 +217,22 @@ func (*LoginResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *LoginResponse) GetIdToken() string {
-	if x != nil {
-		return x.IdToken
+	if x != nil && x.IdToken != nil {
+		return *x.IdToken
 	}
 	return ""
 }
 
 func (x *LoginResponse) GetRefreshToken() string {
-	if x != nil {
-		return x.RefreshToken
+	if x != nil && x.RefreshToken != nil {
+		return *x.RefreshToken
 	}
 	return ""
 }
 
 type EmailLinkRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Email         *string                `protobuf:"bytes,1,req,name=email" json:"email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -268,15 +268,15 @@ func (*EmailLinkRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *EmailLinkRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
+	if x != nil && x.Email != nil {
+		return *x.Email
 	}
 	return ""
 }
 
 type RefreshIDTokenReponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	IdToken       string                 `protobuf:"bytes,1,opt,name=id_token,json=idToken,proto3" json:"id_token,omitempty"`
+	IdToken       *string                `protobuf:"bytes,1,req,name=id_token,json=idToken" json:"id_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -312,8 +312,8 @@ func (*RefreshIDTokenReponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *RefreshIDTokenReponse) GetIdToken() string {
-	if x != nil {
-		return x.IdToken
+	if x != nil && x.IdToken != nil {
+		return *x.IdToken
 	}
 	return ""
 }
@@ -325,27 +325,27 @@ const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"auth.proto\x12\x04auth\x1a\x1bgoogle/protobuf/empty.proto\"`\n" +
 	"\x0fRegisterRequest\x12\x1b\n" +
-	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\",\n" +
+	"\tfull_name\x18\x01 \x02(\tR\bfullName\x12\x14\n" +
+	"\x05email\x18\x02 \x02(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x03 \x02(\tR\bpassword\",\n" +
 	"\x10RegisterResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"@\n" +
+	"\amessage\x18\x01 \x02(\tR\amessage\"@\n" +
 	"\fLoginRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"O\n" +
+	"\x05email\x18\x01 \x02(\tR\x05email\x12\x1a\n" +
+	"\bpassword\x18\x02 \x02(\tR\bpassword\"O\n" +
 	"\rLoginResponse\x12\x19\n" +
-	"\bid_token\x18\x01 \x01(\tR\aidToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"(\n" +
+	"\bid_token\x18\x01 \x02(\tR\aidToken\x12#\n" +
+	"\rrefresh_token\x18\x02 \x02(\tR\frefreshToken\"(\n" +
 	"\x10EmailLinkRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"2\n" +
+	"\x05email\x18\x01 \x02(\tR\x05email\"2\n" +
 	"\x15RefreshIDTokenReponse\x12\x19\n" +
-	"\bid_token\x18\x01 \x01(\tR\aidToken2\xff\x02\n" +
+	"\bid_token\x18\x01 \x02(\tR\aidToken2\xff\x02\n" +
 	"\vAuthService\x12M\n" +
 	"\x1cRegisterWithEmailAndPassword\x12\x15.auth.RegisterRequest\x1a\x16.auth.RegisterResponse\x12D\n" +
 	"\x19LoginWithEmailAndPassword\x12\x12.auth.LoginRequest\x1a\x13.auth.LoginResponse\x12K\n" +
 	"\x19SendEmailVerificationLink\x12\x16.auth.EmailLinkRequest\x1a\x16.google.protobuf.Empty\x12G\n" +
 	"\x15SendPasswordResetLink\x12\x16.auth.EmailLinkRequest\x1a\x16.google.protobuf.Empty\x12E\n" +
-	"\x0eRefreshIDToken\x12\x16.google.protobuf.Empty\x1a\x1b.auth.RefreshIDTokenReponseB\x03Z\x01.b\x06proto3"
+	"\x0eRefreshIDToken\x12\x16.google.protobuf.Empty\x1a\x1b.auth.RefreshIDTokenReponseB\x03Z\x01."
 
 var (
 	file_auth_proto_rawDescOnce sync.Once

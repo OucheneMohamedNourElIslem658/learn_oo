@@ -26,34 +26,35 @@ func NewAuthServiceServer() *AuthServiceServer {
 }
 
 func (s *AuthServiceServer) RegisterWithEmailAndPassword(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
-	apiErr := s.authRepo.RegisterWithEmailAndPassword(req.FullName, req.Email, req.Password)
+	apiErr := s.authRepo.RegisterWithEmailAndPassword(*req.FullName, *req.Email, *req.Password)
 
 	if apiErr != nil {
 		return nil, errors.New(apiErr.Message)
 	}
 
+	msg := "your account has been created, please verify your email to have full access"
 	return &authpb.RegisterResponse{
-		Message: "email verification link has been sent",
+		Message: &msg,
 	}, nil
 }
 
 func (s *AuthServiceServer) LoginWithEmailAndPassword(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-	idToken, refreshToken, apiErr := s.authRepo.LoginWithEmailAndPassword(req.Email, req.Password)
+	idToken, refreshToken, apiErr := s.authRepo.LoginWithEmailAndPassword(*req.Email, *req.Password)
 
 	if apiErr != nil {
 		return nil, errors.New(apiErr.Message)
 	}
 
 	return &authpb.LoginResponse{
-		IdToken:      *idToken,
-		RefreshToken: *refreshToken,
+		IdToken:      idToken,
+		RefreshToken: refreshToken,
 	}, nil
 }
 
 func (s *AuthServiceServer) SendEmailVerificationLink(ctx context.Context, req *authpb.EmailLinkRequest) (*emptypb.Empty, error) {
 	link := getDomainLink(ctx) + "/api/v1/users/auth/serve-email-verification-template"
 
-	apiErr := s.authRepo.SendEmailVerificationLink(req.Email, link)
+	apiErr := s.authRepo.SendEmailVerificationLink(*req.Email, link)
 
 	if apiErr != nil {
 		return nil, errors.New(apiErr.Message)
@@ -65,7 +66,7 @@ func (s *AuthServiceServer) SendEmailVerificationLink(ctx context.Context, req *
 func (s *AuthServiceServer) SendPasswordResetLink(ctx context.Context, req *authpb.EmailLinkRequest) (*emptypb.Empty, error) {
 	link := getDomainLink(ctx) + "/api/v1/users/auth/serve-reset-password-form"
 
-	apiErr := s.authRepo.SendPasswordResetLink(req.Email, link)
+	apiErr := s.authRepo.SendPasswordResetLink(*req.Email, link)
 
 	if apiErr != nil {
 		return nil, errors.New(apiErr.Message)
@@ -87,7 +88,7 @@ func (s *AuthServiceServer) RefreshIDToken(ctx context.Context, req *emptypb.Emp
 		}
 
 		return &authpb.RefreshIDTokenReponse{
-			IdToken: *idToken,
+			IdToken: idToken,
 		}, nil
 	}
 

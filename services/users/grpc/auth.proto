@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 package auth;
 
@@ -15,29 +15,29 @@ service AuthService {
 }
 
 message RegisterRequest {
-  string full_name = 1;
-  string email = 2;
-  string password = 3;
+  required string full_name = 1;
+  required string email = 2;
+  required string password = 3;
 }
 
 message RegisterResponse {
-  string message = 1;
+  required string message = 1;
 }
 
 message LoginRequest {
-  string email = 1;
-  string password = 2;
+  required string email = 1;
+  required string password = 2;
 }
 
 message LoginResponse {
-  string id_token = 1;
-  string refresh_token = 2;
+  required string id_token = 1;
+  required string refresh_token = 2;
 }
 
 message EmailLinkRequest {
-  string email = 1;
+  required string email = 1;
 }
 
 message RefreshIDTokenReponse {
-  string id_token = 1;
+  required string id_token = 1;
 }

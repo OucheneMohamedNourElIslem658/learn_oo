@@ -474,110 +474,6 @@ func (x *GetAuthorRequest) GetId() string {
 	return ""
 }
 
-type AddAccomplishmentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileContent   []byte                 `protobuf:"bytes,1,opt,name=file_content,json=fileContent,proto3" json:"file_content,omitempty"`
-	FileName      string                 `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	ContentType   string                 `protobuf:"bytes,3,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AddAccomplishmentRequest) Reset() {
-	*x = AddAccomplishmentRequest{}
-	mi := &file_profiles_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AddAccomplishmentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AddAccomplishmentRequest) ProtoMessage() {}
-
-func (x *AddAccomplishmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profiles_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AddAccomplishmentRequest.ProtoReflect.Descriptor instead.
-func (*AddAccomplishmentRequest) Descriptor() ([]byte, []int) {
-	return file_profiles_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *AddAccomplishmentRequest) GetFileContent() []byte {
-	if x != nil {
-		return x.FileContent
-	}
-	return nil
-}
-
-func (x *AddAccomplishmentRequest) GetFileName() string {
-	if x != nil {
-		return x.FileName
-	}
-	return ""
-}
-
-func (x *AddAccomplishmentRequest) GetContentType() string {
-	if x != nil {
-		return x.ContentType
-	}
-	return ""
-}
-
-type DeleteAccomplishmentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteAccomplishmentRequest) Reset() {
-	*x = DeleteAccomplishmentRequest{}
-	mi := &file_profiles_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteAccomplishmentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteAccomplishmentRequest) ProtoMessage() {}
-
-func (x *DeleteAccomplishmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profiles_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteAccomplishmentRequest.ProtoReflect.Descriptor instead.
-func (*DeleteAccomplishmentRequest) Descriptor() ([]byte, []int) {
-	return file_profiles_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *DeleteAccomplishmentRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
 var File_profiles_proto protoreflect.FileDescriptor
 
 const file_profiles_proto_rawDesc = "" +
@@ -629,21 +525,13 @@ const file_profiles_proto_rawDesc = "" +
 	"\rthumbnail_url\x18\x06 \x01(\tH\x00R\fthumbnailUrl\x88\x01\x01B\x10\n" +
 	"\x0e_thumbnail_url\"\"\n" +
 	"\x10GetAuthorRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"}\n" +
-	"\x18AddAccomplishmentRequest\x12!\n" +
-	"\ffile_content\x18\x01 \x01(\fR\vfileContent\x12\x1b\n" +
-	"\tfile_name\x18\x02 \x01(\tR\bfileName\x12!\n" +
-	"\fcontent_type\x18\x03 \x01(\tR\vcontentType\"-\n" +
-	"\x1bDeleteAccomplishmentRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id2\x9f\x03\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\xff\x01\n" +
 	"\x0fProfilesService\x123\n" +
 	"\n" +
 	"GetProfile\x12\x16.google.protobuf.Empty\x1a\r.auth.Profile\x12A\n" +
 	"\x0fUpgradeToAuthor\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12A\n" +
 	"\x0fDowngradeToUser\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x121\n" +
-	"\tGetAuthor\x12\x16.auth.GetAuthorRequest\x1a\f.auth.Author\x12K\n" +
-	"\x11AddAccomplishment\x12\x1e.auth.AddAccomplishmentRequest\x1a\x16.google.protobuf.Empty\x12Q\n" +
-	"\x14DeleteAccomplishment\x12!.auth.DeleteAccomplishmentRequest\x1a\x16.google.protobuf.EmptyB\x03Z\x01.b\x06proto3"
+	"\tGetAuthor\x12\x16.auth.GetAuthorRequest\x1a\f.auth.AuthorB\x03Z\x01.b\x06proto3"
 
 var (
 	file_profiles_proto_rawDescOnce sync.Once
@@ -657,16 +545,14 @@ func file_profiles_proto_rawDescGZIP() []byte {
 	return file_profiles_proto_rawDescData
 }
 
-var file_profiles_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_profiles_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_profiles_proto_goTypes = []any{
-	(*Profile)(nil),                     // 0: auth.Profile
-	(*Author)(nil),                      // 1: auth.Author
-	(*Course)(nil),                      // 2: auth.Course
-	(*File)(nil),                        // 3: auth.File
-	(*GetAuthorRequest)(nil),            // 4: auth.GetAuthorRequest
-	(*AddAccomplishmentRequest)(nil),    // 5: auth.AddAccomplishmentRequest
-	(*DeleteAccomplishmentRequest)(nil), // 6: auth.DeleteAccomplishmentRequest
-	(*emptypb.Empty)(nil),               // 7: google.protobuf.Empty
+	(*Profile)(nil),          // 0: auth.Profile
+	(*Author)(nil),           // 1: auth.Author
+	(*Course)(nil),           // 2: auth.Course
+	(*File)(nil),             // 3: auth.File
+	(*GetAuthorRequest)(nil), // 4: auth.GetAuthorRequest
+	(*emptypb.Empty)(nil),    // 5: google.protobuf.Empty
 }
 var file_profiles_proto_depIdxs = []int32{
 	3,  // 0: auth.Profile.image:type_name -> auth.File
@@ -677,20 +563,16 @@ var file_profiles_proto_depIdxs = []int32{
 	3,  // 5: auth.Course.video:type_name -> auth.File
 	3,  // 6: auth.Course.image:type_name -> auth.File
 	1,  // 7: auth.Course.author:type_name -> auth.Author
-	7,  // 8: auth.ProfilesService.GetProfile:input_type -> google.protobuf.Empty
-	7,  // 9: auth.ProfilesService.UpgradeToAuthor:input_type -> google.protobuf.Empty
-	7,  // 10: auth.ProfilesService.DowngradeToUser:input_type -> google.protobuf.Empty
+	5,  // 8: auth.ProfilesService.GetProfile:input_type -> google.protobuf.Empty
+	5,  // 9: auth.ProfilesService.UpgradeToAuthor:input_type -> google.protobuf.Empty
+	5,  // 10: auth.ProfilesService.DowngradeToUser:input_type -> google.protobuf.Empty
 	4,  // 11: auth.ProfilesService.GetAuthor:input_type -> auth.GetAuthorRequest
-	5,  // 12: auth.ProfilesService.AddAccomplishment:input_type -> auth.AddAccomplishmentRequest
-	6,  // 13: auth.ProfilesService.DeleteAccomplishment:input_type -> auth.DeleteAccomplishmentRequest
-	0,  // 14: auth.ProfilesService.GetProfile:output_type -> auth.Profile
-	7,  // 15: auth.ProfilesService.UpgradeToAuthor:output_type -> google.protobuf.Empty
-	7,  // 16: auth.ProfilesService.DowngradeToUser:output_type -> google.protobuf.Empty
-	1,  // 17: auth.ProfilesService.GetAuthor:output_type -> auth.Author
-	7,  // 18: auth.ProfilesService.AddAccomplishment:output_type -> google.protobuf.Empty
-	7,  // 19: auth.ProfilesService.DeleteAccomplishment:output_type -> google.protobuf.Empty
-	14, // [14:20] is the sub-list for method output_type
-	8,  // [8:14] is the sub-list for method input_type
+	0,  // 12: auth.ProfilesService.GetProfile:output_type -> auth.Profile
+	5,  // 13: auth.ProfilesService.UpgradeToAuthor:output_type -> google.protobuf.Empty
+	5,  // 14: auth.ProfilesService.DowngradeToUser:output_type -> google.protobuf.Empty
+	1,  // 15: auth.ProfilesService.GetAuthor:output_type -> auth.Author
+	12, // [12:16] is the sub-list for method output_type
+	8,  // [8:12] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
@@ -709,7 +591,7 @@ func file_profiles_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profiles_proto_rawDesc), len(file_profiles_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

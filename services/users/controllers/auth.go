@@ -50,7 +50,7 @@ func (authcontroller *AuthController) RegisterWithEmailAndPassword(ctx *gin.Cont
 		})
 	} else {
 		ctx.JSON(http.StatusCreated, gin.H{
-			"message": "email verification has been sent",
+			"message": "your account has been created, please verify your email to have full access",
 		})
 	}
 }
